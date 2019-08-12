@@ -1,0 +1,33 @@
+{% load static %}
+{% load period_tags %}
+<!doctype html>
+<html>
+	<head>
+		<title>Justificatif de paiement</title>
+		<meta charset="utf-8" />
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
+	</head>
+	<body>
+		<div class="container">
+			<div class="row">
+				<div class="col-xs-8">
+					<p><strong>BDE-UTC Pic'Asso</strong><br />
+					Rue Roger Coutollenc<br />
+					60200 COMPIEGNE<br />
+					<p><strong>Objet : Carte Etudiante perdue : {{ mail }}</strong><br />
+					<p>Tu as perdu ta carte Etudiante au Pic'Asso, Pour la récupérer, viens voir les cartes perdues au comptoir vieux fou<br /></p>
+				</div>
+			</div>
+		</div>
+	</body>
+    <link href='https://fonts.googleapis.com/css?family=Roboto+Slab:400,300,700' rel='stylesheet' type='text/css'>
+    <style>
+        body {
+            font-family: 'Roboto Slab', serif;
+            font-weight: 300;
+        }
+        #picassoinfo {
+            font-weight: 300;
+        }
+    </style>
+</html>

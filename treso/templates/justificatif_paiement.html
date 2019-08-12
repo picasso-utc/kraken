@@ -1,0 +1,98 @@
+{% load static %}
+{% load period_tags %}
+<!doctype html>
+<html>
+	<head>
+		<title>Justificatif de paiement</title>
+		<meta charset="utf-8" />
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
+	</head>
+	<body>
+		<div class="container">
+			<div class="row">
+				<div class="col-xs-8">
+					<p><strong>BDE-UTC Pic'Asso</strong><br />
+					Rue Roger Coutollenc<br />
+					60200 COMPIEGNE<br />
+					Siret 397776 725 00012</p>
+					<p><strong>Objet : Justificatif de paiement</strong><br />
+                    Destinataire : {{ perm.nom | upper }}<br />
+					Responsable du partenariat : {{ perm.nom_resp }} {% if perm.role %}({{ perm.role }}){% endif %}<br />
+					Adresse mail du responsable : {{ perm.mail_resp }}<br />
+					Téléphone du responsable : {{ perm.tel_resp }}</p>
+					<p>Date de la permanence : {{ perm.date | date:'d/m/Y' }}<br />
+					Période : {{ perm.periode | period }}</p>
+				</div>
+				{% if not mail %}<div class="col-xs-4">
+					<img class="pull-right" src="{% static 'logo_monochrome.png' %}" />
+				</div>{% endif %}
+			</div>
+			<div class="row" style="margin-top:15px">
+				<div class="col-md-12">
+					<table class="table table-striped table-bordered">
+						<thead>
+							<tr>
+								<th class="col-xs-7">Article</th>
+								<th>Prix TTC</th>
+								<th>Ventes</th>
+								<th>Total</th>
+							</tr>
+						</thead>
+						{% for article in articles %}
+                        <tr>
+							<td class="col-xs-7">{{ article.nom }}</td>
+							<td>{{ article.prix }}€</td>
+							<td>{{ article.ventes }}</td>
+							<td>{{ article.total }}€</td>
+						</tr>
+                        {% endfor %}
+					</table>
+				</div>
+			</div>
+            <div class="row">
+                <div class="col-xs-5 col-xs-offset-7">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Montant</th>
+                            </tr>
+                        </thead>
+                        <tr>
+                            <td>Total HT</td>
+                            <td>{{ total_ht }}€</td>
+                        </tr>
+                        {% for amount in tva_amounts %}
+                        <tr>
+                            <td>Montant TVA {{ amount.tva }}%</td>
+                            <td>{{ amount.amount }}€</td>
+                        </tr>
+                        {% endfor %}
+                        <tr>
+                            <td><strong>Montant TTC</strong></td>
+                            <td><strong>{{ total_ttc }}€</strong></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+			{% if not mail %}<div class="row">
+				<div class="col-xs-4 col-xs-offset-2">
+					<p class="pull-right">Signature du représentant du BDE-UTC Pic'Asso</p>
+				</div>
+				<div class="col-xs-4">
+					<p class="pull-right">Signature du représentant du partenaire</p>
+				</div>
+			</div>{% endif %}
+		</div>
+	</body>
+    <link href='https://fonts.googleapis.com/css?family=Roboto+Slab:400,300,700' rel='stylesheet' type='text/css'>
+    <style>
+        body {
+            font-family: 'Roboto Slab', serif;
+            font-weight: 300;
+        }
+        #picassoinfo {
+            font-weight: 300;
+        }
+    </style>
+</html>
