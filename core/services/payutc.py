@@ -312,6 +312,16 @@ class PayutcClient:
 		return self.request('post', 'WEBSALE/getTransactionInfo', data, **kwargs, api='services')
 
 
+
+	# ============================================================
+	# 			USERRIGHT
+	# ============================================================
+
+	def auto_complete(self, data):
+		data = {'queryString': data['queryString']}
+		return self.request('post', 'USERRIGHT/userAutocomplete', data, api='services')
+
+
 	# ============================================================
 	# 			ARTICLES
 	# ============================================================	
