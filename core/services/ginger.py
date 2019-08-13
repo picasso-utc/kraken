@@ -46,8 +46,8 @@ class GingerClient():
     def _buildResponse(self, api_response):
         """Fonction pour construire une réponse à une requête API"""
 
-        if api_response.status_code != 200:
-            raise GingerException(api_response.status_code, api_response.json())
+        # if api_response.status_code != 200:
+            # raise GingerException(api_response.status_code, api_response.json())
 
         response = {
             'data' : api_response.json(),
