@@ -6,6 +6,7 @@ from perm import views as perm_views
 router = routers.DefaultRouter()
 
 router.register('perms', perm_views.PermViewSet, 'perm')
+router.register('users', core_views.UserViewSet, 'perm')
 router.register('creneau', perm_views.CreneauViewSet)
 router.register('signatures', perm_views.SignatureViewSet, 'signature')
 router.register('facture/categories', treso_views.CategorieFactureRecueViewSet)
