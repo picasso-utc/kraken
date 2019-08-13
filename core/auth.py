@@ -28,6 +28,7 @@ def _set_session_information(request, username, sessionid):
     ginger = GingerClient()
     ginger_response = ginger.get_user_info(username)
     request.session['user'] = ginger_response['data']
+    request.session.set_expiry(3600) 
     return request
 
 def _get_params(request, format=None):
@@ -47,6 +48,7 @@ def login_badge(request, format=None):
     p = PayutcClient()
     resp = p.process_request("login", "badge", params = {"badge_id": badge_id, "pin": pin})
     _set_session_information(request, resp['username'], resp['sessionid'])
+    request.session.set_expiry(3600) 
 
     return JsonResponse(resp, status=200)
 
