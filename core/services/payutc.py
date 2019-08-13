@@ -9,7 +9,7 @@ from rest_framework.exceptions import APIException, NotFound
 DEFAULT_CHUNK_SIZE = 5000
 ALLOWED_ACTIONS_MAP = {
 	'get': 		'get',
-'find': 		'get',
+	'find':		'get',
 	'create': 	'post',
 	'update': 	'put',
 	'delete': 	'delete',
@@ -21,7 +21,7 @@ BASE_CONFIG = {
 	'system_id': 		PAYUTC_SYSTEM_ID,
 	'fun_id': 			PAYUTC_FUN_ID,
 	# Login credentials
-	'session_id': 		None,
+	'sessionid': 		None,
 	'login_method': 	None,
 	'badge_id': 		None,
 	'badge_pin': 		None,
@@ -59,11 +59,10 @@ class PayutcClient:
 	The Payutc Client for Weezevent
 	"""
 
-	def __init__(self, config: dict={}):
+	def __init__(self, sessionid=None, config: dict={}):
 		self.config = { **BASE_CONFIG, **config }
-		self.last = {}
-		if self.config['login_method']:
-			self.login()
+		self.config['sessionid'] = sessionid
+
 
 	# ============================================================
 	# 			POINT D'ENTREE
@@ -107,7 +106,7 @@ class PayutcClient:
 
 	def request(self, method: str, uri: str, data: dict={}, **kwargs):
 		# Get all request configuration
-		print("1")
+
 		api = kwargs.get('api', 'resources')
 		url = f"{self.config['base_url']}/{api}/{uri}"
 		request_config = {
@@ -116,7 +115,7 @@ class PayutcClient:
 				'nemopay-version': self.config['nemopay_version'],
 			}, 
 			'params': self.get_config('app_key', 'system_id'),
-			'cookies': { 'sessionid': self.config.get('session_id') },
+			'cookies': { 'sessionid': self.config.get('sessionid') },
 		}
 		for kw in ('headers', 'params', 'cookies'):
 			if kw in kwargs:
@@ -130,15 +129,12 @@ class PayutcClient:
 			request_config['json'] = data
 		if 'request_config' in kwargs:
 			request_config.update(kwargs['request_config'])
-		print("2")
+
 		# Make the request
+		print(request_config)
 		
 		request = getattr(requests, method)
-		print(request)
-		print(url)
-		# print(**request_config)
 		response = request(url, **request_config)
-		print(response.json())
 
 		# Keep details if needed
 		request_config['url'] = url
@@ -158,7 +154,6 @@ class PayutcClient:
 			# raise APIException()
 			raise PayutcException(message, response, request_config)
 		# Or simply return the response	
-		print(response)
 		return response	
 
 	def pre_built_request(self, *pre_args, **pre_kwargs):
