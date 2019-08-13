@@ -28,6 +28,7 @@ urlpatterns = [
 	# Include other application urls
 	path('api/perms/', include('perm.urls')),
 	path('api/treso/', include('treso.urls')),
+	path('api/payutc/', include('payutc.urls')),
 
 	# Include routers
 	path('api/', include(router.urls)),
