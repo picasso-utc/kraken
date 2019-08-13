@@ -15,12 +15,12 @@ class UserRight(models.Model):
     de ceux qui tous les droits (type, l'équipe info).
     """
     USERRIGHT_ALL = 'A'
-    USERRIGHT_ARTICLES = 'P'
+    USERRIGHT_MEMBER = 'M'
     USERRIGHT_NONE = 'N'
 
     USERRIGHT_CHOICES = (
         (USERRIGHT_ALL, 'Accès total'),
-        (USERRIGHT_ARTICLES, 'Accès articles'),
+        (USERRIGHT_MEMBER, 'Accès membre'),
         (USERRIGHT_NONE, 'Accès interdit'),
     )
 
