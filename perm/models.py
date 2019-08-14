@@ -89,7 +89,7 @@ class Creneau(models.Model):
     montantTTCMaxAutorise = models.FloatField(null=True, default=None)
 
     def __str__(self):
-        return f"{self.date} : {self.creneau}"
+        return f"{self.date}:{self.creneau}"
 
 
 class Article(core_models.PricedModel):
