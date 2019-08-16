@@ -24,6 +24,7 @@ urlpatterns = [
 	path('api/auth/logout', core_views.logout, name='auth.logout'),
 	
 	path('api/admin/settings', core_views.admin_settings),
+	path('api/current/semester', core_views.current_semester),
 
 	# Include other application urls
 	path('api/perms/', include('perm.urls')),

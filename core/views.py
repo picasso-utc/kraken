@@ -1,5 +1,5 @@
 from rest_framework import viewsets, mixins
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, renderer_classes
 from django.http import JsonResponse
 from core import serializers as core_serializers
 from core import models as core_models
@@ -8,6 +8,10 @@ from core.permissions import IsAdminUser, IsAuthenticatedUser, IsMemberUser
 from constance import config
 from core.settings import CONSTANCE_CONFIG
 from django.db.models import Q
+from rest_framework.renderers import JSONRenderer
+from rest_framework.response import Response
+
+
 
 from core.services import ginger as g
 
@@ -109,7 +113,6 @@ def get_constance_params():
 	return [{'key': key, 'value': config.__getattr__(key)} for key in CONSTANCE_CONFIG.keys()]
 
 
-# ['GET', 'POST']
 @api_view(['GET', 'POST'])
 @permission_classes((IsAdminUser, ))
 def admin_settings(request, format=None):
@@ -124,3 +127,15 @@ def admin_settings(request, format=None):
 			for param in request.data['settings']:
 				config.__setattr__(param['key'], param['value'])
 		return JsonResponse({'settings': get_constance_params()})
+
+
+
+@api_view(['GET'])
+@renderer_classes((JSONRenderer, ))
+@permission_classes((IsAdminUser, ))
+def current_semester(request):
+    """
+    Endpoint qui renvoie la somme des factures payées du semestre (émises et reçues)
+    """
+    semester = core_models.Semestre.objects.get(pk=config.SEMESTER)
+    return JsonResponse(core_serializers.SemestreSerializer(semester).data)
