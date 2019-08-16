@@ -64,6 +64,8 @@ class Semestre(models.Model):
 
     annee = models.IntegerField()
     periode = models.CharField(max_length=1, choices=SEMESTRE_CHOICES)
+    start_date = models.DateField()
+    end_date = models.DateField()
     # solde_debut = models.IntegerField(default=0)
 
     def __str__(self):
