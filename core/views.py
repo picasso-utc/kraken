@@ -109,7 +109,8 @@ def get_constance_params():
 	return [{'key': key, 'value': config.__getattr__(key)} for key in CONSTANCE_CONFIG.keys()]
 
 
-['GET', 'POST']
+# ['GET', 'POST']
+@api_view(['GET', 'POST'])
 @permission_classes((IsAdminUser, ))
 def admin_settings(request, format=None):
 	"""
@@ -119,14 +120,7 @@ def admin_settings(request, format=None):
 		return JsonResponse({'settings': get_constance_params()})
 
 	elif request.method == 'POST':
-		for param in request.data:
-			config.__setattr__(param['key'], param['value'])
+		if 'settings' in request.data:
+			for param in request.data['settings']:
+				config.__setattr__(param['key'], param['value'])
 		return JsonResponse({'settings': get_constance_params()})
-
-
-# @api_view(['POST'])
-# @permission_classes((IsAdminUser, ))
-# def admin_settings(request, format=None):
-# 		for param in request.data:
-# 			config.__setattr__(param['name'], param['val'])
-# 		return JsonResponse({'settings': get_constance_params()})
