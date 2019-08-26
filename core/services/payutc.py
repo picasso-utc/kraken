@@ -317,6 +317,12 @@ class PayutcClient:
 		return self.request('post', 'USERRIGHT/userAutocomplete', data, api='services')
 
 
+	def get_sales(self, data):
+		fun_id = self.get_config('fun_id')
+		data = {'start': data['start'], 'end': data['end'], 'row_count': data['row_count'], 'fun_id': self.config['fun_id']}
+		return self.request('post', 'GESSALES/getSales', data, api='services')
+
+
 	# ============================================================
 	# 			ARTICLES
 	# ============================================================	
