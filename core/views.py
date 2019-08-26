@@ -83,8 +83,7 @@ class UserViewSet(mixins.ListModelMixin,
 	def create(self, request):
 		serializer = core_serializers.UserRightSerializer(request.data)
 		user = serializer.data
-		print(user)
-		# pass
+
 		new_user, created = core_models.UserRight.objects.update_or_create(
 			login=user['login'],
 	        defaults={'right': user['right']}
