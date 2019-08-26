@@ -48,7 +48,8 @@ INSTALLED_APPS = [
 	# Applications
 	'core',
 	'perm',
-	'treso'
+	'treso',
+	'payutc',
 ]
 
 # AUTH_USER_MODEL = 'core.User'
