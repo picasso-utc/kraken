@@ -110,7 +110,8 @@ class UserViewSet(mixins.ListModelMixin,
 
 
 def get_constance_params():
-	return [{'key': key, 'value': config.__getattr__(key)} for key in CONSTANCE_CONFIG.keys()]
+	# return [{'key': key, 'value': config.__getattr__(key)} for key in CONSTANCE_CONFIG.keys()]
+	return {key: config.__getattr__(key) for key in CONSTANCE_CONFIG.keys()}
 
 
 @api_view(['GET', 'POST'])
@@ -124,8 +125,8 @@ def admin_settings(request, format=None):
 
 	elif request.method == 'POST':
 		if 'settings' in request.data:
-			for param in request.data['settings']:
-				config.__setattr__(param['key'], param['value'])
+			for key, value in request.data['settings'].items():
+				config.__setattr__(key, value)
 		return JsonResponse({'settings': get_constance_params()})
 
 
