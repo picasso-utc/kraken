@@ -7,4 +7,6 @@ urlpatterns = [
 
 	path('user/autocomplete/<str:query>', payutc_views.user_autocomplete),
 
+	path('public/articles', payutc_views.get_sorted_articles),
+
 ]

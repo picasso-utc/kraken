@@ -93,3 +93,43 @@ def user_autocomplete(request, query, format=None):
 	return JsonResponse({'users': p.auto_complete(data)})
 
 	# return auth_view.login_badge(request, format)
+
+
+@api_view(['GET'])
+def get_sorted_articles(request, format=None):
+	p = PayutcClient()
+	articles = p.get_articles()
+
+	sorted_articles = {
+		3: 	('softs', []),
+		11: ('bieresPression', []),
+		10: ('bieresBouteille', []),
+		9: 	('snacksSucres', []),
+		17: ('snacksSales', []),
+		184:('glace', []),
+		221:('petitDej', []),
+		199:('pampryls', []),
+	}
+
+	for article in articles :
+
+		# IDs des catégories
+		# ==================
+		# Softs : 3
+		# Bières pression : 11
+		# Bières bouteille : 10
+		# Snacks sucrés : 9
+		# Snacks salés : 17
+		# Glacé : 184
+		# Petit dej : 221
+		# Pampryls : 199
+
+		if (article["active"]) :
+			bin = sorted_articles.get(article["categorie_id"])
+			if bin is not None:
+				bin[1].append({
+					'name' : article["name"],
+					'price' : article["price"]
+				})
+
+	return JsonResponse(dict(sorted_articles.values()), status=200)
