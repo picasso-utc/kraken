@@ -18,7 +18,7 @@ class GoodiesWinnerViewSet(mixins.ListModelMixin,
 					mixins.UpdateModelMixin,
                     viewsets.GenericViewSet):
 
-	permission_classes = (IsAdminUser,)
+	permission_classes = (IsMemberUserOrReadOnly,)
 
 	def list(self, request):
 		queryset = payutc_models.GoodiesWinner.objects.all()
