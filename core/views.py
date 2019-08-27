@@ -10,6 +10,7 @@ from core.settings import CONSTANCE_CONFIG
 from django.db.models import Q
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
+from core.services.ginger import GingerClient
 
 
 
@@ -43,6 +44,18 @@ def logout(request, format=None):
 @permission_classes((IsAuthenticatedUser, ))
 def me(request, format=None):
 	return auth_view.me(request, format)
+
+
+@api_view(['GET'])
+@permission_classes((IsAdminUser, ))
+def user_information(request, format=None):
+	login = request.GET.get('login', '')
+	g = GingerClient()
+	user = g.get_user_info(login)
+	if user['status'] == 200:
+		return JsonResponse(user['data'])
+	return JsonResponse({})
+	
 
 
 # ViewSets
