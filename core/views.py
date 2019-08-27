@@ -143,12 +143,19 @@ def admin_settings(request, format=None):
 
 
 
-@api_view(['GET'])
-@renderer_classes((JSONRenderer, ))
+@api_view(['GET', 'POST'])
+# @renderer_classes((JSONRenderer, ))
 @permission_classes((IsAdminUser, ))
 def current_semester(request):
-    """
-    Endpoint qui renvoie la somme des factures payées du semestre (émises et reçues)
-    """
-    semester = core_models.Semestre.objects.get(pk=config.SEMESTER)
-    return JsonResponse(core_serializers.SemestreSerializer(semester).data)
+
+	if request.method == 'GET':
+		print(config.SEMESTER)
+		semester = core_models.Semestre.objects.get(pk=config.SEMESTER)
+		return JsonResponse(core_serializers.SemestreSerializer(semester).data)
+
+	elif request.method == 'POST':
+		if 'new_current_semester' in request.data:
+			semester_id = request.data['new_current_semester']
+			config.__setattr__('SEMESTER', semester_id)
+			semester = core_models.Semestre.objects.get(pk=semester_id)
+			return JsonResponse(core_serializers.SemestreSerializer(semester).data)
