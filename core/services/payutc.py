@@ -333,4 +333,8 @@ class PayutcClient:
 		fun_id = self.get_config('fun_id')
 		return self.request('post', 'SELFPOS/getArticles', fun_id, api='services')
 
+	def set_product(self, data = {}):
+		data['fun_id'] = BASE_CONFIG['fun_id']
+		return self.request('post', 'GESARTICLE/setProduct', data, api='services')
+
 
