@@ -116,10 +116,6 @@ def tva_info(request, id):
     sessionid = request.session['payutc_session']
     p = PayutcClient(sessionid)
     sales = p.get_export(start=periode.debut.isoformat(), end=periode.fin.isoformat(), event_id=1)
-    # c = payutc.Client()
-    # c.loginApp()
-    # c.loginBadge()
-    # sales = c.call('TRESO', 'getExport', fun_id=NEMOPAY_FUNDATION_ID, )
     payutc_tva_types = set(sale['pur_tva'] for sale in sales)
 
     factures_emises = treso_models.FactureEmiseRow.objects.prefetch_related('facture').filter(facture__date_creation__gte=periode.debut, facture__date_creation__lte=periode.fin)

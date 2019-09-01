@@ -58,6 +58,35 @@ def user_information(request, format=None):
 	
 
 
+@api_view(['GET'])
+@permission_classes((IsAdminUser, ))
+def semestre_state(request):
+    """
+    Endpoint qui renvoie la somme des factures payées du semestre (émises et reçues)
+    """
+    return JsonResponse(core_models.Semestre.objects.get(pk=config.SEMESTER).get_paid_bills())
+
+
+@api_view(['GET', 'PUT'])
+@permission_classes((IsAdminUser, ))
+def semester_beginning_credit(request):
+    """
+    Endpoint qui renvoie le solde au début du semestre actuel - sauf si 
+    l'utilisateur spécifie un semester (avec le paramètre GET "semester")
+    """
+    semesterId = request.GET.get("semester", config.SEMESTER)
+    semester = core_models.Semestre.objects.get(pk=semesterId)
+    serializer = core_serializers.SemestreSerializer(semester)
+    print(serializer)
+    print(request.method)
+    print(semester)
+    print(semester)
+    if request.method == 'PUT':
+        semester.solde_debut = request.data['solde_debut']
+        semester.save()
+        print(semester)
+    return JsonResponse({'solde': int(semester.solde_debut)})
+
 # ViewSets
 
 class SemestreViewSet(viewsets.ModelViewSet):

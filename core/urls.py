@@ -25,6 +25,8 @@ urlpatterns = [
 	
 	path('api/admin/settings', core_views.admin_settings),
 	path('api/core/user', core_views.user_information),
+	path('api/core/semester/state', core_views.semestre_state),
+	path('api/core/semester/credit', core_views.semester_beginning_credit),
 	path('api/current/semester', core_views.current_semester),
 
 	# Include other application urls
