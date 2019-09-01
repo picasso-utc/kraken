@@ -91,18 +91,19 @@ class Semestre(models.Model):
         #     return qs.filter(semestre__id=live_config.SEMESTER)
         # return qs.filter(semestre__id=int(semester_wanted))
 
-    # def get_paid_bills(self):
-    #     from facture.models import FactureEmise, FactureRecue
-    #     sum_paid_received_bills = sum(fac.prix
-    #                                   for fac in FactureRecue.objects.filter(semestre=self,
-    #                                                                          etat=FactureRecue.FACTURE_PAYEE))
-    #     sum_paid_outvoiced_bills = sum(fac.get_total_ttc_price()
-    #                                    for fac in FactureEmise.objects.filter(semestre=self,
-    #                                                                           etat=FactureEmise.FACTURE_PAYEE))
-    #     return {
-    #         'sum_paid_received_bills': sum_paid_received_bills,
-    #         'sum_paid_outvoiced_bills': sum_paid_outvoiced_bills,
-    #     }
+    def get_paid_bills(self):
+        from treso.models import FactureEmise, FactureRecue
+        sum_paid_received_bills = sum(fac.prix
+                                      for fac in FactureRecue.objects.filter(semestre=self,
+                                                                             etat=FactureRecue.FACTURE_PAYEE))
+        sum_paid_outvoiced_bills = sum(fac.get_total_ttc_price()
+                                       for fac in FactureEmise.objects.filter(semestre=self,
+                                                                              etat=FactureEmise.FACTURE_PAYEE))
+        return {
+            'sum_paid_received_bills': sum_paid_received_bills,
+            'sum_paid_outvoiced_bills': sum_paid_outvoiced_bills,
+        }
+
 
 class PricedModel(models.Model):
     """
