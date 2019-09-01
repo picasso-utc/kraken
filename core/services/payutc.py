@@ -287,9 +287,11 @@ class PayutcClient:
 
 	def get_nb_sell(self, **kwargs):
 		data = self.get_values_or_config(kwargs, 'obj_id', 'fun_id', 'start', 'end')
-		data['start'] = self.format_datetime(data['start'])
-		data['end'] = self.format_datetime(data['end'])
-		return self.request('post', 'STATS/getNbSell', data, **kwargs, api='services')
+		if 'start' in data:
+			data['start'] = self.format_datetime(data['start'])
+		if 'end' in data:
+			data['end'] = self.format_datetime(data['end'])
+		return self.request('post', 'STATS/getNbSell', data, api='services')
 		
 
 	# ============================================================
