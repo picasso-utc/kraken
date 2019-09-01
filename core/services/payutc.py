@@ -123,6 +123,8 @@ class PayutcClient:
 
 		if data.get('fundation') == 'from_config':
 			data['fundation'] = self.config['fun_id']
+		# if data.get('fun_id') == 'from_config':
+		# data['fun_id'] = self.config['fun_id']
 		if method == 'get':
 			request_config['params'].update(data)
 		else:
@@ -336,5 +338,14 @@ class PayutcClient:
 	def set_product(self, data = {}):
 		data['fun_id'] = BASE_CONFIG['fun_id']
 		return self.request('post', 'GESARTICLE/setProduct', data, api='services')
+
+
+	def get_export(self, **kwargs):
+		data = self.get_values_or_config(kwargs, 'fun_id', 'start', 'end', 'event_id')
+		if 'start' in data:
+			data['start'] = self.format_datetime(data['start'])
+		if 'end' in data:
+			data['end'] = self.format_datetime(data['end'])
+		return self.request('post', 'TRESO/getExport', data, api='services')
 
 

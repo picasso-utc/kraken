@@ -5,15 +5,17 @@
 # from django.http import HttpResponse
 # from django.shortcuts import render
 from rest_framework import viewsets
-# from rest_framework.decorators import api_view, permission_classes, renderer_classes
+from django.http import JsonResponse
+from rest_framework.decorators import api_view, permission_classes
 # from rest_framework.renderers import JSONRenderer
 # from rest_framework.response import Response
 # import xlwt
 
 # # from picsous.permissions import IsAdmin, IsAuthorizedUser
 # # from picsous.settings import NEMOPAY_FUNDATION_ID
+from core.services.payutc import PayutcClient
 
-# from core import models as core_models
+from core import models as core_models
 from core import viewsets as core_viewsets
 # # from core.services import payutc, excel_generation
 from treso import models as treso_models
@@ -98,38 +100,41 @@ class ReversementEffectueViewSet(viewsets.ModelViewSet):
 # #                                             'total_ttc': facture.get_total_ttc_price()})
 
 
-# # @api_view(['GET'])
-# # @permission_classes((IsAdmin, ))
-# # @renderer_classes((JSONRenderer, ))
-# # def tva_info(request, id):
-# #     periode = core_models.PeriodeTVA.objects.get(pk=id)
+@api_view(['GET'])
+@permission_classes((IsAdminUser, ))
+def tva_info(request, id):
+    periode = core_models.PeriodeTVA.objects.get(pk=id)
 
-# #     # Pour la TVA déductible : on veut juste obtenir le montant total de TVA
-# #     tva_deductible = sum([facture.get_total_taxes() for facture
-# #         in facture_models.FactureRecue.objects.filter(date__gte=periode.debut, date__lte=periode.fin)])
+    # Pour la TVA déductible : on veut juste obtenir le montant total de TVA
+    tva_deductible = sum([facture.get_total_taxes() for facture
+        in treso_models.FactureRecue.objects.filter(date__gte=periode.debut, date__lte=periode.fin)])
 
-# #     # Pour la TVA à déclarer :
-# #     #   * On récupère toute la TVA sur PayUTC pendant cette période.
-# #     #   * On récupère toute la TVA sur les factures émises pendant cette période.
-# #     # Event_id hardcoded to 1
-# #     c = payutc.Client()
-# #     c.loginApp()
-# #     c.loginBadge()
-# #     sales = c.call('TRESO', 'getExport', fun_id=NEMOPAY_FUNDATION_ID, start=periode.debut.isoformat(), end=periode.fin.isoformat(), event_id=1)
-# #     payutc_tva_types = Set(sale['pur_tva'] for sale in sales)
+    # Pour la TVA à déclarer :
+    #   * On récupère toute la TVA sur PayUTC pendant cette période.
+    #   * On récupère toute la TVA sur les factures émises pendant cette période.
+    # Event_id hardcoded to 1
+    sessionid = request.session['payutc_session']
+    p = PayutcClient(sessionid)
+    sales = p.get_export(start=periode.debut.isoformat(), end=periode.fin.isoformat(), event_id=1)
+    # c = payutc.Client()
+    # c.loginApp()
+    # c.loginBadge()
+    # sales = c.call('TRESO', 'getExport', fun_id=NEMOPAY_FUNDATION_ID, )
+    payutc_tva_types = set(sale['pur_tva'] for sale in sales)
 
-# #     factures_emises = facture_models.FactureEmiseRow.objects.prefetch_related('facture').filter(facture__date_creation__gte=periode.debut, facture__date_creation__lte=periode.fin)
-# #     tva_types = payutc_tva_types.union(Set(facture.tva for facture in factures_emises))
+    factures_emises = treso_models.FactureEmiseRow.objects.prefetch_related('facture').filter(facture__date_creation__gte=periode.debut, facture__date_creation__lte=periode.fin)
+    tva_types = payutc_tva_types.union(set(facture.tva for facture in factures_emises))
 
-# #     tva_a_declarer = list()
-# #     for tva_type in tva_types:
-# #         tva_a_declarer.append({'pourcentage': tva_type,
-# #                                'montant': sum([(1 - (100 / (100 + sale['pur_tva'])))*sale['total']*0.01 for sale in sales if sale['pur_tva'] == tva_type])
-# #                                + sum(facture.get_total_taxes() * facture.qty for facture in factures_emises if facture.tva == tva_type)})
+    tva_a_declarer = list()
+    for tva_type in tva_types:
+        tva_a_declarer.append({'pourcentage': tva_type,
+                               'montant': sum([(1 - (100 / (100 + sale['pur_tva'])))*sale['total']*0.01 for sale in sales if sale['pur_tva'] == tva_type])
+                               + sum(facture.get_total_taxes() * facture.qty for facture in factures_emises if facture.tva == tva_type)})
 
-# #     return Response({'tva_deductible': tva_deductible,
-# #                      'tva_a_declarer': tva_a_declarer,
-# #                      'tva_a_declarer_total': sum(tva['montant'] for tva in tva_a_declarer)})
+    return JsonResponse({'tva_deductible': tva_deductible,
+                     'tva_a_declarer': tva_a_declarer,
+                     'tva_a_declarer_total': sum(tva['montant'] for tva in tva_a_declarer)})
+
 
 # # def excel_check_generation(request):
 # #     # Vue permettant de générer un fichier excel avec la liste des chèques, et des factures associées
