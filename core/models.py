@@ -66,7 +66,7 @@ class Semestre(models.Model):
     periode = models.CharField(max_length=1, choices=SEMESTRE_CHOICES)
     start_date = models.DateField()
     end_date = models.DateField()
-    # solde_debut = models.IntegerField(default=0)
+    solde_debut = models.IntegerField(default=0)
 
     def __str__(self):
         return f"{self.periode}{self.annee}"
@@ -122,3 +122,35 @@ class PricedModel(models.Model):
     class Meta:
         """ Représentation en DB """
         abstract = True
+
+
+
+# class TimeModel(models.Model):
+#     """ Modèle représentant une période temporelle """
+#     class Meta(object):
+#         """ Représentation en DB """
+#         abstract = True
+
+#     debut = models.DateField()
+#     fin = models.DateField()
+
+
+class PeriodeTVA(models.Model):
+    """
+    Période de TVA.
+    """
+    PERIODE_NON_DECLAREE = 'N'
+    PERIODE_DECLAREE = 'D'
+
+    PERIODE_CHOICES = (
+        (PERIODE_NON_DECLAREE, 'Non déclarée'),
+        (PERIODE_DECLAREE, 'Déclarée'),
+    )
+
+    state = models.CharField(max_length=1, choices=PERIODE_CHOICES, default='N')
+    debut = models.DateField()
+    fin = models.DateField()
+
+    class Meta:
+        """ Représentation en DB """
+        abstract = False

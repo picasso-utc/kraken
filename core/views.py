@@ -60,10 +60,19 @@ def user_information(request, format=None):
 
 # ViewSets
 
-class SemestreView(viewsets.ModelViewSet):
+class SemestreViewSet(viewsets.ModelViewSet):
 	serializer_class = core_serializers.SemestreSerializer
 	queryset = core_models.Semestre.objects.all()
 	permission_classes = (IsMemberUser,)
+
+
+class PeriodeTVAViewSet(viewsets.ModelViewSet):
+    """
+    PeriodeTVA endpoint
+    """
+    permission_classes = (IsAdminUser, )
+    queryset = core_models.PeriodeTVA.objects.all()
+    serializer_class = core_serializers.PeriodeTVASerializer
 
 
 class UserViewSet(mixins.ListModelMixin,
