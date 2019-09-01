@@ -37,33 +37,7 @@ class Perm(models.Model):
     #         'perm_articles': perm_articles,
     #     }
 
-    # def get_justificatif_information(self):
-    #     articles = self.article_set.all()
-    #     perm_articles = list()
-    #     tva = Set()
-    #     for article in articles:
-    #         article_info = {
-    #             'nom': article.nom, 
-    #             'prix': article.prix,
-    #             'ventes': article.ventes, 
-    #             'tva': article.tva
-    #         }
-    #         tva.add(article.tva)
-    #         article_info['total'] = article_info['prix'] * article_info['ventes']
-    #         perm_articles.append(article_info)
-    #     tva_amounts = list()
-    #     total_ht = round(sum([article.get_price_without_taxes()*article.ventes for article in articles]), 2)
-    #     for tva_type in tva:
-    #         tva_amounts.append({
-    #             'tva': tva_type,
-    #             'amount': round(sum([article.get_total_taxes() * article.ventes for article in articles if article.tva == tva_type]), 2)})
-    #     total_ttc = round(sum([article.prix*article.ventes for article in articles]), 2)
-    #     return {
-    #         'perm_articles': perm_articles,
-    #         'total_ht': total_ht,
-    #         'total_ttc': total_ttc,
-    #         'tva_amounts': tva_amounts,
-    #     }
+    
 
 
 class Creneau(models.Model):
@@ -90,6 +64,36 @@ class Creneau(models.Model):
 
     def __str__(self):
         return f"{self.date}:{self.creneau}"
+
+
+    def get_justificatif_information(self):
+        articles = self.article_set.all()
+        perm_articles = list()
+        tva = set()
+        for article in articles:
+            article_info = {
+                'nom': article.nom, 
+                'prix': article.prix,
+                'ventes': article.ventes, 
+                'tva': article.tva
+            }
+            tva.add(article.tva)
+            article_info['total'] = article_info['prix'] * article_info['ventes']
+            perm_articles.append(article_info)
+        tva_amounts = list()
+        total_ht = round(sum([article.get_price_without_taxes()*article.ventes for article in articles]), 2)
+        for tva_type in tva:
+            tva_amounts.append({
+                'tva': tva_type,
+                'amount': round(sum([article.get_total_taxes() * article.ventes for article in articles if article.tva == tva_type]), 2)})
+        total_ttc = round(sum([article.prix*article.ventes for article in articles]), 2)
+        return {
+            'perm_articles': perm_articles,
+            'total_ht': total_ht,
+            'total_ttc': total_ttc,
+            'tva_amounts': tva_amounts,
+        }
+
 
 
 class Article(core_models.PricedModel):
