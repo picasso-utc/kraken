@@ -1,5 +1,7 @@
 from django.db import models
 from core import models as core_models
+from core.settings import PAYUTC_ARTICLES_CATEGORY
+from django.utils import timezone
 
 
 class Perm(models.Model):
@@ -104,36 +106,38 @@ class Article(core_models.PricedModel):
     nom = models.CharField(max_length=255)
     perm = models.ForeignKey(Creneau, on_delete=models.CASCADE)
 
-    # def create_payutc_article(self):
-    #     if self.id_payutc:
-    #         return self.id_payutc
-    #     from core.services import payutc
-    #     c = payutc.Client()
-    #     c.loginApp()
-    #     c.loginBadge()
-    #     rep = c.call('GESARTICLE', 'setProduct', active=True, alcool=False, cotisant=True,
-    #                  components=[],
-    #                  fun_id=NEMOPAY_FUNDATION_ID, image_path='', meta=dict(),
-    #                  name=self.nom + ' - ' + self.perm.nom, pack=False,
-    #                  parent=NEMOPAY_ARTICLES_CATEGORY, prices=[],
-    #                  prix=int(self.prix*100), stock=self.stock,
-    #                  tva=self.tva, variable_price=False, virtual=False)
-    #     self.id_payutc = int(rep['success'])
-    #     self.ventes_last_update = timezone.now()
-    #     self.save()
-    #     Menu.objects.create(article=self)
-    #     return self.id_payutc
 
-    # def update_ventes(self):
-    #     from core.services import payutc
-    #     c = payutc.Client()
-    #     c.loginApp()
-    #     c.loginBadge()
-    #     rep = c.call('STATS', 'getNbSell', fun_id=NEMOPAY_FUNDATION_ID, obj_id=self.id_payutc)
-    #     self.ventes = rep
-    #     self.ventes_last_update = timezone.now()
-    #     self.save()
-    #     return self.ventes
+    def create_payutc_article(self, sessionid):
+        if self.id_payutc:
+            return self.id_payutc
+        from core.services.payutc import PayutcClient
+        p = PayutcClient(sessionid)
+        data = {
+            'active': True,
+            'alcool': False,
+            'cotisant': True,
+            'name': self.nom + ' - ' + self.perm.perm.nom,
+            'parent': PAYUTC_ARTICLES_CATEGORY,
+            'prix': int(self.prix*100),
+            'stock': self.stock,
+            'tva': self.tva,
+            'variable_price': False
+        }
+        res = p.set_product(data)
+        self.id_payutc = int(res['success'])
+        self.ventes_last_update = timezone.now()
+        self.save()
+        # Menu.objects.create(article=self)
+        return self.id_payutc
+
+    def update_sales(self, sessionid):
+        from core.services.payutc import PayutcClient
+        p = PayutcClient(sessionid)
+        rep = p.get_nb_sell(obj_id=self.id_payutc)
+        self.ventes = rep
+        self.ventes_last_update = timezone.now()
+        self.save()
+        return self.ventes
 
     # def set_article_disabled(self):
     #     from core.services import payutc
