@@ -144,7 +144,6 @@ def admin_settings(request, format=None):
 
 
 @api_view(['GET', 'POST'])
-# @renderer_classes((JSONRenderer, ))
 @permission_classes((IsAdminUser, ))
 def current_semester(request):
 
