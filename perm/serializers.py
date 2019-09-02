@@ -8,7 +8,7 @@ from core import models as core_models
 class PermSerializer(serializers.ModelSerializer):
     creneaux = serializers.StringRelatedField(many=True, required=False, read_only=True)
     semestre = serializers.StringRelatedField(many=False, read_only=True)
-    semestre_id = serializers.PrimaryKeyRelatedField(queryset=core_models.Semestre.objects.all(), source="semestre")
+    # semestre_id = serializers.PrimaryKeyRelatedField(queryset=core_models.Semestre.objects.all(), source="semestre")
 
     class Meta:
         model = perm_models.Perm
