@@ -5,6 +5,7 @@ from . import serializers as perm_serializers
 from .import models as perm_models
 from django.shortcuts import render
 from core.permissions import IsAdminUser, IsAuthenticatedUser, IsMemberUser, IsMemberUserOrReadOnly
+import datetime
 
 class PermViewSet(viewsets.ModelViewSet):
     serializer_class = perm_serializers.PermSerializer
@@ -56,6 +57,28 @@ def get_article_sales(request, id):
     sessionid = request.session['payutc_session']
     sales = article.update_sales(sessionid)
     return JsonResponse({'sales': sales})
+
+
+@api_view(['GET'])
+@permission_classes((IsMemberUser, ))
+def get_current_creneau(request):
+    date = datetime.datetime.now()
+
+    # On déterminer si la perm en cours est celle du matin, du midi ou du soir
+    hour = date.time().hour
+    creneau = 'M'
+    if hour >= 16 :
+        creneau = 'S'
+    elif hour >= 11:
+        creneau = 'D'
+    
+    queryset = perm_models.Creneau.objects.filter(creneau=creneau, date=date)
+    serializer = perm_serializers.CreneauSerializer(queryset, many=True)
+    current_creneau = dict()
+    if serializer.data:
+        current_creneau = serializer.data[0]
+    return JsonResponse(current_creneau)
+
 
 
 
