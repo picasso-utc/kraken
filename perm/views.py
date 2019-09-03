@@ -36,6 +36,7 @@ class MenuViewSet(viewsets.ModelViewSet):
     """
     Menu viewset
     """
+    permission_classes = (IsMemberUser,)
     queryset = perm_models.Menu.objects.filter(is_closed=False)
     serializer_class = perm_serializers.MenuSerializer
 
