@@ -19,7 +19,7 @@ class PermSerializer(serializers.ModelSerializer):
 
 
 class ArticleSerializer(serializers.ModelSerializer):
-    perm = serializers.PrimaryKeyRelatedField(queryset = perm_models.Creneau.objects.all())
+    creneau = serializers.PrimaryKeyRelatedField(queryset = perm_models.Creneau.objects.all())
 
     class Meta:
         model = perm_models.Article

@@ -104,7 +104,7 @@ class Article(core_models.PricedModel):
     ventes = models.IntegerField(default=0)
     ventes_last_update = models.DateTimeField(null=True, default=None)
     nom = models.CharField(max_length=255)
-    perm = models.ForeignKey(Creneau, on_delete=models.CASCADE)
+    creneau = models.ForeignKey(Creneau, on_delete=models.CASCADE)
 
 
     def create_payutc_article(self, sessionid):
@@ -116,7 +116,7 @@ class Article(core_models.PricedModel):
             'active': True,
             'alcool': False,
             'cotisant': True,
-            'name': self.nom + ' - ' + self.perm.perm.nom,
+            'name': self.nom + ' - ' + self.creneau.perm.nom,
             'parent': PAYUTC_ARTICLES_CATEGORY,
             'prix': int(self.prix*100),
             'stock': self.stock,
