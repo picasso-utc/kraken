@@ -127,7 +127,7 @@ class Article(core_models.PricedModel):
         self.id_payutc = int(res['success'])
         self.ventes_last_update = timezone.now()
         self.save()
-        # Menu.objects.create(article=self)
+        Menu.objects.create(article=self)
         return self.id_payutc
 
     def update_sales(self, sessionid):
