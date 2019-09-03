@@ -271,8 +271,11 @@ class PayutcClient:
 		keys = ('fun_id', 'start', 'end', 'offset', 'row_count', 'order_desc',
 						'product_id__in', 'buyer_id__in', 'category_id__in')
 		data = self.get_values_or_config(kwargs, *keys)
-		data['start'] = self.format_datetime(data['start'])
-		data['end'] = self.format_datetime(data['end'])
+		print(data)
+		if 'start' in data:
+			data['start'] = self.format_datetime(data['start'])
+		if 'end' in data:
+			data['end'] = self.format_datetime(data['end'])
 		return self.request('post', 'GESSALES/getSales', data, **kwargs, api='services')
 
 	def get_sales_by_chunk(self, **kwargs):
@@ -321,10 +324,10 @@ class PayutcClient:
 		return self.request('post', 'USERRIGHT/userAutocomplete', data, api='services')
 
 
-	def get_sales(self, data):
-		fun_id = self.get_config('fun_id')
-		data = {'start': data['start'], 'end': data['end'], 'row_count': data['row_count'], 'fun_id': self.config['fun_id']}
-		return self.request('post', 'GESSALES/getSales', data, api='services')
+	# def get_sales(self, data):
+	# 	fun_id = self.get_config('fun_id')
+	# 	data = {'start': data['start'], 'end': data['end'], 'row_count': data['row_count'], 'fun_id': self.config['fun_id']}
+	# 	return self.request('post', 'GESSALES/getSales', data, api='services')
 
 
 	# ============================================================
