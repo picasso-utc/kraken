@@ -148,6 +148,58 @@ class Article(core_models.PricedModel):
     #     return rep
 
 
+class Menu(models.Model):
+    article = models.ForeignKey(Article, on_delete=models.CASCADE)
+    is_closed = models.BooleanField(default=False)
+    last_update = models.DateTimeField(null=True, auto_now_add=True)
+
+    # def update_orders(self):
+    #     from core.services import payutc
+    #     c = payutc.Client()
+    #     c.loginApp()
+    #     c.loginBadge()
+    #     rep = c.call('GESSALES', 'getSales', fun_id=NEMOPAY_FUNDATION_ID, product_id__in=[self.article.id_payutc])
+    #     for line in rep['transactions']:
+    #         if line['status'] == 'V':
+    #             orderline, created = OrderLine.objects.get_or_create(id_transaction_payutc=line['id'], defaults={"menu": self})
+    #             if created:
+    #                 for payments in line['rows']:
+    #                     orderline.id_rows_payutc = payments['id']
+    #                     for menu in payments['payments']:
+    #                         orderline.id_buyer = menu['buyer']['id']
+    #                         orderline.quantity = menu['quantity']
+    #                         orderline.buyer_first_name = menu['buyer']['first_name']
+    #                         orderline.buyer_name = menu['buyer']['last_name']
+    #                         orderline.save()
+    #         for line1 in line['rows']:
+    #             if line1['cancels']:
+    #                 o = OrderLine.objects.filter(id_rows_payutc=line1['cancels']).first()
+    #                 if o:
+    #                     o.is_canceled = True
+    #                     o.save()
+    #     buyers_list = list()
+    #     orders = OrderLine.objects.filter(menu_id=self.id, quantity__gt=0, is_canceled=False).order_by('served', 'is_staff', 'id_transaction_payutc')
+    #     for order in orders:
+    #         buyers_list.append({'last_name': order.buyer_name, 'first_name': order.buyer_first_name, 'quantity': order.quantity, 'served': order.served, 'is_staff': order.is_staff, 'id_transaction': order.id_transaction_payutc})
+    #     return buyers_list
+
+
+class OrderLine(models.Model):
+    menu = models.ForeignKey(Menu, on_delete=models.CASCADE)
+    buyer_name = models.CharField(max_length=255)
+    buyer_first_name = models.CharField(max_length=255)
+    quantity = models.IntegerField(default=0)
+    served = models.BooleanField(default=False)
+    is_staff = models.BooleanField(default=False)
+    id_transaction_payutc = models.IntegerField(default=0, unique=True)
+    id_rows_payutc = models.IntegerField(default=0)
+    id_buyer = models.IntegerField(default=0)
+    is_canceled = models.BooleanField(default=False)
+
+    def __str__(self):
+        return '#' + str(self.id_rows_payutc) + ' - ' + self.buyer_name
+
+
 class Signature(models.Model):
     nom = models.CharField(blank=True, max_length=100)
     perm = models.CharField(blank=True, max_length=100)

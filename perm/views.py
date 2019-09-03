@@ -31,6 +31,15 @@ class ArticleViewSet(viewsets.ModelViewSet):
     queryset = perm_models.Article.objects.all()
     permission_classes = (IsAdminUser,)
 
+
+class MenuViewSet(viewsets.ModelViewSet):
+    """
+    Menu viewset
+    """
+    queryset = perm_models.Menu.objects.filter(is_closed=False)
+    serializer_class = perm_serializers.MenuSerializer
+
+
 class SignatureViewSet(viewsets.ModelViewSet):
     serializer_class = perm_serializers.SignatureSerializer
     queryset = perm_models.Signature.objects.all()
@@ -78,6 +87,70 @@ def get_current_creneau(request):
     if serializer.data:
         current_creneau = serializer.data[0]
     return JsonResponse(current_creneau)
+
+
+@api_view(['GET'])
+# @renderer_classes((JSONRenderer, ))
+def get_order_lines(request, id):
+    menu = perm_models.Menu.objects.get(article__id_payutc=id)
+    orders = perm_models.Menu.update_orders(menu)
+    orderlines = perm_models.OrderLine.objects.filter(menu__article__id_payutc=id, is_canceled=False, quantity__gt=0)
+    total_quantity = sum(order.quantity for order in orderlines)
+    orderlines_served = orderlines.filter(served=True)
+    served_quantity = sum(order.quantity for order in orderlines_served)
+    return JsonResponse({
+        'menu': {'name': menu.article.nom, 'quantity': menu.article.stock, 'id_payutc': id, 'total_quantity': total_quantity,
+                 'served_quantity': served_quantity},
+        'orders': orders
+    })
+
+
+
+@api_view(['POST'])
+# @renderer_classes((JSONRenderer, ))
+def set_ordeline_served(request, id):
+    """
+    Endpoint qui permet de dire qu'un menu a été donné.
+    """
+    orderline = perm_models.OrderLine.objects.get(id_transaction_payutc=id)
+    if orderline.served:
+        orderline.served = False
+    else:
+        orderline.served = True
+    orderline.save()
+    return JsonResponse(True)
+
+
+@api_view(['POST'])
+# @renderer_classes((JSONRenderer, ))
+def set_ordeline_staff(request, id):
+    """
+    Endpoint qui permet de dire qu'un menu a été donné.
+    """
+    orderline = perm_models.OrderLine.objects.get(id_transaction_payutc=id)
+    if orderline.is_staff:
+        orderline.is_staff = False
+    else:
+        orderline.is_staff = True
+    orderline.save()
+    return JsonResponse(True)
+
+
+@api_view(['POST'])
+# @renderer_classes((JSONRenderer, ))
+def set_menu_closed(request, id):
+    menu = perm_models.Menu.objects.get(article__id_payutc=id)
+    if menu.is_closed:
+        menu.is_closed = False
+    else:
+        menu.article.set_article_disabled()
+        # tv_1 = TVConfiguration.objects.filter(tv_id=1).order_by('-id')[1]
+        # tv_2 = TVConfiguration.objects.filter(tv_id=2).order_by('-id')[1]
+        # TVConfiguration.objects.create(tv_id=1, url=tv_1.url, enable_messages=tv_1.enable_messages)
+        # TVConfiguration.objects.create(tv_id=2, url=tv_2.url, enable_messages=tv_2.enable_messages)
+        menu.is_closed = True
+    menu.save()
+    return JsonResponse(True)
 
 
 

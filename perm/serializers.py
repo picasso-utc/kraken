@@ -41,6 +41,19 @@ class CreneauSerializer(serializers.ModelSerializer):
         exclude = exclude_list
     
 
+class OrderLinesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = perm_models.OrderLine
+
+
+class MenuSerializer(serializers.ModelSerializer):
+    article = ArticleSerializer()
+
+    class Meta:
+        model = perm_models.Menu
+        fields = ('article',)
+
+        
 class SignatureSerializer(serializers.ModelSerializer):
     class Meta:
         model = perm_models.Signature
