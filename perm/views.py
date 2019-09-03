@@ -94,7 +94,8 @@ def get_current_creneau(request):
 # @renderer_classes((JSONRenderer, ))
 def get_order_lines(request, id):
     menu = perm_models.Menu.objects.get(article__id_payutc=id)
-    orders = perm_models.Menu.update_orders(menu)
+    sessionid = request.session['payutc_session']
+    orders = perm_models.Menu.update_orders(menu, sessionid)
     orderlines = perm_models.OrderLine.objects.filter(menu__article__id_payutc=id, is_canceled=False, quantity__gt=0)
     total_quantity = sum(order.quantity for order in orderlines)
     orderlines_served = orderlines.filter(served=True)
