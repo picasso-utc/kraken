@@ -40,7 +40,8 @@ class GoodiesWinnerViewSet(mixins.ListModelMixin,
 		# START =	"2019-06-10T00:00:01.000Z"
 		# END = "2019-06-15T23:00:00.000Z"
 		ROW_COUNT = 20000
-		sales = p.get_sales({'start': start, 'end': end, 'row_count': ROW_COUNT})['transactions']
+		# sales = p.get_sales({'start': start, 'end': end, 'row_count': ROW_COUNT})['transactions']
+		sales = p.get_sales(start=start, end=end, row_count=ROW_COUNT)['transactions']
 
 		# Recherche des membres dans le Pic actuel
 		pic_members = []
