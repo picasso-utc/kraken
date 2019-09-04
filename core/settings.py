@@ -105,6 +105,8 @@ CSRF_USE_SESSIONS = False  # Useful ??
 CORS_ALLOW_HEADERS = ('content-disposition', 'accept-encoding',
                       'content-type', 'accept', 'origin', 'withcredentials')
 
+X_FRAME_OPTIONS = 'ALLOW-FROM kraken.picasso-utc.fr'
+
 SECRET_KEY = confidentials.SECRET_KEY
 PAYUTC_APP_KEY = confidentials.PAYUTC_APP_KEY
 PAYUTC_APP_URL = confidentials.PAYUTC_APP_URL
