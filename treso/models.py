@@ -55,7 +55,7 @@ class FactureRecue(PricedModel):
     personne_a_rembourser = models.CharField(null=True, default=None, max_length=255)
     immobilisation = models.BooleanField(default=False)
     remarque = models.TextField(null=True, default=None)
-    semestre = models.ForeignKey(Semestre, on_delete=models.SET_NULL, null=True)
+    semestre = models.ForeignKey(Semestre, on_delete=models.SET_NULL, null=True, default=get_current_semester)
     # , default=CURRENT_SEMESTER) 
 
 
@@ -102,7 +102,7 @@ class FactureEmise(models.Model):
     date_paiement = models.DateField(null=True)
     date_due = models.DateField()
     etat = models.CharField(max_length=1, choices=FACTURE_STATES)
-    semestre = models.ForeignKey(Semestre, on_delete=models.SET_NULL, null=True)
+    semestre = models.ForeignKey(Semestre, on_delete=models.SET_NULL, null=True, default=get_current_semester)
     # , default=CURRENT_SEMESTER)
     # default=get_current_semester)
 
@@ -143,7 +143,7 @@ class ReversementEffectue(PricedModel):
 
     C'est un PricedModel mais il y a peu d'intérêt à conserver la TVA.
     """
-    semestre = models.ForeignKey(Semestre, on_delete=models.SET_NULL, null=True)
+    semestre = models.ForeignKey(Semestre, on_delete=models.SET_NULL, null=True, default=get_current_semester)
     # , default=CURRENT_SEMESTER)
     # default=get_current_semester)
     date_effectue = models.DateField(null=True) # Date a laquelle il fut effectue
