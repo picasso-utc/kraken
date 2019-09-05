@@ -1,4 +1,6 @@
 from datetime import datetime
+import json
+
 from math import ceil
 from core.settings import PAYUTC_APP_KEY, PAYUTC_APP_URL, PAYUTC_SYSTEM_ID, PAYUTC_FUN_ID
 import requests
@@ -261,6 +263,20 @@ class PayutcClient:
 		pin = self.__get_and_set_config('badge_pin', pin)
 		response = self.request('post', 'POSS3/loginBadge2', { 'badge_id': badge_id, 'pin': pin }, api='services')
 		return self.__login(response)
+
+
+	def patch_api_rest(self, service, method, id, sessionid, params=None, **data):
+		if params is None:
+			params = {'system_id': PAYUTC_SYSTEM_ID, 'sessionid': sessionid}
+	    # if self.SESSION_ID is not None:
+            # params['sessionid'] = self.SESSION_ID
+		# params['sessionid'] = sessionid
+		headers = {'nemopay-version': '2018-07-03', 'Content-Type': 'application/json'}
+		url = "https://api.nemopay.net/" + service + "/" + method + "/" + str(id)
+		r = requests.patch(url, json=data, params=params, headers=headers)
+		if r.status_code != 200:
+			raise NemopayClientException(r.text)
+		return json.loads(r.text)
 
 
 	# ============================================================
