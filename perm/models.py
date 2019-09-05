@@ -2,14 +2,15 @@ from django.db import models
 from core import models as core_models
 from core.settings import PAYUTC_ARTICLES_CATEGORY
 from django.utils import timezone
+from core.services.current_semester import get_current_semester
+
 
 
 class Perm(models.Model):
 
     nom = models.CharField(max_length=255)
     asso = models.BooleanField(default=True)  # true if asso
-    semestre = models.ForeignKey(core_models.Semestre, on_delete=models.SET_NULL, null=True)
-    # , default=get_current_semester)
+    semestre = models.ForeignKey(core_models.Semestre, on_delete=models.SET_NULL, null=True, default=get_current_semester)
     nom_resp = models.CharField(null=True, default=None, max_length=255)
     mail_resp = models.CharField(null=True, default=None, max_length=255)
 

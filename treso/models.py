@@ -1,7 +1,7 @@
 from django.db import models
 from perm.models import Perm, Creneau
 from core.models import Semestre
-from core.settings import CURRENT_SEMESTER
+from core.services.current_semester import get_current_semester
 
 
 class PricedModel(models.Model):
