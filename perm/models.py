@@ -140,13 +140,15 @@ class Article(core_models.PricedModel):
         self.save()
         return self.ventes
 
-    # def set_article_disabled(self):
-    #     from core.services import payutc
-    #     c = payutc.Client()
-    #     c.loginApp()
-    #     c.loginBadge()
-    #     rep = c.patch_api_rest('resources', 'products', self.id_payutc, active=False)
-    #     return rep
+    def set_article_disabled(self, sessionid):
+        from core.services.payutc import PayutcClient
+        # c = payutc.Client()
+        # c.loginApp()
+        # c.loginBadge()
+        p = PayutcClient(sessionid)
+        rep = p.patch_api_rest('resources', 'products', self.id_payutc, sessionid, active=False)
+        # rep = c.patch_api_rest('resources', 'products', self.id_payutc, active=False)
+        return rep
 
 
 class Menu(models.Model):
