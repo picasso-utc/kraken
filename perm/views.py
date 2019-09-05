@@ -120,7 +120,7 @@ def set_ordeline_served(request, id):
     else:
         orderline.served = True
     orderline.save()
-    return JsonResponse(True)
+    return JsonResponse({})
 
 
 @api_view(['POST'])
@@ -135,24 +135,26 @@ def set_ordeline_staff(request, id):
     else:
         orderline.is_staff = True
     orderline.save()
-    return JsonResponse(True)
+    return JsonResponse({})
 
 
 @api_view(['POST'])
 # @renderer_classes((JSONRenderer, ))
+@permission_classes((IsAdminUser, ))
 def set_menu_closed(request, id):
     menu = perm_models.Menu.objects.get(article__id_payutc=id)
     if menu.is_closed:
         menu.is_closed = False
     else:
-        menu.article.set_article_disabled()
+        sessionid = request.session['payutc_session']
+        menu.article.set_article_disabled(sessionid)
         # tv_1 = TVConfiguration.objects.filter(tv_id=1).order_by('-id')[1]
         # tv_2 = TVConfiguration.objects.filter(tv_id=2).order_by('-id')[1]
         # TVConfiguration.objects.create(tv_id=1, url=tv_1.url, enable_messages=tv_1.enable_messages)
         # TVConfiguration.objects.create(tv_id=2, url=tv_2.url, enable_messages=tv_2.enable_messages)
         menu.is_closed = True
     menu.save()
-    return JsonResponse(True)
+    return JsonResponse({})
 
 
 
