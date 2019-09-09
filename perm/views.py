@@ -67,19 +67,21 @@ def get_article_sales(request, id):
     return JsonResponse({'sales': sales})
 
 
+def get_creneau(date):
+
+    # On déterminer si la perm en cours est celle du matin, du midi ou du soir
+    hour = date.time().hour
+    return 'M'
+    if hour >= 16 :
+        return 'S'
+    elif hour >= 11:
+        return 'D'
+
 @api_view(['GET'])
 @permission_classes((IsMemberUser, ))
 def get_current_creneau(request):
     date = datetime.datetime.now()
-
-    # On déterminer si la perm en cours est celle du matin, du midi ou du soir
-    hour = date.time().hour
-    creneau = 'M'
-    if hour >= 16 :
-        creneau = 'S'
-    elif hour >= 11:
-        creneau = 'D'
-    
+    creneau = get_creneau(date)
     queryset = perm_models.Creneau.objects.filter(creneau=creneau, date=date)
     serializer = perm_serializers.CreneauSerializer(queryset, many=True)
     current_creneau = dict()
