@@ -108,11 +108,12 @@ class Article(core_models.PricedModel):
     creneau = models.ForeignKey(Creneau, on_delete=models.CASCADE)
 
 
-    def create_payutc_article(self, sessionid):
+    def create_payutc_article(self):
         if self.id_payutc:
             return self.id_payutc
         from core.services.payutc import PayutcClient
-        p = PayutcClient(sessionid)
+        p = PayutcClient()
+        p.login_admin()
         data = {
             'active': True,
             'alcool': False,
@@ -131,9 +132,10 @@ class Article(core_models.PricedModel):
         Menu.objects.create(article=self)
         return self.id_payutc
 
-    def update_sales(self, sessionid):
+    def update_sales(self):
         from core.services.payutc import PayutcClient
-        p = PayutcClient(sessionid)
+        p = PayutcClient()
+        p.login_admin()
         rep = p.get_nb_sell(obj_id=self.id_payutc)
         self.ventes = rep
         self.ventes_last_update = timezone.now()
@@ -142,12 +144,9 @@ class Article(core_models.PricedModel):
 
     def set_article_disabled(self, sessionid):
         from core.services.payutc import PayutcClient
-        # c = payutc.Client()
-        # c.loginApp()
-        # c.loginBadge()
-        p = PayutcClient(sessionid)
+        p = PayutcClient()
+        p.login_admin()
         rep = p.patch_api_rest('resources', 'products', self.id_payutc, sessionid, active=False)
-        # rep = c.patch_api_rest('resources', 'products', self.id_payutc, active=False)
         return rep
 
 
@@ -156,9 +155,10 @@ class Menu(models.Model):
     is_closed = models.BooleanField(default=False)
     last_update = models.DateTimeField(null=True, auto_now_add=True)
 
-    def update_orders(self, sessionid):
+    def update_orders(self):
         from core.services.payutc import PayutcClient
-        p = PayutcClient(sessionid)
+        p = PayutcClient()
+        p.login_admin()
         rep = p.get_sales(product_id__in=[self.article.id_payutc])
         for line in rep['transactions']:
             if line['status'] == 'V':

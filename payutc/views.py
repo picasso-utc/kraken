@@ -34,13 +34,11 @@ class GoodiesWinnerViewSet(mixins.ListModelMixin,
 		# END doit être au format "AAAA-MM-JJ"
 		# ROW_COUNT représente le nombre maximum de ventes récupérées
 		sessionid = request.session['payutc_session']
-		p = PayutcClient(sessionid)
+		p = PayutcClient()
+		p.login_admin()
 		start = request.data['start_date'] + "T00:00:01.000Z"
 		end = request.data['end_date'] + "T23:00:00.000Z"
-		# START =	"2019-06-10T00:00:01.000Z"
-		# END = "2019-06-15T23:00:00.000Z"
 		ROW_COUNT = 20000
-		# sales = p.get_sales({'start': start, 'end': end, 'row_count': ROW_COUNT})['transactions']
 		sales = p.get_sales(start=start, end=end, row_count=ROW_COUNT)['transactions']
 
 		# Recherche des membres dans le Pic actuel
@@ -70,7 +68,6 @@ class GoodiesWinnerViewSet(mixins.ListModelMixin,
 
 
 	def update(self, request, pk=None):
-		print(pk)
 		winner_instance = payutc_models.GoodiesWinner.objects.get(pk=pk)
 		winner_instance.picked_up = not winner_instance.picked_up
 		winner_instance.save()
@@ -91,7 +88,8 @@ def user_autocomplete(request, query, format=None):
 		'queryString': query
 	}
 	sessionid = request.session['payutc_session']
-	p = PayutcClient(sessionid)
+	p = PayutcClient()
+	p.login_admin()
 	return JsonResponse({'users': p.auto_complete(data)})
 
 	# return auth_view.login_badge(request, format)

@@ -52,8 +52,7 @@ class SignatureViewSet(viewsets.ModelViewSet):
 def create_payutc_article(request, id):
     # Endpoint qui permet d'obtenir, pour un article de pk {id}, d'enregistrer l'article dans PayUTC.
     article = perm_models.Article.objects.get(pk=id)
-    sessionid = request.session['payutc_session']
-    article.create_payutc_article(sessionid)
+    article.create_payutc_article()
     # TVConfiguration.objects.create(tv_id=1, url="http://beethoven.picasso-utc.fr/NextMenus", enable_messages=False)
     # TVConfiguration.objects.create(tv_id=2, url="http://beethoven.picasso-utc.fr/NextMenus", enable_messages=False)
     return JsonResponse({})
@@ -64,8 +63,7 @@ def create_payutc_article(request, id):
 def get_article_sales(request, id):
     # Endpoint qui permet d'obtenir, pour un article de pk {id}, le nombre de ventes.
     article = perm_models.Article.objects.get(pk=id)
-    sessionid = request.session['payutc_session']
-    sales = article.update_sales(sessionid)
+    sales = article.update_sales()
     return JsonResponse({'sales': sales})
 
 
@@ -94,8 +92,7 @@ def get_current_creneau(request):
 @permission_classes((IsMemberUser, ))
 def get_order_lines(request, id):
     menu = perm_models.Menu.objects.get(article__id_payutc=id)
-    sessionid = request.session['payutc_session']
-    orders = perm_models.Menu.update_orders(menu, sessionid)
+    orders = perm_models.Menu.update_orders(menu)
     orderlines = perm_models.OrderLine.objects.filter(menu__article__id_payutc=id, is_canceled=False, quantity__gt=0)
     total_quantity = sum(order.quantity for order in orderlines)
     orderlines_served = orderlines.filter(served=True)
@@ -145,8 +142,7 @@ def set_menu_closed(request, id):
     if menu.is_closed:
         menu.is_closed = False
     else:
-        sessionid = request.session['payutc_session']
-        menu.article.set_article_disabled(sessionid)
+        menu.article.set_article_disabled()
         # tv_1 = TVConfiguration.objects.filter(tv_id=1).order_by('-id')[1]
         # tv_2 = TVConfiguration.objects.filter(tv_id=2).order_by('-id')[1]
         # TVConfiguration.objects.create(tv_id=1, url=tv_1.url, enable_messages=tv_1.enable_messages)
