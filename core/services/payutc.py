@@ -5,7 +5,7 @@ from math import ceil
 from core.settings import PAYUTC_APP_KEY, PAYUTC_APP_URL, PAYUTC_SYSTEM_ID, PAYUTC_FUN_ID
 import requests
 from rest_framework.exceptions import APIException, NotFound
-
+from constance import config as live_config
 
 
 DEFAULT_CHUNK_SIZE = 5000
@@ -25,8 +25,8 @@ BASE_CONFIG = {
 	# Login credentials
 	'sessionid': 		None,
 	'login_method': 	None,
-	'badge_id': 		None,
-	'badge_pin': 		None,
+	'badge_id': 		live_config.PAYUTC_CONNECTION_UID,
+	'pin': 		live_config.PAYUTC_CONNECTION_PIN,
 	'app_key':			PAYUTC_APP_KEY,
 	'mail': 			None,
 	'password': 		None,
@@ -55,6 +55,7 @@ class PayutcException(Exception):
 			if detail:
 				return self.message + f" ({detail})"
 		return self.message
+
 
 class PayutcClient:
 	"""
@@ -258,11 +259,14 @@ class PayutcClient:
 		response = self.request('post', 'SELFPOS/login2', { 'login': login, 'password': password }, api='services')
 		return self.__login(response)
 
-	def login_badge(self, pin: int=None, badge_id: str=None):
-		badge_id = self.__get_and_set_config('badge_id', badge_id)
-		pin = self.__get_and_set_config('badge_pin', pin)
-		response = self.request('post', 'POSS3/loginBadge2', { 'badge_id': badge_id, 'pin': pin }, api='services')
+	def login_badge(self, pin: int=None, badge_id: str=None, **kwargs):
+		keys = ('badge_id', 'pin')
+		data = self.get_values_or_config(kwargs, *keys)
+		response = self.request('post', 'POSS3/loginBadge2', data, api='services')
 		return self.__login(response)
+
+	def login_admin(self):
+		self.config['sessionid'] = self.login_badge()['sessionid']
 
 
 	def patch_api_rest(self, service, method, id, sessionid, params=None, **data):
