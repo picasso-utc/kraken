@@ -42,6 +42,15 @@ class CreneauSerializer(serializers.ModelSerializer):
         # if not is_admin():
             # exclude_list = ('state', 'montantTTCMaxAutorise', 'id', 'perm_id')
         exclude = exclude_list
+
+
+class CreneauPublicSerializer(serializers.ModelSerializer):
+    
+    perm = PermPublicSerializer(read_only=True)    
+
+    class Meta:
+        model = perm_models.Creneau
+        fields = ('id', 'perm')
     
 
 class OrderLinesSerializer(serializers.ModelSerializer):
