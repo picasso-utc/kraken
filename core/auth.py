@@ -28,7 +28,7 @@ def _set_session_information(request, username, sessionid):
     ginger = GingerClient()
     ginger_response = ginger.get_user_info(username)
     request.session['user'] = ginger_response['data']
-    request.session.set_expiry(3600) 
+    # 2h de session
     request.session.set_expiry(2*3600) 
     return request
 
