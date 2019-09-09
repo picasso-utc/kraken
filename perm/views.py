@@ -10,13 +10,13 @@ import datetime
 class PermViewSet(viewsets.ModelViewSet):
     serializer_class = perm_serializers.PermSerializer
     queryset = perm_models.Perm.objects.all()
-    permission_classes = (IsMemberUserOrReadOnly,)
+    permission_classes = (IsMemberUser,)
 
 
 class CreneauViewSet(viewsets.ModelViewSet):
     serializer_class = perm_serializers.CreneauSerializer
     queryset = perm_models.Creneau.objects.all()
-    permission_classes = (IsMemberUserOrReadOnly,)
+    permission_classes = (IsMemberUser,)
 
 
 @api_view(['GET'])
@@ -29,7 +29,7 @@ def get_creneau_sales(request, id):
 class ArticleViewSet(viewsets.ModelViewSet):
     serializer_class = perm_serializers.ArticleSerializer
     queryset = perm_models.Article.objects.all()
-    permission_classes = (IsAdminUser,)
+    permission_classes = (IsMemberUser,)
 
 
 class MenuViewSet(viewsets.ModelViewSet):
@@ -44,7 +44,7 @@ class MenuViewSet(viewsets.ModelViewSet):
 class SignatureViewSet(viewsets.ModelViewSet):
     serializer_class = perm_serializers.SignatureSerializer
     queryset = perm_models.Signature.objects.all()
-    permission_classes = (IsAdminUser,)
+    permission_classes = (IsMemberUser,)
 
 
 @api_view(['GET'])
@@ -91,7 +91,7 @@ def get_current_creneau(request):
 
 
 @api_view(['GET'])
-# @renderer_classes((JSONRenderer, ))
+@permission_classes((IsMemberUser, ))
 def get_order_lines(request, id):
     menu = perm_models.Menu.objects.get(article__id_payutc=id)
     sessionid = request.session['payutc_session']
@@ -109,7 +109,7 @@ def get_order_lines(request, id):
 
 
 @api_view(['POST'])
-# @renderer_classes((JSONRenderer, ))
+@permission_classes((IsMemberUser, ))
 def set_ordeline_served(request, id):
     """
     Endpoint qui permet de dire qu'un menu a été donné.
@@ -124,7 +124,7 @@ def set_ordeline_served(request, id):
 
 
 @api_view(['POST'])
-# @renderer_classes((JSONRenderer, ))
+@permission_classes((IsMemberUser, ))
 def set_ordeline_staff(request, id):
     """
     Endpoint qui permet de dire qu'un menu a été donné.
@@ -139,8 +139,7 @@ def set_ordeline_staff(request, id):
 
 
 @api_view(['POST'])
-# @renderer_classes((JSONRenderer, ))
-@permission_classes((IsAdminUser, ))
+@permission_classes((IsMemberUser, ))
 def set_menu_closed(request, id):
     menu = perm_models.Menu.objects.get(article__id_payutc=id)
     if menu.is_closed:

@@ -83,6 +83,7 @@ class GoodiesWinnerViewSet(mixins.ListModelMixin,
 
 
 @api_view(['GET'])
+@permission_classes((IsMemberUser, ))
 def user_autocomplete(request, query, format=None):
 	"""Authenticate with badge_id"""
 
