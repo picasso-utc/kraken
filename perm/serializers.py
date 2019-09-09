@@ -13,9 +13,12 @@ class PermSerializer(serializers.ModelSerializer):
     class Meta:
         model = perm_models.Perm
         exclude_list = list()
-        # if not is_admin() :
-            # exclude_list = ('id', 'nom_resp', 'mail_resp', 'semestre_id')
         exclude = exclude_list
+
+class PermPublicSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = perm_models.Perm
+        fields = ('nom',)
 
 
 class ArticleSerializer(serializers.ModelSerializer):

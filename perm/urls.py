@@ -8,6 +8,7 @@ urlpatterns = [
 	path('sales/article/<int:id>', perm_views.get_article_sales),
 	path('sales/<int:id>', perm_views.get_creneau_sales),
 	path('current/creneau', perm_views.get_current_creneau),
+    path('current/public/creneau', perm_views.get_current_public_creneau),
     path('menu/orders/<int:id>', perm_views.get_order_lines),
     path('menu/served/<int:id>', perm_views.set_ordeline_served),
     path('menu/staff/<int:id>', perm_views.set_ordeline_staff),

@@ -91,6 +91,20 @@ def get_current_creneau(request):
 
 
 @api_view(['GET'])
+def get_current_public_creneau(request):
+    date = datetime.datetime.now()
+    creneau = get_creneau(date)
+    
+    queryset = perm_models.Creneau.objects.filter(creneau=creneau, date=date)
+    serializer = perm_serializers.CreneauPublicSerializer(queryset, many=True)
+    current_creneau = dict()
+    print(serializer)
+    if serializer.data:
+        current_creneau = serializer.data[0]
+    return JsonResponse(current_creneau)
+
+
+@api_view(['GET'])
 @permission_classes((IsMemberUser, ))
 def get_order_lines(request, id):
     menu = perm_models.Menu.objects.get(article__id_payutc=id)
