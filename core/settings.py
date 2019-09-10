@@ -97,15 +97,15 @@ TEMPLATES = [
 DEBUG = confidentials.DEBUG
 
 ALLOWED_HOSTS = confidentials.ALLOWED_HOSTS
-CORS_ORIGIN_ALLOW_All = True
+CORS_ORIGIN_ALLOW_All = False
 CORS_ORIGIN_WHITELIST = confidentials.CORS_ORIGIN_WHITELIST
 CORS_ALLOW_CREDENTIALS = True
 CSRF_COOKIE_HTTPONLY = False # False to enable the use of cookies in ajax requests
 CSRF_USE_SESSIONS = False  # Useful ??
-CORS_ALLOW_HEADERS = ('content-disposition', 'accept-encoding',
-                      'content-type', 'accept', 'origin', 'withcredentials')
-
-X_FRAME_OPTIONS = 'ALLOW-FROM kraken.picasso-utc.fr'
+CORS_ALLOW_HEADERS = ('content-disposition', 'accept-encoding', 'cookie', 'credentials',
+                      'content-type', 'accept', 'origin', 'withcredentials', 'x-xsrf-token')
+SESSION_COOKIE_SAMESITE = None
+# X_FRAME_OPTIONS = 'ALLOW-FROM kraken.picasso-utc.fr'
 
 SECRET_KEY = confidentials.SECRET_KEY
 PAYUTC_APP_KEY = confidentials.PAYUTC_APP_KEY
@@ -114,6 +114,7 @@ PAYUTC_FUN_ID = confidentials.PAYUTC_FUN_ID
 PAYUTC_SYSTEM_ID = confidentials.PAYUTC_SYSTEM_ID
 PAYUTC_ARTICLES_CATEGORY = confidentials.PAYUTC_ARTICLES_CATEGORY
 CURRENT_SEMESTER = "19"
+USE_X_FORWARDED_HOST = True
 
 
 LOGIN_REDIRECT_URL = confidentials.LOGIN_REDIRECT_URL
@@ -151,7 +152,7 @@ CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Paris'
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
