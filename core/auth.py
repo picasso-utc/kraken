@@ -2,6 +2,7 @@ from core.services.payutc import PayutcClient, PayutcException
 from core.services.ginger import GingerClient
 from core import models as core_models
 from core import serializers as core_serializers
+from core.settings import LOGIN_REDIRECT_URL
 
 from django.http import JsonResponse, HttpResponse
 from django.urls import reverse
@@ -36,7 +37,8 @@ def _get_params(request, format=None):
     """Get ticket, service and redirection params from the request"""
     ticket = request.GET.get('ticket')
     redirection = request.GET.get('redirect', '/api')
-    service = request.build_absolute_uri(reverse('auth.login_callback'))
+    # service = request.build_absolute_uri(reverse('auth.login_callback'))
+    service = LOGIN_REDIRECT_URL
     service += '?redirect=' + redirection
     return ticket, service, redirection
 
