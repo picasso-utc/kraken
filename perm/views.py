@@ -70,11 +70,11 @@ def get_creneau(date):
 
     # On déterminer si la perm en cours est celle du matin, du midi ou du soir
     hour = date.time().hour
-    return 'M'
     if hour >= 16 :
         return 'S'
     elif hour >= 11:
         return 'D'
+    return 'M'
 
 @api_view(['GET'])
 @permission_classes((IsMemberUser, ))
