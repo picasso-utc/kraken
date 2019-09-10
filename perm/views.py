@@ -1,6 +1,6 @@
 from rest_framework.decorators import api_view, permission_classes
 from django.http import JsonResponse
-from rest_framework import viewsets
+from rest_framework import viewsets, mixins
 from . import serializers as perm_serializers
 from .import models as perm_models
 from django.shortcuts import render
@@ -41,10 +41,9 @@ class MenuViewSet(viewsets.ModelViewSet):
     serializer_class = perm_serializers.MenuSerializer
 
 
-class SignatureViewSet(viewsets.ModelViewSet):
+class SignatureViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
     serializer_class = perm_serializers.SignatureSerializer
     queryset = perm_models.Signature.objects.all()
-    permission_classes = (IsMemberUser,)
 
 
 @api_view(['GET'])
