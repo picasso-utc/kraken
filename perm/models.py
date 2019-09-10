@@ -203,7 +203,7 @@ class OrderLine(models.Model):
 
 class Signature(models.Model):
     nom = models.CharField(blank=True, max_length=100)
-    perm = models.CharField(blank=True, max_length=100)
+    creneau = models.ForeignKey(Creneau, on_delete=models.CASCADE, default=None)
     date = models.DateField(blank=True)
     login = models.CharField(blank=True, max_length=100)
 

@@ -67,6 +67,9 @@ class MenuSerializer(serializers.ModelSerializer):
 
         
 class SignatureSerializer(serializers.ModelSerializer):
+    creneau = CreneauSerializer(read_only=True) 
+    creneau_id = serializers.PrimaryKeyRelatedField(queryset=perm_models.Creneau.objects.all(), source="creneau")
     class Meta:
         model = perm_models.Signature
-        fields = ('id', 'nom', 'perm', 'date', 'login')
+        exclude_list = list()
+        exclude = exclude_list
