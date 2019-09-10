@@ -186,7 +186,6 @@ def admin_settings(request, format=None):
 def current_semester(request):
 
 	if request.method == 'GET':
-		print(config.SEMESTER)
 		semester = core_models.Semestre.objects.get(pk=config.SEMESTER)
 		return JsonResponse(core_serializers.SemestreSerializer(semester).data)
 
@@ -196,3 +195,4 @@ def current_semester(request):
 			config.__setattr__('SEMESTER', semester_id)
 			semester = core_models.Semestre.objects.get(pk=semester_id)
 			return JsonResponse(core_serializers.SemestreSerializer(semester).data)
+
