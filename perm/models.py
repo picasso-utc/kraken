@@ -142,7 +142,7 @@ class Article(core_models.PricedModel):
         self.save()
         return self.ventes
 
-    def set_article_disabled(self, sessionid):
+    def set_article_disabled(self):
         from core.services.payutc import PayutcClient
         p = PayutcClient()
         p.login_admin()
