@@ -23,6 +23,7 @@ class PermPublicSerializer(serializers.ModelSerializer):
 
 class ArticleSerializer(serializers.ModelSerializer):
     creneau = serializers.PrimaryKeyRelatedField(queryset = perm_models.Creneau.objects.all())
+    menu = serializers.StringRelatedField(many=True, read_only=True)
 
     class Meta:
         model = perm_models.Article

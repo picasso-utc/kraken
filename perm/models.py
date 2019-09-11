@@ -151,9 +151,12 @@ class Article(core_models.PricedModel):
 
 
 class Menu(models.Model):
-    article = models.ForeignKey(Article, on_delete=models.CASCADE)
+    article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name="menu")
     is_closed = models.BooleanField(default=False)
     last_update = models.DateTimeField(null=True, auto_now_add=True)
+
+    def __str__(self):
+        return str(self.id)
 
     def update_orders(self):
         from core.services.payutc import PayutcClient
