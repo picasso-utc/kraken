@@ -146,7 +146,7 @@ class Article(core_models.PricedModel):
         from core.services.payutc import PayutcClient
         p = PayutcClient()
         p.login_admin()
-        rep = p.patch_api_rest('resources', 'products', self.id_payutc, sessionid, active=False)
+        rep = p.patch_api_rest('resources', 'products', self.id_payutc, active=False)
         return rep
 
 

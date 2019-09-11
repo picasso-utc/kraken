@@ -269,9 +269,9 @@ class PayutcClient:
 		self.config['sessionid'] = self.login_badge()['sessionid']
 
 
-	def patch_api_rest(self, service, method, id, sessionid, params=None, **data):
+	def patch_api_rest(self, service, method, id, sessionid=None, params=None, **data):
 		if params is None:
-			params = {'system_id': PAYUTC_SYSTEM_ID, 'sessionid': sessionid}
+			params = {'system_id': PAYUTC_SYSTEM_ID, 'sessionid': self.config['sessionid']}
 	    # if self.SESSION_ID is not None:
             # params['sessionid'] = self.SESSION_ID
 		# params['sessionid'] = sessionid
