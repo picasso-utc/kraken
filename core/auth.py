@@ -52,6 +52,19 @@ def login_badge(request, format=None):
     resp = p.process_request("login", "badge", params = {"badge_id": badge_id, "pin": pin})
     _set_session_information(request, resp['username'], resp['sessionid'])
     request.session.set_expiry(3600) 
+def login_username(request, format=None):
+    """Authenticate with username and pin"""
+
+    body_content = request.data
+    username = body_content["username"]
+    pin = body_content["pin"]
+    ginger = GingerClient()
+    ginger_response = ginger.get_user_info(username)
+    badge_id = ginger_response['data']['badge_uid']
+    p = PayutcClient()
+    resp = p.process_request("login", "badge", params = {"badge_id": badge_id, "pin": pin})
+    _set_session_information(request, resp['username'], resp['sessionid'], 'menu')
+    request.session.set_expiry(2*3600) 
 
     return JsonResponse(resp, status=200)
 
