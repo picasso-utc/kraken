@@ -24,6 +24,11 @@ def login_badge(request, format=None):
 	"""Authenticate with badge_id"""
 	return auth_view.login_badge(request, format)
 
+@api_view(['POST'])
+def login_username(request, format=None):
+	"""Authenticate with badge_id"""
+	return auth_view.login_username(request, format)
+
 @api_view(['GET'])
 def login(request, format=None):
 	"""Redirect to CAS with a callback pointing to login_callback"""

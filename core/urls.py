@@ -20,6 +20,7 @@ urlpatterns = [
 	path('api/auth/login', core_views.login, name='auth.login'),
 	path('api/auth/login_callback', core_views.login_callback, name='auth.login_callback'),
 	path('api/auth/badge', core_views.login_badge, name="auth.badge"),
+	path('api/auth/username', core_views.login_username, name="auth.username"),
 	path('api/auth/me', core_views.me, name='auth.me'),
 	path('api/auth/logout', core_views.logout, name='auth.logout'),
 	
