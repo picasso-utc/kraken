@@ -4,7 +4,7 @@ from rest_framework import viewsets, mixins
 from . import serializers as perm_serializers
 from .import models as perm_models
 from django.shortcuts import render
-from core.permissions import IsAdminUser, IsAuthenticatedUser, IsMemberUser, IsMemberUserOrReadOnly
+from core.permissions import IsAdminUser, IsAuthenticatedUser, IsMemberUser, IsMemberUserOrReadOnly, CanAccessMenuFunctionnalities
 import datetime
 
 class PermViewSet(viewsets.ModelViewSet):
@@ -36,7 +36,8 @@ class MenuViewSet(viewsets.ModelViewSet):
     """
     Menu viewset
     """
-    permission_classes = (IsMemberUser,)
+    # TO DO Restreindre Méthode
+    permission_classes = (CanAccessMenuFunctionnalities,)
     queryset = perm_models.Menu.objects.filter(is_closed=False)
     serializer_class = perm_serializers.MenuSerializer
 
@@ -104,7 +105,7 @@ def get_current_public_creneau(request):
 
 
 @api_view(['GET'])
-@permission_classes((IsMemberUser, ))
+@permission_classes((CanAccessMenuFunctionnalities, ))
 def get_order_lines(request, id):
     menu = perm_models.Menu.objects.get(article__id_payutc=id)
     orders = perm_models.Menu.update_orders(menu)
@@ -121,7 +122,7 @@ def get_order_lines(request, id):
 
 
 @api_view(['POST'])
-@permission_classes((IsMemberUser, ))
+@permission_classes((CanAccessMenuFunctionnalities, ))
 def set_ordeline_served(request, id):
     """
     Endpoint qui permet de dire qu'un menu a été donné.
@@ -136,7 +137,7 @@ def set_ordeline_served(request, id):
 
 
 @api_view(['POST'])
-@permission_classes((IsMemberUser, ))
+@permission_classes((CanAccessMenuFunctionnalities, ))
 def set_ordeline_staff(request, id):
     """
     Endpoint qui permet de dire qu'un menu a été donné.
@@ -151,7 +152,7 @@ def set_ordeline_staff(request, id):
 
 
 @api_view(['POST'])
-@permission_classes((IsMemberUser, ))
+@permission_classes((CanAccessMenuFunctionnalities, ))
 def set_menu_closed(request, id):
     menu = perm_models.Menu.objects.get(article__id_payutc=id)
     if menu.is_closed:
