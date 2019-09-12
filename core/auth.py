@@ -14,10 +14,11 @@ from django.shortcuts import redirect
 
 
 
-def _set_session_information(request, username, sessionid):
+def _set_session_information(request, username, sessionid, connexion="full"):
     """Set username, sessionid, rights and user information into the session"""
     request.session['login'] = username
     request.session['payutc_session'] = sessionid
+    request.session['connexion'] = connexion
 
     # Check for user rights into the database
     user_right_queryset = core_models.UserRight.objects.get(login = username)
@@ -51,7 +52,11 @@ def login_badge(request, format=None):
     p = PayutcClient()
     resp = p.process_request("login", "badge", params = {"badge_id": badge_id, "pin": pin})
     _set_session_information(request, resp['username'], resp['sessionid'])
-    request.session.set_expiry(3600) 
+    request.session.set_expiry(2*3600) 
+
+    return JsonResponse(resp, status=200)
+
+
 def login_username(request, format=None):
     """Authenticate with username and pin"""
 
@@ -98,11 +103,13 @@ def me(request, format=None):
     login = request.session.get('login')
     right = request.session.get('right')
     user = request.session.get('user')
+    connexion = request.session.get('connexion')
     return JsonResponse({
         'authenticated': login is not None,
         'login': login,
         'right': right,
-        'user': user
+        'user': user,
+        'connexion': connexion
     })
 
 
