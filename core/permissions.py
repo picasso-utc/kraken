@@ -40,3 +40,15 @@ class IsMemberUserOrReadOnly(BasePermission):
         login = request.session.get('login')
         isMemberUser = (right =='A' or right == 'P') and (UserRight.objects.filter(login=login, right=right).count())
         return isMemberUser or request.method in SAFE_METHODS
+
+
+class CanAccessMenuFunctionnalities(BasePermission):
+
+    def has_permission(self, request, view):
+
+        right = request.session.get('right')
+        login = request.session.get('login')
+        connexion = request.session.get('connexion')
+        has_full_connexion = connexion == FULL_CONNEXION
+        isMemberUser = (right =='A' or right == 'P') and (UserRight.objects.filter(login=login, right=right).count()) and has_full_connexion
+        return isMemberUser or connexion == MENU_CONNEXION
