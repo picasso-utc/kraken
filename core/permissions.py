@@ -22,7 +22,7 @@ class IsMemberUser(BasePermission):
         right = request.session.get('right')
         login = request.session.get('login')
         has_full_connexion = request.session.get('connexion') == FULL_CONNEXION
-        return (right =='A' or right == 'P') and (UserRight.objects.filter(login=login, right=right).count()) and has_full_connexion
+        return (right =='A' or right == 'M') and (UserRight.objects.filter(login=login, right=right).count()) and has_full_connexion
 
 class IsAuthenticatedUser(BasePermission):
 
@@ -38,7 +38,7 @@ class IsMemberUserOrReadOnly(BasePermission):
 
         right = request.session.get('right')
         login = request.session.get('login')
-        isMemberUser = (right =='A' or right == 'P') and (UserRight.objects.filter(login=login, right=right).count())
+        isMemberUser = (right =='A' or right == 'M') and (UserRight.objects.filter(login=login, right=right).count())
         return isMemberUser or request.method in SAFE_METHODS
 
 
@@ -50,5 +50,5 @@ class CanAccessMenuFunctionnalities(BasePermission):
         login = request.session.get('login')
         connexion = request.session.get('connexion')
         has_full_connexion = connexion == FULL_CONNEXION
-        isMemberUser = (right =='A' or right == 'P') and (UserRight.objects.filter(login=login, right=right).count()) and has_full_connexion
+        isMemberUser = (right =='A' or right == 'M') and (UserRight.objects.filter(login=login, right=right).count()) and has_full_connexion
         return isMemberUser or connexion == MENU_CONNEXION
