@@ -52,7 +52,7 @@ def me(request, format=None):
 
 
 @api_view(['GET'])
-@permission_classes((IsAdminUser, ))
+@permission_classes((IsMemberUser, ))
 def user_information(request, format=None):
 	login = request.GET.get('login', '')
 	g = GingerClient()
@@ -187,7 +187,7 @@ def admin_settings(request, format=None):
 
 
 @api_view(['GET', 'POST'])
-@permission_classes((IsAdminUser, ))
+@permission_classes((IsMemberUser, ))
 def current_semester(request):
 
 	if request.method == 'GET':
