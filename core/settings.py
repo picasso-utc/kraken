@@ -145,6 +145,14 @@ CONSTANCE_CONFIG = {
 
 CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'
 
+EMAIL_USE_SSL=True
+EMAIL_USE_TLS = False
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = confidentials.EMAIL_HOST_USER
+EMAIL_HOST_PASSWORD = confidentials.EMAIL_HOST_PASSWORD
+EMAIL_PORT = 465
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
 
 # --------------------------------------------------------------------------
 # 		Internationalization
