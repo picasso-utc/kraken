@@ -13,4 +13,5 @@ urlpatterns = [
     path('menu/served/<int:id>', perm_views.set_ordeline_served),
     path('menu/staff/<int:id>', perm_views.set_ordeline_staff),
     path('menu/closed/<int:id>', perm_views.set_menu_closed),
+    path('mail', perm_views.send_mail),
 ]

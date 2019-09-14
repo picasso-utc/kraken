@@ -6,6 +6,9 @@ from .import models as perm_models
 from django.shortcuts import render
 from core.permissions import IsAdminUser, IsAuthenticatedUser, IsMemberUser, IsMemberUserOrReadOnly, CanAccessMenuFunctionnalities
 import datetime
+from core.settings import DEFAULT_FROM_EMAIL
+from django.core.mail import send_mail
+from datetime import date
 
 class PermViewSet(viewsets.ModelViewSet):
     serializer_class = perm_serializers.PermSerializer
@@ -167,6 +170,43 @@ def set_menu_closed(request, id):
     menu.save()
     return JsonResponse({})
 
+
+@api_view(['POST'])
+@permission_classes((IsMemberUser, ))
+def send_mail(request):
+    from django.core.mail import EmailMessage
+    perms = request.data
+    for perm in perms:
+
+        creneaux = ''
+        for creneau in perm["creneaux"]:
+            creneau_information = creneau.split(":")
+            date_information = creneau_information[0].split("-")
+            date = date_information[2] + "/" + date_information[1] + "/" + date_information[0]
+            creneau_type = "Soir"
+            if creneau_information[1] == "D":
+                creneau_type = "Midi"
+            elif creneau_information[1] == "M":
+                creneau_type = "Matin"
+
+            creneaux += "Le " + date + " - Perm " + creneau_type + "\n"
+
+        message = f"""Bonjour, ici le Pic'Asso\n
+        Nous te contactons car ta perm {perm['nom']}
+        blabla d'introduction/règle/etc ...\n
+        Créneaux ce semestre :
+        {creneaux}
+        blabla de fin
+        """
+
+        email = EmailMessage(
+            subject=f"Pic'Asso - Perm {perm['nom']}",
+            body=message,
+            from_email=DEFAULT_FROM_EMAIL,
+            to=['josselin.pennors@hotmail.fr'],
+        )
+        email.send()
+    return JsonResponse({})
 
 
 
