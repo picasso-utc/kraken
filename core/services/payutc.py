@@ -88,7 +88,6 @@ class PayutcClient:
 			# 'fun_id' : fun_id['fun_id']
 		}
 		# data['fun_id'] = str(data['fun_id'])
-		print(data)
 		return self.request('post', 'GESARTICLE/loginCas2', data, api='services')
 
 	def badge(self, params):
@@ -136,7 +135,6 @@ class PayutcClient:
 			request_config.update(kwargs['request_config'])
 
 		# Make the request
-		print(request_config)
 		
 		request = getattr(requests, method)
 		response = request(url, **request_config)
@@ -187,8 +185,7 @@ class PayutcClient:
 			'Content-Type': 'application/json',
 			'nemopay-version': self.config['nemopay_version'],
 		})
-		print(url)
-		print(params)
+
 		response = requests.get(url, params=params, headers=headers)
 		if is_success(response.status_code):
 			return response.json()
@@ -291,7 +288,6 @@ class PayutcClient:
 		keys = ('fun_id', 'start', 'end', 'offset', 'row_count', 'order_desc',
 						'product_id__in', 'buyer_id__in', 'category_id__in')
 		data = self.get_values_or_config(kwargs, *keys)
-		print(data)
 		if 'start' in data:
 			data['start'] = self.format_datetime(data['start'])
 		if 'end' in data:
