@@ -2,6 +2,7 @@ from rest_framework.decorators import api_view, permission_classes
 from django.http import JsonResponse
 from rest_framework import viewsets, mixins
 from . import serializers as perm_serializers
+from django.template.loader import get_template, render_to_string
 from .import models as perm_models
 from django.shortcuts import render
 from core.permissions import IsAdminUser, IsAuthenticatedUser, IsMemberUser, IsMemberUserOrReadOnly, CanAccessMenuFunctionnalities
@@ -178,34 +179,39 @@ def send_mail(request):
     perms = request.data
     for perm in perms:
 
-        creneaux = ''
+        creneaux = []
         for creneau in perm["creneaux"]:
             creneau_information = creneau.split(":")
             date_information = creneau_information[0].split("-")
             date = date_information[2] + "/" + date_information[1] + "/" + date_information[0]
+
             creneau_type = "Soir"
+            creneau_index = 2
             if creneau_information[1] == "D":
                 creneau_type = "Midi"
+                creneau_index = 1
             elif creneau_information[1] == "M":
                 creneau_type = "Matin"
+                creneau_index = 0
 
-            creneaux += "Le " + date + " - Perm " + creneau_type + "\n"
+            new_creneau = {'date': date, 'creneau_type': creneau_type, 'creneau_index': creneau_index}
+            creneaux.append(new_creneau)
 
-        message = f"""Bonjour, ici le Pic'Asso\n
-        Nous te contactons car ta perm {perm['nom']}
-        blabla d'introduction/règle/etc ...\n
-        Créneaux ce semestre :
-        {creneaux}
-        blabla de fin
-        """
+        # TO DO Sort creneaux
+        sorted_creneaux = sorted(creneaux, key=lambda x: x['creneau_index'])
 
+        mail_content = render_to_string('perm_notification.html', {'creneaux': sorted_creneaux})
         email = EmailMessage(
             subject=f"Pic'Asso - Perm {perm['nom']}",
-            body=message,
+            body=mail_content,
             from_email=DEFAULT_FROM_EMAIL,
-            to=['josselin.pennors@hotmail.fr'],
+            to=['mathilde.petit@etu.utc.fr'],
         )
+        # to=['mathilde.petit@etu.utc.fr'],
+        email.content_subtype = "html" # this is the crucial part 
+        email.attach_file('core/templates/exemple_planning.xlsx')
         email.send()
+
     return JsonResponse({})
 
 
