@@ -205,12 +205,12 @@ def send_mail(request):
             subject=f"Pic'Asso - Perm {perm['nom']}",
             body=mail_content,
             from_email=DEFAULT_FROM_EMAIL,
-            to=['mathilde.petit@etu.utc.fr'],
+            to=perm['mail_resp'],
         )
-        # to=['mathilde.petit@etu.utc.fr'],
         email.content_subtype = "html" # this is the crucial part 
         email.attach_file('core/templates/exemple_planning.xlsx')
         email.send()
+        print(f"Envoi du mail {perm['nom']}")
 
     return JsonResponse({})
 
