@@ -237,8 +237,7 @@ def send_creneau_reminder(request):
             subject=f"Pic'Asso - Perm {creneau['perm']['nom']} - {date}",
             body=mail_content,
             from_email=DEFAULT_FROM_EMAIL,
-            # to=[perm['mail_resp']],
-            to=['josselin.pennors@etu.utc.fr']
+            to=[creneau['perm']['mail_resp']],
         )
         email.content_subtype = "html" # this is the crucial part 
         if creneau['creneau'] == 'S':
