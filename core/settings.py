@@ -143,6 +143,9 @@ CONSTANCE_CONFIG = {
     'SEMESTER': (0, 'Semestre actuel', int),
 }
 
+
+MAIL_REMINDER_APP_KEY= confidentials.MAIL_REMINDER_APP_KEY
+
 CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'
 
 EMAIL_USE_SSL=True
