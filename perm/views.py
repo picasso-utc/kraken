@@ -5,11 +5,12 @@ from . import serializers as perm_serializers
 from django.template.loader import get_template, render_to_string
 from .import models as perm_models
 from django.shortcuts import render
-from core.permissions import IsAdminUser, IsAuthenticatedUser, IsMemberUser, IsMemberUserOrReadOnly, CanAccessMenuFunctionnalities
+from core.permissions import IsAdminUser, IsAuthenticatedUser, IsMemberUser, IsMemberUserOrReadOnly, CanAccessMenuFunctionnalities, HasApplicationRight
 import datetime
 from core.settings import DEFAULT_FROM_EMAIL
 from django.core.mail import send_mail
-from datetime import date
+from datetime import date, datetime, timedelta
+from django.core.mail import EmailMessage
 
 class PermViewSet(viewsets.ModelViewSet):
     serializer_class = perm_serializers.PermSerializer
@@ -84,7 +85,7 @@ def get_creneau(date):
 @api_view(['GET'])
 @permission_classes((IsMemberUser, ))
 def get_current_creneau(request):
-    date = datetime.datetime.now()
+    date = datetime.now()
     creneau = get_creneau(date)
     queryset = perm_models.Creneau.objects.filter(creneau=creneau, date=date)
     serializer = perm_serializers.CreneauSerializer(queryset, many=True)
@@ -96,7 +97,7 @@ def get_current_creneau(request):
 
 @api_view(['GET'])
 def get_current_public_creneau(request):
-    date = datetime.datetime.now()
+    date = datetime.now()
     creneau = get_creneau(date)
     
     queryset = perm_models.Creneau.objects.filter(creneau=creneau, date=date)
@@ -175,7 +176,7 @@ def set_menu_closed(request, id):
 @api_view(['POST'])
 @permission_classes((IsMemberUser, ))
 def send_mail(request):
-    from django.core.mail import EmailMessage
+    
     perms = request.data
     for perm in perms:
 
@@ -215,4 +216,33 @@ def send_mail(request):
     return JsonResponse({})
 
 
+@api_view(['GET'])
+@permission_classes((HasApplicationRight,))
+def send_creneau_reminder(request):
 
+    # Search for date in one week
+    reminder_date = (datetime.now() + timedelta(days=7)).strftime('%Y-%m-%d')
+
+    # Search in database creneau that fit this date
+    queryset = perm_models.Creneau.objects.filter(date=reminder_date)
+    serializer = perm_serializers.CreneauSerializer(queryset, many=True)
+
+    creneaux = serializer.data
+    for creneau in creneaux:
+        date_information = creneau["date"].split("-")
+        date = date_information[2] + "/" + date_information[1] + "/" + date_information[0]
+
+        mail_content = render_to_string('perm_reminder.html', {'creneau_type': creneau['creneau']})
+        email = EmailMessage(
+            subject=f"Pic'Asso - Perm {creneau['perm']['nom']} - {date}",
+            body=mail_content,
+            from_email=DEFAULT_FROM_EMAIL,
+            # to=[perm['mail_resp']],
+            to=['josselin.pennors@etu.utc.fr']
+        )
+        email.content_subtype = "html" # this is the crucial part 
+        if creneau['creneau'] == 'S':
+            email.attach_file('core/templates/exemple_planning.xlsx')
+        email.send()
+
+    return JsonResponse({})
