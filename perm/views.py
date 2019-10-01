@@ -103,7 +103,6 @@ def get_current_public_creneau(request):
     queryset = perm_models.Creneau.objects.filter(creneau=creneau, date=date)
     serializer = perm_serializers.CreneauPublicSerializer(queryset, many=True)
     current_creneau = dict()
-    print(serializer)
     if serializer.data:
         current_creneau = serializer.data[0]
     return JsonResponse(current_creneau)
@@ -245,3 +244,14 @@ def send_creneau_reminder(request):
         email.send()
 
     return JsonResponse({})
+
+
+@api_view(['POST'])
+def get_week_calendar(request):
+
+    data = request.data
+    queryset = perm_models.Creneau.objects.filter(date__range=(data['start_date'], data['end_date']))
+    serializer = perm_serializers.CreneauPublicSerializer(queryset, many=True)
+    return JsonResponse({'creneaux': serializer.data})
+
+    
