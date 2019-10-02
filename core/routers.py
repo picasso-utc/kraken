@@ -3,6 +3,7 @@ from treso import views as treso_views
 from core import views as core_views
 from perm import views as perm_views
 from payutc import views as payutc_views
+from tv import views as tv_views
 
 router = routers.DefaultRouter()
 
@@ -21,3 +22,8 @@ router.register('facture/emiserow', treso_views.FactureEmiseRowViewSet)
 router.register('facture/reversements', treso_views.ReversementEffectueViewSet)
 router.register('perm/articles', perm_views.ArticleViewSet)
 router.register('payutc/goodies', payutc_views.GoodiesWinnerViewSet, 'goodies')
+
+
+# WebTV
+router.register('tv', tv_views.WebTVViewSet)
+router.register('config/tv', tv_views.WebTVConfigurationViewSet)
