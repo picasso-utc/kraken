@@ -29,3 +29,7 @@ class TVConfiguration(models.Model):
 
     def __str__(self):
         return self.tv.name
+
+class TVMedia(models.Model):
+	name = models.CharField(max_length=50)
+	media = models.FileField(upload_to="tv", null=True, blank=True, default=None)

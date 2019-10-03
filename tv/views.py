@@ -31,3 +31,11 @@ class WebTVConfigurationViewSet(viewsets.ModelViewSet):
 
     def post(self):
         print(self.request.data)
+
+class TVMediaViewSet (viewsets.ModelViewSet):
+    """
+    TV Media viewset
+    """
+    queryset = tv_models.TVMedia.objects.all()
+    serializer_class = tv_serializers.TVMediaSerializer
+    permission_classes = (IsMemberUser,)

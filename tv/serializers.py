@@ -12,3 +12,8 @@ class WebTVSerializer(serializers.ModelSerializer):
     class Meta:
         model = tv_models.WebTV
         exclude = list()
+
+class TVMediaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = tv_models.TVMedia
+        exclude = list()
