@@ -25,5 +25,7 @@ router.register('payutc/goodies', payutc_views.GoodiesWinnerViewSet, 'goodies')
 
 
 # WebTV
-router.register('tv', tv_views.WebTVViewSet)
+router.register('tvs', tv_views.WebTVViewSet)
+# router.register('tv/config', tv_views.WebTVConfigurationViewSet)
 router.register('config/tv', tv_views.WebTVConfigurationViewSet)
+router.register('tv/media', tv_views.TVMediaViewSet)
