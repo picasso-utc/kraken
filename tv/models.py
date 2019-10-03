@@ -30,6 +30,14 @@ class TVConfiguration(models.Model):
     def __str__(self):
         return self.tv.name
 
+
+class TVLink(models.Model):
+    name = models.CharField(max_length=50)
+    url = models.CharField(max_length=500, blank=True)
+    default = models.BooleanField(default=False)
+    is_image = models.BooleanField(default=False)
+
+
 class TVMedia(models.Model):
 	name = models.CharField(max_length=50)
 	media = models.FileField(upload_to="tv", null=True, blank=True, default=None)
