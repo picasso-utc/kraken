@@ -5,8 +5,10 @@ from tv import models as tv_models
 class WebTVConfigurationSerializer(serializers.ModelSerializer):
     class Meta:
         model = tv_models.TVConfiguration
+        exclude = list()
 
 
 class WebTVSerializer(serializers.ModelSerializer):
     class Meta:
         model = tv_models.WebTV
+        exclude = list()

@@ -18,18 +18,14 @@ class WebTV(models.Model):
                 image = tv_configuration.photo
             else:
                 image = None
-            enable_messages = tv_configuration.enable_messages
         else:
             url = None
-        return {'name': self.name, 'location': self.location, 'url': url, 'image': image, 'enable_messages': enable_messages}
+        return {'name': self.name, 'location': self.location, 'url': url, 'image': image}
 
 
 class TVConfiguration(models.Model):
     tv = models.ForeignKey(WebTV, on_delete=models.CASCADE)
     url = models.CharField(max_length=500, null=True, blank=True, default=None)
-    photo = models.ImageField(upload_to="photos", null=True, blank=True, default=None)
-    enable_messages = models.BooleanField(default=False)
-    is_image = models.BooleanField(default=False)
 
     def __str__(self):
         return self.tv.name
