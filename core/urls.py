@@ -9,6 +9,8 @@ from perm import views as perm_views
 from core import views as core_views
 
 from core.routers import router
+from django.conf.urls.static import static
+from . import settings
 
 
 
@@ -37,4 +39,4 @@ urlpatterns = [
 
 	# Include routers
 	path('api/', include(router.urls)),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
