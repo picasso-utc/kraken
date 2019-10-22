@@ -39,6 +39,8 @@ class Perm(models.Model):
     #         'articles': articles,
     #         'perm_articles': perm_articles,
     #     }
+    def __str__(self):
+        return f"{self.nom}"
 
     
 
@@ -66,7 +68,7 @@ class Creneau(models.Model):
     montantTTCMaxAutorise = models.FloatField(null=True, default=None)
 
     def __str__(self):
-        return f"{self.date}:{self.creneau}:{self.id}"
+        return f"{self.date} : {self.creneau} - {self.perm.nom}"
 
 
     def get_justificatif_information(self):
@@ -212,3 +214,23 @@ class Signature(models.Model):
 
     def _str_(self):
         return self.login
+
+
+
+class Astreinte(models.Model):
+    ASTREINTE_TYPE_CHOICES = (
+        ('M1', 'Matin1'),
+        ('M2', 'Matin2'),
+        ('D1', 'Déjeuner1'),
+        ('D2', 'Déjeuner2'),
+        ('S', 'Soir'),
+    )
+    member_id = models.ManyToManyField(core_models.Member)
+    creneau_id = models.ForeignKey(Creneau, on_delete=models.CASCADE)
+    astreinte_type = models.CharField(choices=ASTREINTE_TYPE_CHOICES, max_length=1)
+
+    def __str__(self):
+        return f"{self.creneau_id.perm.nom}:{self.astreinte_type} - {self.creneau_id.date}"
+
+
+

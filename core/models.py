@@ -51,6 +51,9 @@ class UserRight(models.Model):
 	# def get_short_name(self):
 	# 	return self.login
 
+    def __str__(self):
+        return f"{self.login}"
+
 
 class Semestre(models.Model):
     # Modèle représentant un semestre de cours.
@@ -155,3 +158,32 @@ class PeriodeTVA(models.Model):
     class Meta:
         """ Représentation en DB """
         abstract = False
+
+
+
+
+class Poste(models.Model):
+    """
+    Classe qui regroupe tous les postes du pic
+    """
+    ordre = models.IntegerField()
+    nom = models.CharField(max_length=25, unique=True)
+
+    def __str__(self):
+        return f"{self.nom}"
+
+
+
+class Member(models.Model):
+    """
+    Classe qui regroupe tous les membres du pic
+    """
+    userright_id = models.ForeignKey(UserRight, on_delete=models.CASCADE)
+    semestre_id = models.ForeignKey(Semestre, on_delete=models.CASCADE)
+    poste_id = models.ForeignKey(Poste, on_delete=models.CASCADE)
+    photo = models.CharField(max_length=50, null=True)
+
+    def __str__(self):
+        return  self.userright_id.login + ', ' + self.poste_id.nom
+
+

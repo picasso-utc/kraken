@@ -74,3 +74,9 @@ class SignatureSerializer(serializers.ModelSerializer):
         model = perm_models.Signature
         exclude_list = list()
         exclude = exclude_list
+
+class AstreinteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = perm_models.Astreinte
+        fields = ('member_id', 'creneau_id', 'astreinte_type')
+

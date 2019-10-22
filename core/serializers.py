@@ -21,3 +21,15 @@ class UserRightSerializer(serializers.ModelSerializer):
     class Meta:
         model = core_models.UserRight
         fields = ('id', 'login', 'right', 'last_login')
+
+class PosteSerializer(serializers.ModelSerializer):
+	# Serializer des postes existants
+    class Meta:
+        model = core_models.Poste
+        fields = ('nom', 'ordre')
+
+class MemberSerializer(serializers.ModelSerializer):
+    # Serializer des membres existants
+    class Meta:
+        model = core_models.Member
+        fields = ('userright_id', 'semestre_id', 'poste_id', 'photo')

@@ -35,6 +35,10 @@ class ArticleViewSet(viewsets.ModelViewSet):
     queryset = perm_models.Article.objects.all()
     permission_classes = (IsMemberUser,)
 
+class AstreinteViewSet(viewsets.ModelViewSet):
+    serializer_class = perm_serializers.AstreinteSerializer
+    queryset = perm_models.Astreinte.objects.all()
+    permission_classes = (IsAdminUser,)
 
 class MenuViewSet(viewsets.ModelViewSet):
     """
@@ -49,6 +53,7 @@ class MenuViewSet(viewsets.ModelViewSet):
 class SignatureViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
     serializer_class = perm_serializers.SignatureSerializer
     queryset = perm_models.Signature.objects.all()
+
 
 
 @api_view(['GET'])

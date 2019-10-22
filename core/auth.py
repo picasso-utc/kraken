@@ -23,12 +23,14 @@ def _set_session_information(request, username, sessionid, connexion="full"):
     # Check for user rights into the database
     user_right_queryset = core_models.UserRight.objects.get(login = username)
     user_right = core_serializers.UserRightSerializer(user_right_queryset)
+    print(user_right)
     if user_right is not None and user_right.data and user_right.data['right'] != 'N':
         request.session['right'] = user_right.data['right'] 
 
     # Get detailed user information with Ginger
     ginger = GingerClient()
     ginger_response = ginger.get_user_info(username)
+    print(ginger_response)
     request.session['user'] = ginger_response['data']
     # 2h de session
     request.session.set_expiry(2*3600) 
