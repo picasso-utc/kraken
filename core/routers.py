@@ -3,6 +3,7 @@ from treso import views as treso_views
 from core import views as core_views
 from perm import views as perm_views
 from payutc import views as payutc_views
+from survey import views as survey_views
 
 router = routers.DefaultRouter()
 
@@ -21,3 +22,8 @@ router.register('facture/emiserow', treso_views.FactureEmiseRowViewSet)
 router.register('facture/reversements', treso_views.ReversementEffectueViewSet)
 router.register('perm/articles', perm_views.ArticleViewSet)
 router.register('payutc/goodies', payutc_views.GoodiesWinnerViewSet, 'goodies')
+
+
+router.register('surveys', survey_views.SurveyViewSet, 'surveys')
+router.register('survey/items', survey_views.SurveyItemViewSet, 'survey_tems')
+router.register('survey/item/votes', survey_views.SurveyItemVoteViewSet, 'survey_item_votes')
