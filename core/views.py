@@ -57,7 +57,7 @@ class PosteViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdminUser,)
 
 
-class PosteViewSet(viewsets.ModelViewSet):
+class MemberViewSet(viewsets.ModelViewSet):
     serializer_class = core_serializers.MemberSerializer
     queryset = core_models.Member.objects.all()
     permission_classes = (IsAdminUser,)
