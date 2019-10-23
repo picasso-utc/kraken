@@ -171,8 +171,8 @@ class Poste(models.Model):
     order = models.IntegerField()
     name = models.CharField(max_length=25, unique=True)
 
-    # def __str__(self):
-    #     return f"{self.nom}"
+    def __str__(self):
+        return f"{self.name}"
 
 
 
