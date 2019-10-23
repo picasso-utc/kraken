@@ -29,6 +29,8 @@ class PosteSerializer(serializers.ModelSerializer):
         exclude = list()
 
 class MemberSerializer(serializers.ModelSerializer):
+    userright = UserRightSerializer(read_only=True)
+    
     # Serializer des membres existants
     class Meta:
         model = core_models.Member
