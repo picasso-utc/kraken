@@ -220,4 +220,16 @@ def send_mail(request):
     return JsonResponse({})
 
 
+@api_view(['GET'])
+@permission_classes((IsMemberUser, ))
+def get_user_astreintes(request):
 
+    member_id = request.session.get('member_id')
+
+    if member_id:
+        astreinte_queryset = perm_models.Astreinte.objects.filter(member_id = member_id)
+        astreintes = perm_serializers.AstreinteSerializer(astreinte_queryset, many = True)
+
+        return JsonResponse({'astreintes': astreintes.data})
+
+    return JsonResponse({'astreintes': []})
