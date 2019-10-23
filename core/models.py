@@ -54,7 +54,7 @@ class UserRight(models.Model):
 	# 	return self.login
 
     def __str__(self):
-        return f"{self.login}"
+        return f"{self.name}"
 
 
 class Semestre(models.Model):
