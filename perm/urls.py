@@ -15,6 +15,7 @@ urlpatterns = [
     path('menu/closed/<int:id>', perm_views.set_menu_closed),
     path('mail', perm_views.send_mail),
     path('user/astreintes', perm_views.get_user_astreintes),
+    path('week/astreintes', perm_views.get_week_astreintes),
     path('reminder', perm_views.send_creneau_reminder),
     path('calendar', perm_views.get_week_calendar)
 ]

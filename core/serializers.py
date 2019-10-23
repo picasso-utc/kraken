@@ -20,7 +20,7 @@ class UserRightSerializer(serializers.ModelSerializer):
 	# Serializer des droits des utilisateurs
     class Meta:
         model = core_models.UserRight
-        fields = ('id', 'login', 'right', 'last_login')
+        fields = ('id', 'login', 'right', 'last_login', 'name')
 
 class PosteSerializer(serializers.ModelSerializer):
 	# Serializer des postes existants
@@ -33,3 +33,12 @@ class MemberSerializer(serializers.ModelSerializer):
     class Meta:
         model = core_models.Member
         exclude = list()
+
+class ShortMemberSerializer(serializers.ModelSerializer):
+
+    userright = UserRightSerializer(read_only=True)
+
+    # Serializer des membres existants
+    class Meta:
+        model = core_models.Member
+        fields = ('userright',)

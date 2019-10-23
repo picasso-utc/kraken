@@ -275,4 +275,14 @@ def get_user_astreintes(request):
 
     return JsonResponse({'astreintes': []})
 
+
+@api_view(['POST'])
+@permission_classes((IsMemberUser, ))
+def get_week_astreintes(request):
+
+    data = request.data
+    queryset = perm_models.Creneau.objects.filter(date__range=(data['start_date'], data['end_date']))
+    serializer = perm_serializers.CreneauAstreinteSerializer(queryset, many=True)
+    return JsonResponse({'creneaux': serializer.data})
+
     
