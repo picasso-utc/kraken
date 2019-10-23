@@ -26,10 +26,10 @@ class PosteSerializer(serializers.ModelSerializer):
 	# Serializer des postes existants
     class Meta:
         model = core_models.Poste
-        fields = ('nom', 'ordre')
+        fields = ('nom', 'order')
 
 class MemberSerializer(serializers.ModelSerializer):
     # Serializer des membres existants
     class Meta:
         model = core_models.Member
-        fields = ('userright_id', 'semestre_id', 'poste_id', 'photo')
+        fields = ('id', 'userright_id', 'semester_id', 'poste_id', 'picture')

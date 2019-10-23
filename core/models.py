@@ -167,8 +167,8 @@ class Poste(models.Model):
     """
     Classe qui regroupe tous les postes du pic
     """
-    ordre = models.IntegerField()
-    nom = models.CharField(max_length=25, unique=True)
+    order = models.IntegerField()
+    name = models.CharField(max_length=25, unique=True)
 
     def __str__(self):
         return f"{self.nom}"
@@ -180,9 +180,9 @@ class Member(models.Model):
     Classe qui regroupe tous les membres du pic
     """
     userright_id = models.ForeignKey(UserRight, on_delete=models.CASCADE)
-    semestre_id = models.ForeignKey(Semestre, on_delete=models.CASCADE, default=get_current_semester)
+    semester_id = models.ForeignKey(Semestre, on_delete=models.CASCADE, default=get_current_semester)
     poste_id = models.ForeignKey(Poste, null=True, on_delete=models.SET_NULL)
-    photo = models.CharField(max_length=50, null=True)
+    picture = models.CharField(max_length=50, null=True)
 
     def __str__(self):
         return  self.userright_id.login + ', ' + self.poste_id.nom
