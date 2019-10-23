@@ -1,5 +1,6 @@
 from rest_framework.permissions import BasePermission, SAFE_METHODS
 from core.models import UserRight
+from core.settings import MAIL_REMINDER_APP_KEY
 
 FULL_CONNEXION = 'full'
 MENU_CONNEXION = 'menu'
@@ -52,3 +53,11 @@ class CanAccessMenuFunctionnalities(BasePermission):
         has_full_connexion = connexion == FULL_CONNEXION
         isMemberUser = (right =='A' or right == 'M') and (UserRight.objects.filter(login=login, right=right).count()) and has_full_connexion
         return isMemberUser or connexion == MENU_CONNEXION
+
+
+class HasApplicationRight(BasePermission):
+
+    def has_permission(self, request, view):
+
+        app_key = request.GET.get('app_key')
+        return app_key == MAIL_REMINDER_APP_KEY

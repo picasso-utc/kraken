@@ -51,7 +51,7 @@ class CreneauPublicSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = perm_models.Creneau
-        fields = ('id', 'perm')
+        fields = ('id', 'perm', 'creneau', 'date')
     
 
 class OrderLinesSerializer(serializers.ModelSerializer):
