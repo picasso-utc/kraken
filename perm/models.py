@@ -219,18 +219,18 @@ class Signature(models.Model):
 
 class Astreinte(models.Model):
     ASTREINTE_TYPE_CHOICES = (
-        ('M1', 'Matin1'),
-        ('M2', 'Matin2'),
-        ('D1', 'Déjeuner1'),
-        ('D2', 'Déjeuner2'),
+        ('M1', 'Matin 1'),
+        ('M2', 'Matin 2'),
+        ('D1', 'Déjeuner 1'),
+        ('D2', 'Déjeuner 2'),
         ('S', 'Soir'),
     )
     member = models.ForeignKey(core_models.Member, on_delete=models.CASCADE)
-    creneau = models.ForeignKey(Creneau, on_delete=models.CASCADE)
+    creneau = models.ForeignKey(Creneau, related_name="astreintes", on_delete=models.CASCADE)
     astreinte_type = models.CharField(choices=ASTREINTE_TYPE_CHOICES, max_length=2)
 
-    # def __str__(self):
-    #     return f"{self.creneau_id.perm.nom}:{self.astreinte_type} - {self.creneau_id.date}"
+    def __str__(self):
+        return f"{self.astreinte_type} : {self.member.userright.name}"
 
 
 
