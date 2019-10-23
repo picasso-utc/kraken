@@ -6,20 +6,20 @@ class SurveyItemVoteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = survey_models.SurveyItemVote
-        fields = list()
+        exclude = list()
 
 
 class SurveyItemSerializer(serializers.ModelSerializer):
-    vote = serializers.PrimaryKeyRelatedField(queryset = survey_models.SurveyItemVote.objects.all())
+    surveyitem_set = SurveyItemVoteSerializer(many=True, read_only=True)
 
     class Meta:
         model = survey_models.SurveyItem
-        fields = list()
+        exclude = list()
 
 
 class SurveySerializer(serializers.ModelSerializer):
 
-    survey_item_set = SurveyItemSerializer(many = True, read_only = True)
+    surveyitem_set = SurveyItemSerializer(many = True, read_only = True)
 
     class Meta:
         model = survey_models.Survey
