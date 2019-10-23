@@ -230,7 +230,7 @@ class Astreinte(models.Model):
     astreinte_type = models.CharField(choices=ASTREINTE_TYPE_CHOICES, max_length=2)
 
     def __str__(self):
-        return f"{self.astreinte_type} : {self.member.userright.name}"
+        return f"{self.astreinte_type} - {self.member.userright.name}"
 
 
 
