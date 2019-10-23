@@ -76,7 +76,10 @@ class SignatureSerializer(serializers.ModelSerializer):
         exclude = exclude_list
 
 class AstreinteSerializer(serializers.ModelSerializer):
+
+    creneau = CreneauPublicSerializer(read_only=True) 
+
     class Meta:
         model = perm_models.Astreinte
-        fields = ('id', 'member_id', 'creneau_id', 'astreinte_type')
+        exclude =  list()
 

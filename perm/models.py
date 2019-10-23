@@ -225,12 +225,12 @@ class Astreinte(models.Model):
         ('D2', 'Déjeuner2'),
         ('S', 'Soir'),
     )
-    member_id = models.ManyToManyField(core_models.Member)
-    creneau_id = models.ForeignKey(Creneau, on_delete=models.CASCADE)
-    astreinte_type = models.CharField(choices=ASTREINTE_TYPE_CHOICES, max_length=1)
+    member = models.ForeignKey(core_models.Member, on_delete=models.CASCADE)
+    creneau = models.ForeignKey(Creneau, on_delete=models.CASCADE)
+    astreinte_type = models.CharField(choices=ASTREINTE_TYPE_CHOICES, max_length=2)
 
-    def __str__(self):
-        return f"{self.creneau_id.perm.nom}:{self.astreinte_type} - {self.creneau_id.date}"
+    # def __str__(self):
+    #     return f"{self.creneau_id.perm.nom}:{self.astreinte_type} - {self.creneau_id.date}"
 
 
 

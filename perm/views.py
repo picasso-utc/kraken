@@ -227,6 +227,7 @@ def get_user_astreintes(request):
     member_id = request.session.get('member_id')
 
     if member_id:
+        print(member_id)
         astreinte_queryset = perm_models.Astreinte.objects.filter(member_id = member_id)
         astreintes = perm_serializers.AstreinteSerializer(astreinte_queryset, many = True)
 
