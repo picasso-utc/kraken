@@ -78,5 +78,5 @@ class SignatureSerializer(serializers.ModelSerializer):
 class AstreinteSerializer(serializers.ModelSerializer):
     class Meta:
         model = perm_models.Astreinte
-        fields = ('member_id', 'creneau_id', 'astreinte_type')
+        fields = ('id', 'member_id', 'creneau_id', 'astreinte_type')
 
