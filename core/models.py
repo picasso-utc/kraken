@@ -185,6 +185,6 @@ class Member(models.Model):
     picture = models.CharField(max_length=50, null=True)
 
     def __str__(self):
-        return  self.userright_id.login + ', ' + self.poste_id.nom
+        return  self.userright_id.login + ', ' + self.poste_id.name
 
 
