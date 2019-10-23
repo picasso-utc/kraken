@@ -26,6 +26,7 @@ class UserRight(models.Model):
     )
 
     login = models.CharField(max_length=16, unique=True)
+    name = models.CharField(max_length=50, null=True)
     right = models.CharField(max_length=1, choices=USERRIGHT_CHOICES)
     last_login = models.DateTimeField(blank=True, null=True)
 	# email = models.EmailField(unique=True)
