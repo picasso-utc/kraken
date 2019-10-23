@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractBaseUser
 from django.db import models
+from core.services.current_semester import get_current_semester
 
 
 # class User(AbstractBaseUser):
@@ -179,8 +180,8 @@ class Member(models.Model):
     Classe qui regroupe tous les membres du pic
     """
     userright_id = models.ForeignKey(UserRight, on_delete=models.CASCADE)
-    semestre_id = models.ForeignKey(Semestre, on_delete=models.CASCADE)
-    poste_id = models.ForeignKey(Poste, on_delete=models.CASCADE)
+    semestre_id = models.ForeignKey(Semestre, on_delete=models.CASCADE, default=get_current_semester)
+    poste_id = models.ForeignKey(Poste, null=True, on_delete=models.SET_NULL)
     photo = models.CharField(max_length=50, null=True)
 
     def __str__(self):
