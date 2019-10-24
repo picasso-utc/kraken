@@ -228,6 +228,12 @@ class Astreinte(models.Model):
     member = models.ForeignKey(core_models.Member, on_delete=models.CASCADE)
     creneau = models.ForeignKey(Creneau, related_name="astreintes", on_delete=models.CASCADE)
     astreinte_type = models.CharField(choices=ASTREINTE_TYPE_CHOICES, max_length=2)
+    note_deco = models.IntegerField(default=0)
+    note_orga = models.IntegerField(default=0)
+    note_anim = models.IntegerField(default=0)
+    note_menu = models.IntegerField(default=0)
+    commentaire = models.CharField(null=True, default=None, max_length=255)
+
 
     def __str__(self):
         return f"{self.astreinte_type} - {self.member.userright.name}"
