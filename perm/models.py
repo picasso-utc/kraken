@@ -68,7 +68,7 @@ class Creneau(models.Model):
     montantTTCMaxAutorise = models.FloatField(null=True, default=None)
 
     def __str__(self):
-        return f"{self.date} : {self.creneau} - {self.perm.nom}"
+        return f"{self.date}:{self.creneau}:{self.id}"
 
 
     def get_justificatif_information(self):
