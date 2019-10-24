@@ -87,7 +87,7 @@ class SignatureSerializer(serializers.ModelSerializer):
 
 class AstreinteSerializer(serializers.ModelSerializer):
 
-    creneau = CreneauPublicSerializer(read_only=True) 
+    creneau = CreneauSerializer(read_only=True) 
     creneau_id = serializers.PrimaryKeyRelatedField(queryset=perm_models.Creneau.objects.all(), source="creneau")
     member = core_serializers.ShortMemberSerializer(read_only=True)
     member_id = serializers.PrimaryKeyRelatedField(queryset=core_models.Member.objects.all(), source="member")
