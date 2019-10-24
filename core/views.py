@@ -121,6 +121,16 @@ class PeriodeTVAViewSet(viewsets.ModelViewSet):
     serializer_class = core_serializers.PeriodeTVASerializer
 
 
+
+class UserRightViewSet(viewsets.ModelViewSet):
+    """
+    Userright endpoint
+    """
+    permission_classes = (IsAdminUser, )
+    queryset = core_models.UserRight.objects.all()
+    serializer_class = core_serializers.UserRightSerializer
+
+
 class UserViewSet(mixins.ListModelMixin,
                     mixins.CreateModelMixin,
                     viewsets.GenericViewSet):

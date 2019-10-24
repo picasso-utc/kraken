@@ -27,9 +27,13 @@ def _set_session_information(request, username, sessionid, connexion="full"):
 
     if user_right is not None and user_right.data and user_right.data['right'] != 'N':
         request.session['right'] = user_right.data['right'] 
+        
+        try:
+            member_queryset = core_models.Member.objects.filter(userright_id= user_right.data['id'], semester_id=get_current_semester()).get()
+            member = core_serializers.MemberSerializer(member_queryset)
+        except core_models.Member.DoesNotExist:
+            member = None
 
-        member_queryset = core_models.Member.objects.filter(userright_id= user_right.data['id'], semester_id=get_current_semester()).get()
-        member = core_serializers.MemberSerializer(member_queryset)
         if member is not None and member.data and 'id' in member.data:
             request.session['member_id'] = member.data['id']
 

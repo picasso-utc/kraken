@@ -30,6 +30,7 @@ class PosteSerializer(serializers.ModelSerializer):
 
 class MemberSerializer(serializers.ModelSerializer):
     userright = UserRightSerializer(read_only=True)
+    userright_id = serializers.PrimaryKeyRelatedField(queryset=core_models.UserRight.objects.all(), source="userright")
     
     # Serializer des membres existants
     class Meta:
