@@ -101,4 +101,4 @@ class PermHalloweenSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = perm_models.PermHalloween
-        fields = ('login', 'article_id')
+        fields = ('id', 'login', 'article_id')
