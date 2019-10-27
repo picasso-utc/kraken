@@ -291,3 +291,12 @@ class PermHalloweenViewSet(viewsets.ModelViewSet):
     serializer_class = perm_serializers.PermHalloweenSerializer
     queryset = perm_models.PermHalloween.objects.all()
     # permission_classes = (IsAdminUser,)
+
+
+@api_view(['GET'])
+# @permission_classes((IsMemberUser, ))
+def get_halloween_article_count(request):
+
+    article_id = request.GET.get("article_id", 1)
+    queryset = perm_models.PermHalloween.objects.filter(article_id=article_id)
+    return JsonResponse({'count': len(queryset)})
