@@ -286,3 +286,8 @@ def get_week_astreintes(request):
     return JsonResponse({'creneaux': serializer.data})
 
     
+
+class PermHalloweenViewSet(viewsets.ModelViewSet):
+    serializer_class = perm_serializers.PermHalloweenSerializer
+    queryset = perm_models.PermHalloween.objects.all()
+    # permission_classes = (IsAdminUser,)

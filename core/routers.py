@@ -26,3 +26,6 @@ router.register('admin/postes', core_views.PosteViewSet, 'postes')
 router.register('admin/members', core_views.MemberViewSet, 'members')
 router.register('perm/astreintes', perm_views.AstreinteViewSet, 'astreintes')
 router.register('perm/creneaux', perm_views.CreneauViewSet, 'creneaux')
+
+
+router.register('perm/halloween', perm_views.PermHalloweenViewSet, 'halloween')

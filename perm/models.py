@@ -239,4 +239,7 @@ class Astreinte(models.Model):
         return f"{self.astreinte_type} - {self.member.userright.name}"
 
 
+class PermHalloween(models.Model):
 
+    article_id = models.IntegerField(default=0)
+    login = models.CharField(null=True, default=None, max_length=10)

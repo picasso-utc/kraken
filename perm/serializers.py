@@ -96,3 +96,9 @@ class AstreinteSerializer(serializers.ModelSerializer):
         model = perm_models.Astreinte
         exclude =  list()
 
+
+class PermHalloweenSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = perm_models.PermHalloween
+        fields = ('login', 'article_id')
