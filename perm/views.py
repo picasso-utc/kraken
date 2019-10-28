@@ -39,7 +39,7 @@ class ArticleViewSet(viewsets.ModelViewSet):
 class AstreinteViewSet(viewsets.ModelViewSet):
     serializer_class = perm_serializers.AstreinteSerializer
     queryset = perm_models.Astreinte.objects.all()
-    permission_classes = (IsAdminUser,)
+    permission_classes = (IsMemberUser,)
 
 class MenuViewSet(viewsets.ModelViewSet):
     """
