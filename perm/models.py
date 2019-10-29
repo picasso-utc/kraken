@@ -39,6 +39,8 @@ class Perm(models.Model):
     #         'articles': articles,
     #         'perm_articles': perm_articles,
     #     }
+    def __str__(self):
+        return f"{self.nom}"
 
     
 
@@ -212,3 +214,32 @@ class Signature(models.Model):
 
     def _str_(self):
         return self.login
+
+
+
+class Astreinte(models.Model):
+    ASTREINTE_TYPE_CHOICES = (
+        ('M1', 'Matin 1'),
+        ('M2', 'Matin 2'),
+        ('D1', 'Déjeuner 1'),
+        ('D2', 'Déjeuner 2'),
+        ('S', 'Soir'),
+    )
+    member = models.ForeignKey(core_models.Member, on_delete=models.CASCADE)
+    creneau = models.ForeignKey(Creneau, related_name="astreintes", on_delete=models.CASCADE)
+    astreinte_type = models.CharField(choices=ASTREINTE_TYPE_CHOICES, max_length=2)
+    note_deco = models.IntegerField(default=0)
+    note_orga = models.IntegerField(default=0)
+    note_anim = models.IntegerField(default=0)
+    note_menu = models.IntegerField(default=0)
+    commentaire = models.CharField(null=True, default=None, max_length=255)
+
+
+    def __str__(self):
+        return f"{self.astreinte_type} - {self.member.userright.name}"
+
+
+class PermHalloween(models.Model):
+
+    article_id = models.IntegerField(default=0)
+    login = models.CharField(null=True, default=None, max_length=10)

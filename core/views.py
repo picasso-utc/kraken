@@ -51,6 +51,18 @@ def me(request, format=None):
 	return auth_view.me(request, format)
 
 
+class PosteViewSet(viewsets.ModelViewSet):
+    serializer_class = core_serializers.PosteSerializer
+    queryset = core_models.Poste.objects.all()
+    permission_classes = (IsAdminUser,)
+
+
+class MemberViewSet(viewsets.ModelViewSet):
+    serializer_class = core_serializers.MemberSerializer
+    queryset = core_models.Member.objects.all()
+    permission_classes = (IsAdminUser,)
+
+
 @api_view(['GET'])
 @permission_classes((IsMemberUser, ))
 def user_information(request, format=None):
@@ -107,6 +119,16 @@ class PeriodeTVAViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdminUser, )
     queryset = core_models.PeriodeTVA.objects.all()
     serializer_class = core_serializers.PeriodeTVASerializer
+
+
+
+class UserRightViewSet(viewsets.ModelViewSet):
+    """
+    Userright endpoint
+    """
+    permission_classes = (IsAdminUser, )
+    queryset = core_models.UserRight.objects.all()
+    serializer_class = core_serializers.UserRightSerializer
 
 
 class UserViewSet(mixins.ListModelMixin,
