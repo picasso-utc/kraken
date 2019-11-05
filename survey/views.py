@@ -86,4 +86,53 @@ def get_survey_results(request, id=None):
         return JsonResponse({'results' : results})
     else :
         return JsonResponse({'error': 'Vous n\'avez pas participé à ce sondage'}, status = 409)
+
+
 @api_view(['GET'])
+@permission_classes((IsAuthenticatedUser, ))
+def vote_survey(request, survey_id=None, item_id=None):
+
+    login = request.session['login']
+    queryset = survey_models.Survey.objects.filter(visible=True, id=survey_id)
+    serializer = survey_serializers.SurveySerializer(queryset, many=True)
+    surveys = serializer.data
+    if len(surveys) > 0:
+        survey = surveys[0]
+        # Si multi choix non autorisé, on vérifie que l'utilisateur est pas déjà rentré
+        if not survey["multi_choice"]:
+            found = False
+            for item in survey['surveyitem_set']:
+                vote = [v for v in item['surveyitemvote_set'] if v['login'] == login]
+                if len(vote) > 0:
+                    found = True
+
+            if found :
+                return JsonResponse({'error': 'Vous avez déjà voté pour ce sondage.'}, status = 409)
+
+            # Si pas trouvé on ajoute le vote
+            survey_item_vote = survey_models.SurveyItemVote.objects.create(
+                login=login,
+                survey_item_id=item_id
+            )
+            return JsonResponse({})
+
+        # Si multi choix autorisé on vérfiie simplement que l'utilisateur n'a pas déjà voté pour cet item
+        queryset = survey_models.SurveyItem.objects.filter(id=item_id)
+        serializer = survey_serializers.SurveyItemSerializer(queryset, many=True)
+        survey_items = serializer.data
+        print(survey_items)
+        if len(survey_items) > 0:
+            survey_item = survey_items[0]
+            vote = [v for v in survey_item['surveyitemvote_set'] if v['login'] == login]
+            if len(vote) > 0:
+                return JsonResponse({'error': 'Vous avez déjà voté pour cet item.'}, status = 409)
+
+            survey_item_vote = survey_models.SurveyItemVote.objects.create(
+                login=login,
+                survey_item_id=item_id
+            )
+            return JsonResponse({})
+
+    return JsonResponse({'error': 'Une erreur est survenue'}, status = 500)
+
+
