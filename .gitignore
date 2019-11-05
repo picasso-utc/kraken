@@ -97,8 +97,10 @@ settings_confidential.py
 
 # Static files
 /static
+/media
 
 db.sqlite3
 
 
 .vscode
+
