@@ -6,6 +6,7 @@ class Survey(models.Model):
     image = models.ImageField(upload_to="survey", null=True, blank=True, default=None)
     description = models.TextField()
     visible = models.BooleanField(default=False)
+    multi_choice = models.BooleanField(default=False)
 
 
 class SurveyItem(models.Model):
