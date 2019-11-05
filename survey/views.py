@@ -136,3 +136,11 @@ def vote_survey(request, survey_id=None, item_id=None):
     return JsonResponse({'error': 'Une erreur est survenue'}, status = 500)
 
 
+@api_view(['GET'])
+@permission_classes((IsAuthenticatedUser, ))
+def cancel_vote(request, item_id=None):
+
+    login = request.session['login']
+    survey_models.SurveyItemVote.objects.filter(survey_item_id=item_id, login=login).delete()
+
+    return JsonResponse({})
