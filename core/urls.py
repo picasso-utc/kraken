@@ -9,7 +9,8 @@ from perm import views as perm_views
 from core import views as core_views
 
 from core.routers import router
-
+from django.conf.urls.static import static
+from . import settings
 
 
 urlpatterns = [
@@ -34,7 +35,8 @@ urlpatterns = [
 	path('api/perms/', include('perm.urls')),
 	path('api/treso/', include('treso.urls')),
 	path('api/payutc/', include('payutc.urls')),
+	path('api/surveys/', include('survey.urls')),
 
 	# Include routers
 	path('api/', include(router.urls)),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
