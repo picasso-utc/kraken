@@ -32,6 +32,28 @@ def get_public_surveys(request):
         for item in survey['surveyitem_set']:
             del item["surveyitemvote_set"]
     return JsonResponse({'surveys' : surveys})
+
+
+@api_view(['GET'])
+@permission_classes((IsAuthenticatedUser, ))
+def get_public_survey(request, id=None):
+    login = request.session['login']
+    queryset = survey_models.Survey.objects.filter(visible=True, id=id)
+    serializer = survey_serializers.SurveySerializer(queryset, many=True)
+    surveys = serializer.data
+    if len(surveys) > 0:
+        survey = surveys[0]
+        for item in survey['surveyitem_set']:
+            vote = [v for v in item['surveyitemvote_set'] if v['login'] == login]
+            if len(vote) > 0:
+                item["voted"] = True
+            else : 
+                item["voted"] = False
+            del item['surveyitemvote_set']
+
+    return JsonResponse({'survey' : survey})
+
+
 @api_view(['GET'])
 @permission_classes((IsAuthenticatedUser, ))
 def get_survey_results(request, id=None):
