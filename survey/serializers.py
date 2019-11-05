@@ -12,7 +12,7 @@ class SurveyItemVoteSerializer(serializers.ModelSerializer):
 
 
 class SurveyItemSerializer(serializers.ModelSerializer):
-    image = Base64ImageField(required = False)
+    image = Base64ImageField(required = False, use_url=False)
     surveyitemvote_set = SurveyItemVoteSerializer(many=True, read_only=True)
 
     class Meta:
@@ -22,7 +22,7 @@ class SurveyItemSerializer(serializers.ModelSerializer):
 
 class SurveySerializer(serializers.ModelSerializer):
 
-    image = Base64ImageField()
+    image = Base64ImageField(use_url=False)
     surveyitem_set = SurveyItemSerializer(many = True, read_only = True)
 
     class Meta:
