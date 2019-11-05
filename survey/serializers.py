@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from . import models as survey_models
+from drf_extra_fields.fields import Base64ImageField
+
 
 
 class SurveyItemVoteSerializer(serializers.ModelSerializer):
@@ -10,7 +12,7 @@ class SurveyItemVoteSerializer(serializers.ModelSerializer):
 
 
 class SurveyItemSerializer(serializers.ModelSerializer):
-    surveyitem_set = SurveyItemVoteSerializer(many=True, read_only=True)
+    image = Base64ImageField(required = False)
 
     class Meta:
         model = survey_models.SurveyItem
@@ -19,9 +21,9 @@ class SurveyItemSerializer(serializers.ModelSerializer):
 
 class SurveySerializer(serializers.ModelSerializer):
 
+    image = Base64ImageField()
     surveyitem_set = SurveyItemSerializer(many = True, read_only = True)
 
     class Meta:
         model = survey_models.Survey
         exclude = list()
-
