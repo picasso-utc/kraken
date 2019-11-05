@@ -5,18 +5,20 @@ from django.http import JsonResponse
 from rest_framework.decorators import api_view, permission_classes
 from core.permissions import IsAdminUser, IsAuthenticatedUser, IsMemberUser, IsMemberUserOrReadOnly, CanAccessMenuFunctionnalities, HasApplicationRight
 
+@permission_classes((IsMemberUser, ))
 class SurveyViewSet(viewsets.ModelViewSet):
     serializer_class = survey_serializers.SurveySerializer
     queryset = survey_models.Survey.objects.all()
     permission_classes = (IsMemberUser,)
 
-
+@permission_classes((IsMemberUser, ))
 class SurveyItemViewSet(viewsets.ModelViewSet):
     serializer_class = survey_serializers.SurveyItemSerializer
     queryset = survey_models.SurveyItem.objects.all()
     permission_classes = (IsMemberUser,)
 
 
+@permission_classes((IsMemberUser, ))
 class SurveyItemVoteViewSet(viewsets.ModelViewSet):
     serializer_class = survey_serializers.SurveyItemVoteSerializer
     queryset = survey_models.SurveyItemVote.objects.all()
