@@ -22,8 +22,12 @@ def _set_session_information(request, username, sessionid, connexion="full"):
     request.session['connexion'] = connexion
 
     # Check for user rights into the database
-    user_right_queryset = core_models.UserRight.objects.get(login = username)
-    user_right = core_serializers.UserRightSerializer(user_right_queryset)
+    try:
+        user_right_queryset = core_models.UserRight.objects.get(login = username)
+        user_right = core_serializers.UserRightSerializer(user_right_queryset)
+    except core_models.UserRight.DoesNotExist:
+        user_right = None
+        request.session['right'] = None
 
     if user_right is not None and user_right.data and user_right.data['right'] != 'N':
         request.session['right'] = user_right.data['right'] 
@@ -33,6 +37,7 @@ def _set_session_information(request, username, sessionid, connexion="full"):
             member = core_serializers.MemberSerializer(member_queryset)
         except core_models.Member.DoesNotExist:
             member = None
+            request.session['member_id'] = None
 
         if member is not None and member.data and 'id' in member.data:
             request.session['member_id'] = member.data['id']
