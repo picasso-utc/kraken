@@ -1,43 +1,25 @@
 from django.db import models
 
-class WebTV(models.Model):
-    name = models.CharField(max_length=30)
-    location = models.CharField(max_length=30)
 
-    def __str__(self):
-        return self.name
-
-    def getUrl(self):
-        if TVConfiguration.objects.filter(tv=self).count() > 0:
-            tv_configuration = TVConfiguration.objects.filter(tv=self).last()
-            if tv_configuration.url:
-                url = tv_configuration.url
-            else:
-                url = None
-            if tv_configuration.photo:
-                image = tv_configuration.photo
-            else:
-                image = None
-        else:
-            url = None
-        return {'name': self.name, 'location': self.location, 'url': url, 'image': image}
-
-
-class TVConfiguration(models.Model):
-    tv = models.ForeignKey(WebTV, on_delete=models.CASCADE)
-    url = models.CharField(max_length=500, null=True, blank=True, default=None)
-
-    def __str__(self):
-        return self.tv.name
-
-
-class TVLink(models.Model):
+class WebTVLink(models.Model):
     name = models.CharField(max_length=50)
     url = models.CharField(max_length=500, blank=True)
-    default = models.BooleanField(default=False)
-    is_image = models.BooleanField(default=False)
 
 
-class TVMedia(models.Model):
-	name = models.CharField(max_length=50)
-	media = models.FileField(upload_to="tv", null=True, blank=True, default=None)
+class WebTV(models.Model):
+    name = models.CharField(max_length=30)
+    link = models.ForeignKey(WebTVLink, on_delete=models.SET_NULL, null=True, default=None)
+
+
+class WebTVMedia(models.Model):
+
+    MEDIA_TYPE_CHOICES = (
+        ('I', 'Image'),
+        ('V', 'Video'),
+    )
+
+    name = models.CharField(max_length=50)
+    media_type = models.CharField(choices=MEDIA_TYPE_CHOICES, default='I', max_length=1)
+    media = models.FileField(upload_to="tv", null=True, blank=True, default=None)
+    activate = models.BooleanField(default=False)
+    times = models.IntegerField(default=1)
