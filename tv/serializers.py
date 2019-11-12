@@ -2,18 +2,21 @@ from rest_framework import serializers
 from tv import models as tv_models
 
 
-class WebTVConfigurationSerializer(serializers.ModelSerializer):
+class WebTVLinkSerializer(serializers.ModelSerializer):
     class Meta:
-        model = tv_models.TVConfiguration
+        model = tv_models.WebTVLink
         exclude = list()
 
 
 class WebTVSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = tv_models.WebTV
-        exclude = list()
+	link = WebTVLinkSerializer(read_only=True) 
+	link_id = serializers.PrimaryKeyRelatedField(queryset=tv_models.WebTVLink.objects.all())
+	class Meta:
+		model = tv_models.WebTV
+		exclude = list()
 
-class TVMediaSerializer(serializers.ModelSerializer):
+
+class WebTVMediaSerializer(serializers.ModelSerializer):
     class Meta:
-        model = tv_models.TVMedia
+        model = tv_models.WebTVMedia
         exclude = list()
