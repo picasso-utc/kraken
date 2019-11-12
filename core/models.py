@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractBaseUser
 from django.db import models
+from core.services.current_semester import get_current_semester
 
 
 # class User(AbstractBaseUser):
@@ -25,6 +26,7 @@ class UserRight(models.Model):
     )
 
     login = models.CharField(max_length=16, unique=True)
+    name = models.CharField(max_length=50, null=True)
     right = models.CharField(max_length=1, choices=USERRIGHT_CHOICES)
     last_login = models.DateTimeField(blank=True, null=True)
 	# email = models.EmailField(unique=True)
@@ -50,6 +52,9 @@ class UserRight(models.Model):
 
 	# def get_short_name(self):
 	# 	return self.login
+
+    def __str__(self):
+        return f"{self.name}"
 
 
 class Semestre(models.Model):
@@ -155,3 +160,32 @@ class PeriodeTVA(models.Model):
     class Meta:
         """ Représentation en DB """
         abstract = False
+
+
+
+
+class Poste(models.Model):
+    """
+    Classe qui regroupe tous les postes du pic
+    """
+    order = models.IntegerField()
+    name = models.CharField(max_length=25, unique=True)
+
+    def __str__(self):
+        return f"{self.name}"
+
+
+
+class Member(models.Model):
+    """
+    Classe qui regroupe tous les membres du pic
+    """
+    userright = models.ForeignKey(UserRight, on_delete=models.CASCADE)
+    semester = models.ForeignKey(Semestre, on_delete=models.CASCADE, default=get_current_semester)
+    poste = models.ForeignKey(Poste, null=True, on_delete=models.SET_NULL)
+    picture = models.ImageField(upload_to="member", null=True, blank=True, default=None)
+
+    # def __str__(self):
+    #     return  self.userright_id.login + ', ' + self.poste_id.name
+
+

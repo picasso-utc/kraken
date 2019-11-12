@@ -50,6 +50,7 @@ INSTALLED_APPS = [
 	'perm',
 	'treso',
 	'payutc',
+	'survey'
 	'tv',
 ]
 

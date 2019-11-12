@@ -3,6 +3,7 @@ from treso import views as treso_views
 from core import views as core_views
 from perm import views as perm_views
 from payutc import views as payutc_views
+from survey import views as survey_views
 from tv import views as tv_views
 
 router = routers.DefaultRouter()

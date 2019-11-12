@@ -45,6 +45,16 @@ class CreneauSerializer(serializers.ModelSerializer):
         exclude = exclude_list
 
 
+class CreneauAstreinteSerializer(serializers.ModelSerializer):
+    
+    perm = PermPublicSerializer(read_only=True)
+    astreintes = serializers.StringRelatedField(many=True, required=False, read_only=True)
+
+    class Meta:
+        model = perm_models.Creneau
+        fields = ('id', 'perm', 'creneau', 'date', 'astreintes')
+
+
 class CreneauPublicSerializer(serializers.ModelSerializer):
     
     perm = PermPublicSerializer(read_only=True)    
@@ -74,3 +84,21 @@ class SignatureSerializer(serializers.ModelSerializer):
         model = perm_models.Signature
         exclude_list = list()
         exclude = exclude_list
+
+class AstreinteSerializer(serializers.ModelSerializer):
+
+    creneau = CreneauSerializer(read_only=True) 
+    creneau_id = serializers.PrimaryKeyRelatedField(queryset=perm_models.Creneau.objects.all(), source="creneau")
+    member = core_serializers.ShortMemberSerializer(read_only=True)
+    member_id = serializers.PrimaryKeyRelatedField(queryset=core_models.Member.objects.all(), source="member")
+
+    class Meta:
+        model = perm_models.Astreinte
+        exclude =  list()
+
+
+class PermHalloweenSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = perm_models.PermHalloween
+        fields = ('id', 'login', 'article_id')

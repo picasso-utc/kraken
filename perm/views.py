@@ -36,6 +36,10 @@ class ArticleViewSet(viewsets.ModelViewSet):
     queryset = perm_models.Article.objects.all()
     permission_classes = (IsMemberUser,)
 
+class AstreinteViewSet(viewsets.ModelViewSet):
+    serializer_class = perm_serializers.AstreinteSerializer
+    queryset = perm_models.Astreinte.objects.all()
+    permission_classes = (IsMemberUser,)
 
 class MenuViewSet(viewsets.ModelViewSet):
     """
@@ -50,6 +54,7 @@ class MenuViewSet(viewsets.ModelViewSet):
 class SignatureViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
     serializer_class = perm_serializers.SignatureSerializer
     queryset = perm_models.Signature.objects.all()
+
 
 
 @api_view(['GET'])
@@ -254,4 +259,44 @@ def get_week_calendar(request):
     serializer = perm_serializers.CreneauPublicSerializer(queryset, many=True)
     return JsonResponse({'creneaux': serializer.data})
 
+
+@api_view(['GET'])
+@permission_classes((IsMemberUser, ))
+def get_user_astreintes(request):
+
+    member_id = request.session.get('member_id')
+
+    if member_id:
+        print(member_id)
+        astreinte_queryset = perm_models.Astreinte.objects.filter(member_id = member_id)
+        astreintes = perm_serializers.AstreinteSerializer(astreinte_queryset, many = True)
+
+        return JsonResponse({'astreintes': astreintes.data})
+
+    return JsonResponse({'astreintes': []})
+
+
+@api_view(['POST'])
+@permission_classes((IsMemberUser, ))
+def get_week_astreintes(request):
+
+    data = request.data
+    queryset = perm_models.Creneau.objects.filter(date__range=(data['start_date'], data['end_date']))
+    serializer = perm_serializers.CreneauAstreinteSerializer(queryset, many=True)
+    return JsonResponse({'creneaux': serializer.data})
+
     
+
+class PermHalloweenViewSet(viewsets.ModelViewSet):
+    serializer_class = perm_serializers.PermHalloweenSerializer
+    queryset = perm_models.PermHalloween.objects.all()
+    # permission_classes = (IsAdminUser,)
+
+
+@api_view(['GET'])
+# @permission_classes((IsMemberUser, ))
+def get_halloween_article_count(request):
+
+    article_id = request.GET.get("article_id", 1)
+    queryset = perm_models.PermHalloween.objects.filter(article_id=article_id)
+    return JsonResponse({'count': len(queryset)})

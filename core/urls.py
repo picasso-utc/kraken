@@ -13,7 +13,6 @@ from django.conf.urls.static import static
 from . import settings
 
 
-
 urlpatterns = [
 
 	path('admin/', admin.site.urls),
@@ -36,6 +35,7 @@ urlpatterns = [
 	path('api/perms/', include('perm.urls')),
 	path('api/treso/', include('treso.urls')),
 	path('api/payutc/', include('payutc.urls')),
+	path('api/surveys/', include('survey.urls')),
 
 	# Include routers
 	path('api/', include(router.urls)),
