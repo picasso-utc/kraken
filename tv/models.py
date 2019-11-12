@@ -3,7 +3,7 @@ from django.db import models
 
 class WebTVLink(models.Model):
     name = models.CharField(max_length=50)
-    url = models.CharField(max_length=500, blank=True)
+    url = models.URLField(max_length=200)
 
 
 class WebTV(models.Model):
