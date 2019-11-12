@@ -1,7 +1,8 @@
 from rest_framework import viewsets
 from tv import models as tv_models
 from tv import serializers as tv_serializers
-from rest_framework.decorators import permission_classes
+from rest_framework.decorators import permission_classes, api_view
+from django.http import JsonResponse
 from core.permissions import IsAdminUser, IsAuthenticatedUser, IsMemberUser
 
 
@@ -22,15 +23,6 @@ class WebTVLinkViewSet(viewsets.ModelViewSet):
     serializer_class = tv_serializers.WebTVLinkSerializer
     permission_classes = (IsAdminUser,)
 
-    # def get_queryset(self):
-    #     queryset = tv_models.TVConfiguration.objects.all()
-    #     if self.request.query_params.get('tv'):
-    #         query = self.request.query_params.get('tv')
-    #         queryset = queryset.filter(tv__id=query).order_by('-id')[:1]
-    #     return queryset
-
-    # def post(self):
-    #     print(self.request.data)
 
 class WebTVMediaViewSet (viewsets.ModelViewSet):
     """
@@ -39,3 +31,10 @@ class WebTVMediaViewSet (viewsets.ModelViewSet):
     queryset = tv_models.WebTVMedia.objects.all()
     serializer_class = tv_serializers.WebTVMediaSerializer
     permission_classes = (IsMemberUser,)
+
+
+@api_view(['GET'])
+def get_public_media(request):
+    queryset = tv_models.WebTVMedia.objects.filter(activate=True)
+    serializer = tv_serializers.WebTVMediaSerializer(queryset, many=True)
+    return JsonResponse({'media' : serializer.data})

@@ -36,6 +36,7 @@ urlpatterns = [
 	path('api/treso/', include('treso.urls')),
 	path('api/payutc/', include('payutc.urls')),
 	path('api/surveys/', include('survey.urls')),
+	path('api/tv/', include('tv.urls')),
 
 	# Include routers
 	path('api/', include(router.urls)),
