@@ -37,12 +37,11 @@ def auto_delete_file_on_change(sender, instance, **kwargs):
         old_file = Survey.objects.get(pk=instance.pk).image
     except Survey.DoesNotExist:
         return False
-    print(old_file)
     new_file = instance.image
-    print(new_file)
-    if not old_file == new_file:
-        if os.path.isfile(old_file.path):
-            os.remove(old_file.path)
+    if old_file:
+        if not old_file == new_file:
+            if os.path.isfile(old_file.path):
+                os.remove(old_file.path)
 
 
 class SurveyItem(models.Model):
@@ -77,12 +76,11 @@ def auto_delete_file_item_on_change(sender, instance, **kwargs):
         old_file = SurveyItem.objects.get(pk=instance.pk).image
     except SurveyItem.DoesNotExist:
         return False
-    print(old_file)
     new_file = instance.image
-    print(new_file)
-    if not old_file == new_file:
-        if os.path.isfile(old_file.path):
-            os.remove(old_file.path)
+    if old_file:
+        if not old_file == new_file:
+            if os.path.isfile(old_file.path):
+                os.remove(old_file.path)
 
 
 class SurveyItemVote(models.Model):
