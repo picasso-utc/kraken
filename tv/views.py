@@ -38,3 +38,21 @@ def get_public_media(request):
     queryset = tv_models.WebTVMedia.objects.filter(activate=True)
     serializer = tv_serializers.WebTVMediaSerializer(queryset, many=True)
     return JsonResponse({'media' : serializer.data})
+
+
+@api_view(['GET'])
+def get_next_order_lines_for_tv(request):
+    menu = perm_models.Menu.objects.last()
+    if menu:
+        orders = perm_models.OrderLine.objects.filter(menu_id=menu.id, quantity__gt=0, served=False, menu__is_closed=False, is_canceled=False).order_by('is_staff', 'id_transaction_payutc')
+        buyers_list = list()
+        for order in orders:
+            buyers_list.append({'last_name': order.buyer_name, 'first_name': order.buyer_first_name, 'quantity': order.quantity})
+        return JsonResponse({
+            'menu': menu.article.nom,
+            'orders': buyers_list
+        })
+    return JsonResponse({
+        'menu' : '',
+        'orders': []
+    })
