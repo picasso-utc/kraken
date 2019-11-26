@@ -1,5 +1,6 @@
 from django.db import models
-
+import os
+from django.dispatch import receiver
 
 class WebTVLink(models.Model):
     name = models.CharField(max_length=50)
@@ -23,3 +24,34 @@ class WebTVMedia(models.Model):
     media = models.FileField(upload_to="tv", null=True, blank=True, default=None)
     activate = models.BooleanField(default=False)
     times = models.IntegerField(default=1)
+
+
+@receiver(models.signals.post_delete, sender=WebTVMedia)
+def auto_delete_file_on_delete(sender, instance, **kwargs):
+    """
+    Deletes file from filesystem
+    when corresponding `MediaFile` object is deleted.
+    """
+    if instance.media:
+        if os.path.isfile(instance.media.path):
+            os.remove(instance.media.path)
+
+@receiver(models.signals.pre_save, sender=WebTVMedia)
+def auto_delete_file_on_change(sender, instance, **kwargs):
+    """
+    Deletes old file from filesystem
+    when corresponding `MediaFile` object is updated
+    with new file.
+    """
+    if not instance.pk:
+        return False
+
+    try:
+        old_file = WebTVMedia.objects.get(pk=instance.pk).media
+    except WebTVMedia.DoesNotExist:
+        return False
+    new_file = instance.media
+    if old_file:
+        if not old_file == new_file:
+            if os.path.isfile(old_file.path):
+                os.remove(old_file.path)
