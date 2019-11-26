@@ -48,7 +48,7 @@ class SurveyItem(models.Model):
 
     name = models.CharField(max_length=100)
     image = models.ImageField(upload_to="survey", null=True, blank=True, default=None)
-    description = models.TextField()
+    description = models.TextField(blank=True)
     survey = models.ForeignKey(Survey, on_delete=models.CASCADE)
 
 @receiver(models.signals.post_delete, sender=SurveyItem)
