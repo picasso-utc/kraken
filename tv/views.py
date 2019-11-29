@@ -5,8 +5,9 @@ from survey import serializers as survey_serializers
 from survey import models as survey_models
 from perm import models as perm_models
 from rest_framework.decorators import permission_classes, api_view
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from core.permissions import IsAdminUser, IsAuthenticatedUser, IsMemberUser, IsMemberUserOrReadOnly
+import qrcode
 
 
 class WebTVViewSet(viewsets.ModelViewSet):
@@ -78,3 +79,14 @@ def get_tv_public_surveys(request):
                 item["vote"] = len(item["surveyitemvote_set"])/total_vote
             del item["surveyitemvote_set"]
     return JsonResponse({'surveys' : surveys})
+
+@api_view(['GET'])
+def generate_qr_code(request):
+    survey_id = request.GET.get("survey_id", None)
+    url = 'https://assos.utc.fr/picasso'
+    if survey_id:
+        url += ('/poll/' + survey_id)
+    img = qrcode.make(url)
+    response = HttpResponse(content_type="image/png")
+    img.save(response, "PNG")
+    return response
