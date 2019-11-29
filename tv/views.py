@@ -1,6 +1,8 @@
 from rest_framework import viewsets
 from tv import models as tv_models
 from tv import serializers as tv_serializers
+from survey import serializers as survey_serializers
+from survey import models as survey_models
 from perm import models as perm_models
 from rest_framework.decorators import permission_classes, api_view
 from django.http import JsonResponse
@@ -57,3 +59,22 @@ def get_next_order_lines_for_tv(request):
         'menu' : '',
         'orders': []
     })
+
+
+
+@api_view(['GET'])
+def get_tv_public_surveys(request):
+    queryset = survey_models.Survey.objects.filter(visible=True)
+    serializer = survey_serializers.SurveySerializer(queryset, many=True)
+    surveys = serializer.data
+    for survey in surveys:
+        total_vote = 0
+        for item in survey['surveyitem_set']:
+            total_vote += len(item["surveyitemvote_set"])
+        for item in survey['surveyitem_set']:
+            if total_vote == 0:
+                item["vote"] = 0
+            else :
+                item["vote"] = len(item["surveyitemvote_set"])/total_vote
+            del item["surveyitemvote_set"]
+    return JsonResponse({'surveys' : surveys})
