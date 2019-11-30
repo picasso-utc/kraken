@@ -1,6 +1,6 @@
 from datetime import datetime
 import json
-
+from django.core.cache import cache
 from math import ceil
 from core.settings import PAYUTC_APP_KEY, PAYUTC_APP_URL, PAYUTC_SYSTEM_ID, PAYUTC_FUN_ID
 import requests
@@ -263,7 +263,11 @@ class PayutcClient:
 		return self.__login(response)
 
 	def login_admin(self):
-		self.config['sessionid'] = self.login_badge()['sessionid']
+		sessionid = cache.get('sessionid')
+		if not sessionid:
+			sessionid = self.login_badge()['sessionid']
+			cache.set('sessionid', sessionid, 30*60)
+		self.config['sessionid'] = sessionid
 
 
 	def patch_api_rest(self, service, method, id, sessionid=None, params=None, **data):
