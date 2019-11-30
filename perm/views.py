@@ -66,8 +66,12 @@ def create_payutc_article(request, id):
     article = perm_models.Article.objects.get(pk=id)
     article.create_payutc_article()
 
-    # TVConfiguration.objects.create(tv_id=1, url="http://beethoven.picasso-utc.fr/NextMenus", enable_messages=False)
-    # TVConfiguration.objects.create(tv_id=2, url="http://beethoven.picasso-utc.fr/NextMenus", enable_messages=False)
+    # Put Menu Link for tvs, id = 3
+    tv_1 = tv_models.WebTV.objects.get(pk=1)
+    tv_2 = tv_models.WebTV.objects.get(pk=2)
+    tv_1.update(link__id=3)
+    tv_2.update(link__id=3)
+    
     return JsonResponse({})
 
 
@@ -172,11 +176,6 @@ def set_menu_closed(request, id):
     else:
 
         menu.article.set_article_disabled()
-        # Put Menu Link for tvs, id = 3
-        tv_1 = tv_models.WebTV.objects.get(pk=1)
-        tv_2 = tv_models.WebTV.objects.get(pk=2)
-        tv_1.update(link__id=3)
-        tv_2.update(link__id=3)
         menu.is_closed = True
     menu.save()
     return JsonResponse({})
