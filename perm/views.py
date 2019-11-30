@@ -69,8 +69,11 @@ def create_payutc_article(request, id):
     # Put Menu Link for tvs, id = 3
     tv_1 = tv_models.WebTV.objects.get(pk=1)
     tv_2 = tv_models.WebTV.objects.get(pk=2)
-    tv_1.update(link__id=3)
-    tv_2.update(link__id=3)
+    menu_link = tv_models.objects.get(pk=3)
+    tv_1.link = menu_link
+    tv_1.save()
+    tv_2.link = menu_link
+    tv_2.save()
     
     return JsonResponse({})
 
