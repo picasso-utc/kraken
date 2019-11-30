@@ -300,3 +300,11 @@ def get_halloween_article_count(request):
     article_id = request.GET.get("article_id", 1)
     queryset = perm_models.PermHalloween.objects.filter(article_id=article_id)
     return JsonResponse({'count': len(queryset)})
+
+
+@api_view(['GET'])
+@permission_classes((IsMemberUser,))
+def get_creaneau_signature(request, creneau_id):
+
+    queryset = perm_models.Signature.objects.filter(creneau__id=creneau_id)
+    return JsonResponse({'signature_count': len(queryset)})

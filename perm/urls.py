@@ -18,5 +18,6 @@ urlpatterns = [
     path('week/astreintes', perm_views.get_week_astreintes),
     path('reminder', perm_views.send_creneau_reminder),
     path('calendar', perm_views.get_week_calendar),
-    path('count/halloween', perm_views.get_halloween_article_count)
+    path('count/halloween', perm_views.get_halloween_article_count),
+    path('signature/<int:creneau_id>', perm_views.get_creaneau_signature)
 ]
