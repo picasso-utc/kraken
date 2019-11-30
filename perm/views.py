@@ -11,6 +11,8 @@ from core.settings import DEFAULT_FROM_EMAIL
 from django.core.mail import send_mail
 from datetime import date, datetime, timedelta
 from django.core.mail import EmailMessage
+from tv import models as tv_models
+from tv import serializers as tv_serializers
 
 class PermViewSet(viewsets.ModelViewSet):
     serializer_class = perm_serializers.PermSerializer
@@ -63,6 +65,7 @@ def create_payutc_article(request, id):
     # Endpoint qui permet d'obtenir, pour un article de pk {id}, d'enregistrer l'article dans PayUTC.
     article = perm_models.Article.objects.get(pk=id)
     article.create_payutc_article()
+
     # TVConfiguration.objects.create(tv_id=1, url="http://beethoven.picasso-utc.fr/NextMenus", enable_messages=False)
     # TVConfiguration.objects.create(tv_id=2, url="http://beethoven.picasso-utc.fr/NextMenus", enable_messages=False)
     return JsonResponse({})
@@ -167,11 +170,13 @@ def set_menu_closed(request, id):
     if menu.is_closed:
         menu.is_closed = False
     else:
+
         menu.article.set_article_disabled()
-        # tv_1 = TVConfiguration.objects.filter(tv_id=1).order_by('-id')[1]
-        # tv_2 = TVConfiguration.objects.filter(tv_id=2).order_by('-id')[1]
-        # TVConfiguration.objects.create(tv_id=1, url=tv_1.url, enable_messages=tv_1.enable_messages)
-        # TVConfiguration.objects.create(tv_id=2, url=tv_2.url, enable_messages=tv_2.enable_messages)
+        # Put Menu Link for tvs, id = 3
+        tv_1 = tv_models.WebTV.objects.get(pk=1)
+        tv_2 = tv_models.WebTV.objects.get(pk=2)
+        tv_1.update(link__id=3)
+        tv_2.update(link__id=3)
         menu.is_closed = True
     menu.save()
     return JsonResponse({})
