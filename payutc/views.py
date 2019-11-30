@@ -133,3 +133,27 @@ def get_sorted_articles(request, format=None):
 				})
 
 	return JsonResponse(dict(sorted_articles.values()), status=200)
+
+
+@api_view(['POST'])
+def get_beers_sells(request):
+	"""Get nb sells of product ids"""
+
+	beers = request.data['beers']
+	response = dict()
+
+	p = PayutcClient()
+	p.login_admin()
+
+	duels = beers.keys()
+	for duel in duels: 
+		response[duel] = dict()
+		duel_beers = beers[duel].keys()
+		for beer in duel_beers:
+			beer_id = beers[duel][beer]['id']
+			nb_sells = p.get_nb_sell(obj_id=beer_id, start="2019-11-28T00:00:01.000Z", end="2019-11-28T23:59:59.000Z")
+			response[duel][beer] = dict()
+			response[duel][beer]['id'] = beers[duel][beer]['id']
+			response[duel][beer]['quantity'] = nb_sells
+
+	return JsonResponse({'beers': response}, status=200)

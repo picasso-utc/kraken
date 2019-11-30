@@ -9,4 +9,6 @@ urlpatterns = [
 
 	path('public/articles', payutc_views.get_sorted_articles),
 
+	path('public/beers/sells', payutc_views.get_beers_sells)
+
 ]
