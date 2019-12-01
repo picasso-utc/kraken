@@ -9,6 +9,7 @@ from core import serializers as core_serializers
 from payutc import serializers as payutc_serializers
 from core.permissions import IsAdminUser, IsAuthenticatedUser, IsMemberUser, IsMemberUserOrReadOnly
 import random
+from datetime import datetime
 
 
 
@@ -142,6 +143,10 @@ def get_beers_sells(request):
 	beers = request.data['beers']
 	response = dict()
 
+	current_date = (datetime.now()).strftime('%Y-%m-%d')
+	start_date = current_date + "T00:00:01.000Z"
+	end_date = current_date + "T23:59:59.000Z"
+
 	p = PayutcClient()
 	p.login_admin()
 
@@ -151,7 +156,7 @@ def get_beers_sells(request):
 		duel_beers = beers[duel].keys()
 		for beer in duel_beers:
 			beer_id = beers[duel][beer]['id']
-			nb_sells = p.get_nb_sell(obj_id=beer_id, start="2019-11-28T00:00:01.000Z", end="2019-11-28T23:59:59.000Z")
+			nb_sells = p.get_nb_sell(obj_id=beer_id, start=start_date, end=end_date)
 			response[duel][beer] = dict()
 			response[duel][beer]['id'] = beers[duel][beer]['id']
 			response[duel][beer]['quantity'] = nb_sells
