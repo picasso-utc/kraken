@@ -181,6 +181,14 @@ def set_menu_closed(request, id):
         menu.article.set_article_disabled()
         menu.is_closed = True
     menu.save()
+    # Put Default Link for tvs, id = 4
+    tv_1 = tv_models.WebTV.objects.get(pk=1)
+    tv_2 = tv_models.WebTV.objects.get(pk=2)
+    default_link = tv_models.WebTVLink.objects.get(pk=4)
+    tv_1.link = default_link
+    tv_1.save()
+    tv_2.link = default_link
+    tv_2.save()
     return JsonResponse({})
 
 
