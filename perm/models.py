@@ -122,7 +122,7 @@ class Article(core_models.PricedModel):
             'cotisant': True,
             'name': self.nom + ' - ' + self.creneau.perm.nom,
             'parent': PAYUTC_ARTICLES_CATEGORY,
-            'prix': int(self.prix*100),
+            'prix': round(self.prix*100),
             'stock': self.stock,
             'tva': self.tva,
             'variable_price': False
