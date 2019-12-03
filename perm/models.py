@@ -232,7 +232,7 @@ class Astreinte(models.Model):
     note_orga = models.IntegerField(default=0)
     note_anim = models.IntegerField(default=0)
     note_menu = models.IntegerField(default=0)
-    commentaire = models.CharField(null=True, default=None, max_length=255)
+    commentaire = models.CharField(null=True, default=None, blank=True, max_length=255)
 
 
     def __str__(self):
