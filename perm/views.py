@@ -323,3 +323,75 @@ def get_creaneau_signature(request, creneau_id):
 
     queryset = perm_models.Signature.objects.filter(creneau__id=creneau_id)
     return JsonResponse({'signature_count': len(queryset)})
+
+
+
+@api_view(['GET'])
+@permission_classes((IsMemberUser,))
+def get_perms_for_notation(request):
+
+    queryset = perm_models.Astreinte.objects.all()
+    serializer = perm_serializers.AstreinteSerializer(queryset, many=True)
+
+    perms = dict()
+
+    astreintes = serializer.data
+
+    for astreinte in astreintes:
+        perm_id = astreinte["creneau"]["perm"]["id"]
+            
+        if perm_id not in perms : 
+
+            perms[perm_id] = {}
+            perms[perm_id] = astreinte["creneau"]["perm"]
+            perms[perm_id].pop("creneaux")
+            perms[perm_id]["creneau"] = []
+            perms["total_note_deco"] = 0
+            perms["total_note_anim"] = 0
+            perms["total_note_orga"] = 0
+            perms["total_note_menu"] = 0
+            perms["nb_note_deco"] = 0
+            perms["nb_note_anim"] = 0
+            perms["nb_note_orga"] = 0
+            perms["nb_note_menu"] = 0
+            perms["nb_astreintes"] = 0
+
+        if not any(c for c in perms[perm_id]["creneau"] if c["id"] == astreinte["creneau"]["id"]):
+
+            creneau_data = astreinte["creneau"]
+            creneau_data.pop("perm")
+            creneau_data.pop("state")
+            creneau_data.pop("montantTTCMaxAutorise")
+            creneau_data.pop('facturerecue_set')
+            creneau_data["notation"] = []
+            perms[perm_id]["creneau"].append(creneau_data)
+
+        notation  = {
+            "astreinte_type": astreinte["astreinte_type"],
+            "note_deco": astreinte["note_deco"],
+            "note_orga" : astreinte["note_orga"],
+            "note_anim": astreinte["note_anim"],
+            "note_menu": astreinte["note_menu"],
+            "commentaire": astreinte["commentaire"]
+        }
+
+        if astreinte["note_deco"] > 0:
+            perms["total_note_deco"] += astreinte["note_deco"]
+            perms["nb_note_deco"] += 1
+        if astreinte["note_anim"] > 0:
+            perms["total_note_anim"] += astreinte["note_anim"]
+            perms["nb_note_anim"] += 1
+        if astreinte["note_orga"] > 0:
+            perms["total_note_orga"] += astreinte["note_orga"]
+            perms["nb_note_orga"] += 1
+        if astreinte["note_menu"] > 0:
+            perms["total_note_menu"] += astreinte["note_menu"]
+            perms["nb_note_menu"] += 1
+        perms["nb_astreintes"] += 1
+
+        for creneau in perms[perm_id]["creneau"]:
+            if creneau["id"] == astreinte["creneau"]["id"]:
+                creneau["notation"].append(notation)
+                break
+
+    return JsonResponse({'perms': perms})
