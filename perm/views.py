@@ -330,20 +330,21 @@ def get_creaneau_signature(request, creneau_id):
 @permission_classes((IsMemberUser,))
 def get_perms_for_notation(request):
 
-    queryset = perm_models.Astreinte.objects.all()
-    serializer = perm_serializers.AstreinteSerializer(queryset, many=True)
+    queryset = perm_models.Creneau.objects.all()
+    serializer = perm_serializers.CreneauSerializer(queryset, many=True)
+
+    creneaux = serializer.data
 
     perms = dict()
 
-    astreintes = serializer.data
+    for creneau in creneaux : 
 
-    for astreinte in astreintes:
-        perm_id = astreinte["creneau"]["perm"]["id"]
-            
+        perm_id = creneau["perm"]["id"]
+
         if perm_id not in perms : 
 
             perms[perm_id] = {}
-            perms[perm_id] = astreinte["creneau"]["perm"]
+            perms[perm_id] = creneau["perm"]
             perms[perm_id].pop("creneaux")
             perms[perm_id]["creneau"] = []
             perms[perm_id]["note_deco"] = 0
@@ -356,15 +357,23 @@ def get_perms_for_notation(request):
             perms[perm_id]["nb_note_menu"] = 0
             perms[perm_id]["nb_astreintes"] = 0
 
-        if not any(c for c in perms[perm_id]["creneau"] if c["id"] == astreinte["creneau"]["id"]):
+        if not any(c for c in perms[perm_id]["creneau"] if c["id"] == creneau["id"]):
 
-            creneau_data = astreinte["creneau"]
+            creneau_data = creneau
             creneau_data.pop("perm")
             creneau_data.pop("state")
             creneau_data.pop("montantTTCMaxAutorise")
             creneau_data.pop('facturerecue_set')
             creneau_data["notation"] = []
             perms[perm_id]["creneau"].append(creneau_data)
+
+    queryset = perm_models.Astreinte.objects.all()
+    serializer = perm_serializers.AstreinteSerializer(queryset, many=True)
+
+    
+    astreintes = serializer.data
+
+    for astreinte in astreintes:
 
         notation  = {
             "astreinte_type": astreinte["astreinte_type"],
