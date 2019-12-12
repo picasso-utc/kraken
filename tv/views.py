@@ -78,7 +78,7 @@ def get_tv_public_surveys(request):
             else :
                 item["vote"] = len(item["surveyitemvote_set"])/total_vote
             del item["surveyitemvote_set"]
-        survey['surveyitem_set'] = sorted(survey['surveyitem_set'], key= lambda item: item['vote'])
+        survey['surveyitem_set'] = sorted(survey['surveyitem_set'], key= lambda item: item['vote'], reverse=True)
     return JsonResponse({'surveys' : surveys})
 
 @api_view(['GET'])
