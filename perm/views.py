@@ -394,5 +394,15 @@ def get_perms_for_notation(request):
                 creneau["notation"].append(notation)
                 break
 
-    return JsonResponse({'perms': perms.values()})
+    keys = perms.keys()
+    for key in keys :
+        if perms[key]["nb_note_deco"] > 0 :
+            perms[key]["note_deco"] = perms[key]["note_deco"] / perms[key]["nb_note_deco"]
+        if perms[key]["nb_note_menu"] > 0 :
+            perms[key]["note_menu"] = perms[key]["note_menu"] / perms[key]["nb_note_menu"]
+        if perms[key]["nb_note_orga"] > 0 :
+            perms[key]["note_orga"] = perms[key]["note_orga"] / perms[key]["nb_note_orga"]
+        if perms[key]["nb_note_anim"] > 0 :
+            perms[key]["note_anim"] = perms[key]["note_anim"] / perms[key]["nb_note_anim"]
+
     return JsonResponse({'perms': list(perms.values())})
