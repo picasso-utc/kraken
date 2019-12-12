@@ -394,4 +394,4 @@ def get_perms_for_notation(request):
                 creneau["notation"].append(notation)
                 break
 
-    return JsonResponse({'perms': perms})
+    return JsonResponse({'perms': perms.values()})
