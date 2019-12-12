@@ -346,15 +346,15 @@ def get_perms_for_notation(request):
             perms[perm_id] = astreinte["creneau"]["perm"]
             perms[perm_id].pop("creneaux")
             perms[perm_id]["creneau"] = []
-            perms["total_note_deco"] = 0
-            perms["total_note_anim"] = 0
-            perms["total_note_orga"] = 0
-            perms["total_note_menu"] = 0
-            perms["nb_note_deco"] = 0
-            perms["nb_note_anim"] = 0
-            perms["nb_note_orga"] = 0
-            perms["nb_note_menu"] = 0
-            perms["nb_astreintes"] = 0
+            perms[perm_id]["note_deco"] = 0
+            perms[perm_id]["note_anim"] = 0
+            perms[perm_id]["note_orga"] = 0
+            perms[perm_id]["note_menu"] = 0
+            perms[perm_id]["nb_note_deco"] = 0
+            perms[perm_id]["nb_note_anim"] = 0
+            perms[perm_id]["nb_note_orga"] = 0
+            perms[perm_id]["nb_note_menu"] = 0
+            perms[perm_id]["nb_astreintes"] = 0
 
         if not any(c for c in perms[perm_id]["creneau"] if c["id"] == astreinte["creneau"]["id"]):
 
@@ -376,18 +376,18 @@ def get_perms_for_notation(request):
         }
 
         if astreinte["note_deco"] > 0:
-            perms["total_note_deco"] += astreinte["note_deco"]
-            perms["nb_note_deco"] += 1
+            perms[perm_id]["note_deco"] += astreinte["note_deco"]
+            perms[perm_id]["nb_note_deco"] += 1
         if astreinte["note_anim"] > 0:
-            perms["total_note_anim"] += astreinte["note_anim"]
-            perms["nb_note_anim"] += 1
+            perms[perm_id]["note_anim"] += astreinte["note_anim"]
+            perms[perm_id]["nb_note_anim"] += 1
         if astreinte["note_orga"] > 0:
-            perms["total_note_orga"] += astreinte["note_orga"]
-            perms["nb_note_orga"] += 1
+            perms[perm_id]["note_orga"] += astreinte["note_orga"]
+            perms[perm_id]["nb_note_orga"] += 1
         if astreinte["note_menu"] > 0:
-            perms["total_note_menu"] += astreinte["note_menu"]
-            perms["nb_note_menu"] += 1
-        perms["nb_astreintes"] += 1
+            perms[perm_id]["note_menu"] += astreinte["note_menu"]
+            perms[perm_id]["nb_note_menu"] += 1
+        perms[perm_id]["nb_astreintes"] += 1
 
         for creneau in perms[perm_id]["creneau"]:
             if creneau["id"] == astreinte["creneau"]["id"]:
@@ -395,3 +395,4 @@ def get_perms_for_notation(request):
                 break
 
     return JsonResponse({'perms': perms.values()})
+    return JsonResponse({'perms': list(perms.values())})
