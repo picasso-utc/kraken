@@ -397,12 +397,12 @@ def get_perms_for_notation(request):
     keys = perms.keys()
     for key in keys :
         if perms[key]["nb_note_deco"] > 0 :
-            perms[key]["note_deco"] = perms[key]["note_deco"] / perms[key]["nb_note_deco"]
+            perms[key]["note_deco"] = round(perms[key]["note_deco"] / perms[key]["nb_note_deco"],2)
         if perms[key]["nb_note_menu"] > 0 :
-            perms[key]["note_menu"] = perms[key]["note_menu"] / perms[key]["nb_note_menu"]
+            perms[key]["note_menu"] = round(perms[key]["note_menu"] / perms[key]["nb_note_menu"],2)
         if perms[key]["nb_note_orga"] > 0 :
-            perms[key]["note_orga"] = perms[key]["note_orga"] / perms[key]["nb_note_orga"]
+            perms[key]["note_orga"] = round(perms[key]["note_orga"] / perms[key]["nb_note_orga"],2)
         if perms[key]["nb_note_anim"] > 0 :
-            perms[key]["note_anim"] = perms[key]["note_anim"] / perms[key]["nb_note_anim"]
+            perms[key]["note_anim"] = round(perms[key]["note_anim"] / perms[key]["nb_note_anim"],2)
 
     return JsonResponse({'perms': list(perms.values())})
