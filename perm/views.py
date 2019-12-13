@@ -375,6 +375,8 @@ def get_perms_for_notation(request):
 
     for astreinte in astreintes:
 
+        perm_id = astreinte["creneau"]["perm"]["id"]
+
         notation  = {
             "astreinte_type": astreinte["astreinte_type"],
             "note_deco": astreinte["note_deco"],
