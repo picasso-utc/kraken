@@ -417,3 +417,99 @@ def get_perms_for_notation(request):
             perms[key]["note_anim"] = round(perms[key]["note_anim"] / perms[key]["nb_note_anim"],2)
 
     return JsonResponse({'perms': list(perms.values())})
+
+
+@api_view(['GET'])
+@permission_classes((IsMemberUser,))
+def get_perm_for_notation(request, perm_id):
+
+    queryset = perm_models.Creneau.objects.filter(perm__id=perm_id)
+    serializer = perm_serializers.CreneauSerializer(queryset, many=True)
+
+    creneaux = serializer.data
+
+    perms = dict()
+
+    for creneau in creneaux : 
+
+        if perm_id not in perms : 
+
+            perms[perm_id] = {}
+            perms[perm_id] = creneau["perm"]
+            perms[perm_id].pop("creneaux")
+            perms[perm_id]["creneau"] = []
+            perms[perm_id]["note_deco"] = 0
+            perms[perm_id]["note_anim"] = 0
+            perms[perm_id]["note_orga"] = 0
+            perms[perm_id]["note_menu"] = 0
+            perms[perm_id]["nb_note_deco"] = 0
+            perms[perm_id]["nb_note_anim"] = 0
+            perms[perm_id]["nb_note_orga"] = 0
+            perms[perm_id]["nb_note_menu"] = 0
+            perms[perm_id]["nb_astreintes"] = 0
+
+        if not any(c for c in perms[perm_id]["creneau"] if c["id"] == creneau["id"]):
+
+            creneau_data = creneau
+            creneau_data.pop("perm")
+            creneau_data.pop("state")
+            creneau_data.pop("montantTTCMaxAutorise")
+            creneau_data.pop('facturerecue_set')
+            creneau_data["notation"] = []
+            perms[perm_id]["creneau"].append(creneau_data)
+
+    queryset = perm_models.Astreinte.objects.all()
+    serializer = perm_serializers.AstreinteSerializer(queryset, many=True)
+
+    
+    astreintes = serializer.data
+
+    for astreinte in astreintes:
+
+        if perm_id == astreinte["creneau"]["perm"]["id"]:
+
+            notation  = {
+                "astreinte_type": astreinte["astreinte_type"],
+                "note_deco": astreinte["note_deco"],
+                "note_orga" : astreinte["note_orga"],
+                "note_anim": astreinte["note_anim"],
+                "note_menu": astreinte["note_menu"],
+                "commentaire": astreinte["commentaire"]
+            }
+
+            if astreinte["note_deco"] > 0:
+                perms[perm_id]["note_deco"] += astreinte["note_deco"]
+                perms[perm_id]["nb_note_deco"] += 1
+            if astreinte["note_anim"] > 0:
+                perms[perm_id]["note_anim"] += astreinte["note_anim"]
+                perms[perm_id]["nb_note_anim"] += 1
+            if astreinte["note_orga"] > 0:
+                perms[perm_id]["note_orga"] += astreinte["note_orga"]
+                perms[perm_id]["nb_note_orga"] += 1
+            if astreinte["note_menu"] > 0:
+                perms[perm_id]["note_menu"] += astreinte["note_menu"]
+                perms[perm_id]["nb_note_menu"] += 1
+            perms[perm_id]["nb_astreintes"] += 1
+
+            for creneau in perms[perm_id]["creneau"]:
+                if creneau["id"] == astreinte["creneau"]["id"]:
+                    creneau["notation"].append(notation)
+                    break
+
+    keys = perms.keys()
+    for key in keys :
+        if perms[key]["nb_note_deco"] > 0 :
+            perms[key]["note_deco"] = round(perms[key]["note_deco"] / perms[key]["nb_note_deco"],2)
+        if perms[key]["nb_note_menu"] > 0 :
+            perms[key]["note_menu"] = round(perms[key]["note_menu"] / perms[key]["nb_note_menu"],2)
+        if perms[key]["nb_note_orga"] > 0 :
+            perms[key]["note_orga"] = round(perms[key]["note_orga"] / perms[key]["nb_note_orga"],2)
+        if perms[key]["nb_note_anim"] > 0 :
+            perms[key]["note_anim"] = round(perms[key]["note_anim"] / perms[key]["nb_note_anim"],2)
+
+    return JsonResponse({'perms': list(perms.values())})
+
+@api_view(['GET'])
+def perm_may_be_requested(request):
+    print(CONSTANCE_CONFIG['PERM_MAY_BE_REQUESTED'])
+    return JsonResponse({'perm_may_be_requested': config.__getattr__('PERM_MAY_BE_REQUESTED')})

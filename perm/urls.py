@@ -20,5 +20,6 @@ urlpatterns = [
     path('calendar', perm_views.get_week_calendar),
     path('count/halloween', perm_views.get_halloween_article_count),
     path('signature/<int:creneau_id>', perm_views.get_creaneau_signature),
-    path('notation/all', perm_views.get_perms_for_notation)
+    path('notation/all', perm_views.get_perms_for_notation),
+    path('notation/<int:perm_id>', perm_views.get_perm_for_notation)
 ]
