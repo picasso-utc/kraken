@@ -43,6 +43,23 @@ class Perm(models.Model):
         return f"{self.nom}"
 
     
+class RequestedPerm(models.Model):
+
+    nom = models.CharField(max_length=255)
+    asso = models.BooleanField(default=True)  # true if asso
+    mail_asso = models.CharField(null=True, default=None, max_length=255, blank=True)
+    nom_resp = models.CharField(null=True, default=None, max_length=255)
+    mail_resp = models.CharField(null=True, default=None, max_length=255)
+    nom_resp_2 = models.CharField(null=True, default=None, max_length=255)
+    mail_resp_2 = models.CharField(null=True, default=None, max_length=255)
+    theme = models.CharField(null=True, default=None, max_length=255)
+    description = models.TextField(null=True, default=None)
+    membres = models.CharField(null=True, default=None, max_length=255)
+    periode = models.TextField(null=True, default=None)
+    added = models.BooleanField(default=False)
+    founder_login = models.CharField(max_length=8, default=None)
+    ambiance = models.IntegerField(default=0)
+    semestre = models.ForeignKey(core_models.Semestre, on_delete=models.SET_NULL, null=True, default=get_current_semester)
 
 
 class Creneau(models.Model):
