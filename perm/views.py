@@ -1,5 +1,5 @@
 from rest_framework.decorators import api_view, permission_classes
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from rest_framework import viewsets, mixins
 from . import serializers as perm_serializers
 from django.template.loader import get_template, render_to_string
@@ -17,6 +17,8 @@ from constance import config
 from core.settings import CONSTANCE_CONFIG
 from core.services.current_semester import get_current_semester
 from core.services.portal import PortalClient
+from core.services.HtmlPdf import HtmlPdf
+
 
 class PermViewSet(viewsets.ModelViewSet):
     serializer_class = perm_serializers.PermSerializer
@@ -614,6 +616,21 @@ class RequestedPermViewSet(viewsets.ViewSet):
         else:
             permission_classes = [IsAuthenticatedUser]
         return [permission() for permission in permission_classes]
+
+
+@api_view(['GET'])
+@permission_classes((IsMemberUser,))
+def get_pdf_requested_perms(request):
+    queryset = perm_models.RequestedPerm.objects.filter(semestre_id=get_current_semester())
+    serializer = perm_serializers.RequestedPermSerializer(queryset, many=True)
+    pdf = HtmlPdf()
+    for requested_perm in serializer.data:
+        requested_perm_content = render_to_string('requested_perm.html', {'requested_perm': requested_perm})
+        pdf.add_page()
+        pdf.write_html(requested_perm_content)
+    response = HttpResponse(pdf.output(dest='S').encode('latin-1'))
+    response['Content-Type'] = 'application/pdf'
+    return response
 
 
 @api_view(['GET'])

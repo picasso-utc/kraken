@@ -24,5 +24,6 @@ urlpatterns = [
     path('notation/<int:perm_id>', perm_views.get_perm_for_notation),
     path('public/may/request', perm_views.perm_may_be_requested),
     path('update/may/request', perm_views.update_perm_may_be_requested_setting),
+    path('requested/pdf', perm_views.get_pdf_requested_perms),
     path('assos', perm_views.get_portal_assos)
 ]
