@@ -127,13 +127,7 @@ LOGIN_REDIRECT_URL = confidentials.LOGIN_REDIRECT_URL
 
 GINGER_URL = confidentials.GINGER_URL
 GINGER_KEY = confidentials.GINGER_KEY
-
-# CONSTANCE_CONFIG = {
-# 	'SEMESTER': (0, 'Semestre actuel', int),
-# 	'TEST' : ('Test', 'Test', str)
-# }
-
-# CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'
+PORTAL_URL = confidentials.PORTAL_URL
 
 CONSTANCE_CONFIG = {
     'GINGER_URL': (confidentials.GINGER_URL, 'Adresse de connexion à Ginger.', str),
