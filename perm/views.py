@@ -511,6 +511,96 @@ def get_perm_for_notation(request, perm_id):
 def perm_may_be_requested(request):
     print(CONSTANCE_CONFIG['PERM_MAY_BE_REQUESTED'])
     return JsonResponse({'perm_may_be_requested': config.__getattr__('PERM_MAY_BE_REQUESTED')})
+class RequestedPermViewSet(viewsets.ViewSet):
+
+    def list(self, request):
+        queryset = perm_models.RequestedPerm.objects.filter(semestre_id=get_current_semester())
+        serializer = perm_serializers.RequestedPermSerializer(queryset, many=True)
+
+        return JsonResponse({'requested_perms': serializer.data})
+
+    def create(self, request):
+        if not self.perm_may_be_requested():
+            return JsonResponse({'error': 'Il n\'est pas possible de demander une perm.'})
+        serializer = perm_serializers.RequestedPermSerializer(request.data)
+        requested_perm = serializer.data
+        new_requested_perm = perm_models.RequestedPerm.objects.create(
+            nom = requested_perm["nom"],
+            asso = requested_perm["asso"],
+            mail_asso = requested_perm["mail_asso"],
+            nom_resp = requested_perm["nom_resp"],
+            mail_resp = requested_perm["mail_resp"],
+            nom_resp_2 = requested_perm["nom_resp_2"],
+            mail_resp_2 = requested_perm["mail_resp_2"],
+            theme = requested_perm["theme"],
+            description = requested_perm["description"],
+            membres = requested_perm["membres"],
+            founder_login = requested_perm["founder_login"],
+            ambiance = requested_perm["ambiance"],
+            periode = requested_perm["periode"]
+        )
+
+        return JsonResponse({"id": new_requested_perm.pk})
+
+    def retrieve(self, request, pk=None):
+        requested_perm = perm_models.RequestedPerm.objects.get(pk=pk)
+        serializer = perm_serializers.RequestedPermSerializer(requested_perm)
+
+        #Check if the user is the founder of the requested_perm object
+        login = request.session.get('login')
+        if login == serializer.data["founder_login"]:
+            return JsonResponse({'perm': serializer.data})
+
+        return JsonResponse({"error": "Vous n'avez pas la permission d'accéder à cette ressource"}, status=403)
+
+    def update(self, request, pk=None):
+        if not self.perm_may_be_requested():
+            return JsonResponse({'error': 'Il n\'est pas possible de mettre à jour une perm.'})
+        requested_perm = perm_models.RequestedPerm.objects.get(pk=pk)
+
+        #Check if the user is the founder of the requested_perm object
+        login = request.session.get('login')
+        if login == requested_perm.founder_login:
+            return JsonResponse({"error": "Vous n'avez pas la permission d'accéder à cette ressource"}, status=403)
+
+        requested_perm.nom = request.data["nom"]
+        requested_perm.asso = request.data["asso"]
+        requested_perm.mail_asso = request.data["mail_asso"]
+        requested_perm.nom_resp = request.data["nom_resp"]
+        requested_perm.mail_resp = request.data["mail_resp"]
+        requested_perm.nom_resp_2 = request.data["nom_resp_2"]
+        requested_perm.mail_resp_2 = request.data["mail_resp_2"]
+        requested_perm.theme = request.data["theme"]
+        requested_perm.description = request.data["description"]
+        requested_perm.membres = request.data["membres"]
+        requested_perm.ambiance = request.data["ambiance"]
+        requested_perm.periode = request.data["periode"]
+        requested_perm.save(update_fields=[
+            'nom', 'asso', 'mail_asso', 'nom_resp', 'mail_resp', 'nom_resp_2', 'mail_resp_2', 'theme', 'description', 'membres', 'founder_login',
+            'ambiance', 'periode'    
+        ])
+        return JsonResponse({})
+
+    def partial_update(self, request, pk=None):
+        requested_perm = perm_models.RequestedPerm.objects.get(pk=pk)
+        requested_perm.added = not requested_perm.added
+        requested_perm.save()
+        return JsonResponse({})
+
+    def perm_may_be_requested(self):
+        return config.__getattr__('PERM_MAY_BE_REQUESTED')
+
+    def get_permissions(self):
+        """
+        Instantiates and returns the list of permissions that this view requires.
+        """
+        if self.action == 'list' or self.action == 'partial_update':
+            permission_classes = [IsMemberUser]
+        else:
+            permission_classes = [IsAuthenticatedUser]
+        return [permission() for permission in permission_classes]
+
+
 @api_view(['GET'])
 @permission_classes((IsAuthenticatedUser,))
 def get_portal_assos(request):

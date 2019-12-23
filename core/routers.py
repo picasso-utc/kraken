@@ -32,6 +32,7 @@ router.register('admin/members', core_views.MemberViewSet, 'members')
 router.register('perm/astreintes', perm_views.AstreinteViewSet, 'astreintes')
 router.register('perm/creneaux', perm_views.CreneauViewSet, 'creneaux')
 router.register('perm/halloween', perm_views.PermHalloweenViewSet, 'halloween')
+router.register('request/perm', perm_views.RequestedPermViewSet, 'request_perm')
 
 # WebTV
 router.register('tvs', tv_views.WebTVViewSet)
