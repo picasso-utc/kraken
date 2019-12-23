@@ -140,6 +140,7 @@ CONSTANCE_CONFIG = {
     'PAYUTC_APP_KEY': (confidentials.PAYUTC_APP_KEY, 'Clé d\'application permettant de se connecter à PayUTC.', str),
     'PAYUTC_APP_URL': (confidentials.PAYUTC_APP_URL, 'Adresse permettant de se connecter à PayUTC.', str),
     'SEMESTER': (0, 'Semestre actuel', int),
+    'PERM_MAY_BE_REQUESTED': (False, 'Valeur déterminant si une perm peut être demandée', bool),
 }
 
 
