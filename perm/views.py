@@ -13,6 +13,10 @@ from datetime import date, datetime, timedelta
 from django.core.mail import EmailMessage
 from tv import models as tv_models
 from tv import serializers as tv_serializers
+from constance import config
+from core.settings import CONSTANCE_CONFIG
+from core.services.current_semester import get_current_semester
+from core.services.portal import PortalClient
 
 class PermViewSet(viewsets.ModelViewSet):
     serializer_class = perm_serializers.PermSerializer
@@ -508,6 +512,7 @@ def get_perm_for_notation(request, perm_id):
 
 
 @api_view(['GET'])
+@permission_classes((IsAuthenticatedUser,))
 def perm_may_be_requested(request):
     print(CONSTANCE_CONFIG['PERM_MAY_BE_REQUESTED'])
     return JsonResponse({'perm_may_be_requested': config.__getattr__('PERM_MAY_BE_REQUESTED')})
