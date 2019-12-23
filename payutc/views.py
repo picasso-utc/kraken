@@ -93,8 +93,6 @@ def user_autocomplete(request, query, format=None):
 	p.login_admin()
 	return JsonResponse({'users': p.auto_complete(data)})
 
-	# return auth_view.login_badge(request, format)
-
 
 @api_view(['GET'])
 def get_sorted_articles(request, format=None):
