@@ -13,7 +13,9 @@ class Perm(models.Model):
     semestre = models.ForeignKey(core_models.Semestre, on_delete=models.SET_NULL, null=True, default=get_current_semester)
     nom_resp = models.CharField(null=True, default=None, max_length=255)
     mail_resp = models.CharField(null=True, default=None, max_length=255)
-
+    nom_resp_2 = models.CharField(null=True, default=None, max_length=255)
+    mail_resp_2 = models.CharField(null=True, default=None, max_length=255)
+    mail_asso = models.CharField(null=True, default=None, max_length=255, blank=True)
 
     # def get_montant_deco_max(self):
     #     if self.montantTTCMaxAutorise:
