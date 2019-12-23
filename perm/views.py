@@ -511,3 +511,9 @@ def get_perm_for_notation(request, perm_id):
 def perm_may_be_requested(request):
     print(CONSTANCE_CONFIG['PERM_MAY_BE_REQUESTED'])
     return JsonResponse({'perm_may_be_requested': config.__getattr__('PERM_MAY_BE_REQUESTED')})
+@api_view(['GET'])
+@permission_classes((IsAuthenticatedUser,))
+def get_portal_assos(request):
+    p = PortalClient()
+    response = p.get_assos()
+    return JsonResponse({'assos': response['data']}, status = response['status'])
