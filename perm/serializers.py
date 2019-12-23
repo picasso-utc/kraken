@@ -4,6 +4,12 @@ from treso import serializers as treso_serializers
 from core import serializers as core_serializers
 from core import models as core_models
 
+class RequestedPermSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = perm_models.RequestedPerm
+        exclude = list()
+
 
 class PermSerializer(serializers.ModelSerializer):
     creneaux = serializers.StringRelatedField(many=True, required=False, read_only=True)
