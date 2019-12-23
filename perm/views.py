@@ -514,8 +514,18 @@ def get_perm_for_notation(request, perm_id):
 @api_view(['GET'])
 @permission_classes((IsAuthenticatedUser,))
 def perm_may_be_requested(request):
-    print(CONSTANCE_CONFIG['PERM_MAY_BE_REQUESTED'])
     return JsonResponse({'perm_may_be_requested': config.__getattr__('PERM_MAY_BE_REQUESTED')})
+
+
+@api_view(['POST'])
+@permission_classes((IsAuthenticatedUser,))
+def update_perm_may_be_requested_setting(request):
+    if 'perm_may_be_requested' in request.data:
+        perm_may_be_requested = request.data['perm_may_be_requested']
+        config.__setattr__('PERM_MAY_BE_REQUESTED', perm_may_be_requested)
+    return JsonResponse({})
+
+
 class RequestedPermViewSet(viewsets.ViewSet):
 
     def list(self, request):
