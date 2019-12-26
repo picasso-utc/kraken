@@ -438,7 +438,7 @@ def get_perm_for_notation(request, perm_id):
 
     for creneau in creneaux : 
 
-        if perm_id not in perm : 
+        if "creneau" not in perm : 
 
             perm = creneau["perm"]
             perm.pop("creneaux")
