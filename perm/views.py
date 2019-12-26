@@ -557,6 +557,18 @@ class RequestedPermViewSet(viewsets.ViewSet):
             periode = requested_perm["periode"]
         )
 
+        mail_content = "Coucou " + requested_perm["nom_resp"] + "\n\n" \
+                        + "Ta demande de perm " +  requested_perm["nom"] + " a bien été enregistrée. Tu peux la modifier ici : \n\n" \
+                        + "https://assos.utc.fr/perm/form?form_id=" + str(new_requested_perm.pk) + "\n\n" \
+                        + "La bise, et à bientôt au Pic'Asso !"
+        email = EmailMessage(
+            subject=f"Pic'Asso - Demande de perm",
+            body=mail_content,
+            from_email=DEFAULT_FROM_EMAIL,
+            to=[requested_perm["mail_resp"]],
+        )
+        email.send()
+
         return JsonResponse({"id": new_requested_perm.pk})
 
     def retrieve(self, request, pk=None):
