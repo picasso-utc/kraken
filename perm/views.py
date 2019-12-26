@@ -577,7 +577,7 @@ class RequestedPermViewSet(viewsets.ViewSet):
 
         #Check if the user is the founder of the requested_perm object
         login = request.session.get('login')
-        if login == requested_perm.founder_login:
+        if login != requested_perm.founder_login:
             return JsonResponse({"error": "Vous n'avez pas la permission d'accéder à cette ressource"}, status=403)
 
         requested_perm.nom = request.data["nom"]
