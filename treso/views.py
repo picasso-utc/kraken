@@ -134,7 +134,8 @@ def tva_info(request, id):
                      'tva_a_declarer_total': sum(tva['montant'] for tva in tva_a_declarer)})
 
 
-
+@api_view(['GET'])
+@permission_classes((IsAdminUser,))
 def get_convention(request, id):
     """
     Vue qui permet d'afficher la convention de partenariat de perm d'id {id}.
@@ -149,7 +150,7 @@ def get_convention(request, id):
     return render(request, 'convention.html',
                   {'creneau': serializer.data, 'articles': info['creneau_articles'], 'date': info["date"],
                    'montant': round(creneau.get_montant_deco_max(), 2), 'period': info['period']})
-    
+
 
 
 # # def excel_check_generation(request):
