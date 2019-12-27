@@ -8,6 +8,5 @@ psycopg2==2.8.3
 Pillow==6.2.1
 django-extra-fields==1.2.3
 qrcode==0.4.1
-fpdf==1.7.2
 pdfkit==0.6.1
 PyPDF2==1.26.0
