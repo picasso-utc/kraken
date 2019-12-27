@@ -1,40 +1,68 @@
 {% load static %}
+<!doctype html>
+<html>
+    <head>
+        <title>Convention de partenariat</title>
+        <meta charset="utf-8" />
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
+    </head>
+    <body>
+        <h1 class="title">Perm : {{requested_perm.nom}}</h1>
 
-    <h1 color="#FFFFFF" align="center">Perm : {{requested_perm.nom}}</h1>
+        <h3 class="subtitle">Oranisateur</h3>
+        <p>
+            {% if requested_perm.asso %}
+            Association: Oui
+            {% else %}
+            Association: Non
+            {% endif %}
+        </p>
+        
+        <h3 class="subtitle">Thème de la perm</h3>
+        <p>
+            {{requested_perm.theme}}
+        </p>
 
-    <p align="left">
-        <b>Organisateur</b>
-        {% if requested_perm.asso %}
-        Association: Oui
-        {% else %}
-        Association: Non
-        {% endif %}
-    </p>
-    
-    <p align="left">
-        <b>Thème de la perm</b>  
-        {{requested_perm.theme}}
-    </p>
-    <p align="left">
-        <b>Description</b>
-        {{requested_perm.description}}
-    </p>
-    <p align="left">
-        <b>Lourdeur</b>
-        {{requested_perm.ambiance}}/5
-    </p>
-    <p align="left">
-        <b>Période privilégiée</b>
-        {{requested_perm.periode}}
-    </p>
-    <p align="left">
-        <b>Responsables</b>
-        {{requested_perm.nom_resp}} ({{requested_perm.mail_resp}})
-        <br>
-        {{requested_perm.nom_resp_2}} ({{requested_perm.mail_resp_2}})
-    </p>
-    <p align="left">
-        <b>Permanenciers</b>
-       {{requested_perm.membres}}
-    </p>
+        <h3 class="subtitle">Description</h3>
+        <p>
+            {{requested_perm.description}}
+        </p>
+
+        <h3 class="subtitle">Lourdeur</h3>
+        <p>
+            {{requested_perm.ambiance}}/5
+        </p>
+
+        <h3 class="subtitle">Période privilégiée</h3>
+        <p>
+            {{requested_perm.periode}}
+        </p>
+
+        <h3 class="subtitle">Responsables</h3>
+        <p>
+            {{requested_perm.nom_resp}} ({{requested_perm.mail_resp}})
+            <br>
+            {{requested_perm.nom_resp_2}} ({{requested_perm.mail_resp_2}})
+        </p>
+
+        <h3 class="subtitle">Permanenciers</h3>
+        <p>
+           {{requested_perm.membres}}
+        </p>
+
+    </body>
+    <style>
+        body {
+            font-weight: 300;
+            margin-top: 30px;
+            color: #000223;
+        }
+        .title{
+            text-align: center;
+        }
+        .subtitle{
+            text-decoration: underline;
+        }
+    </style>
+</html>
 
