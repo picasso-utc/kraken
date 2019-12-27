@@ -3,7 +3,7 @@
 # # from sets import Set
 
 # from django.http import HttpResponse
-# from django.shortcuts import render
+from django.shortcuts import render
 from rest_framework import viewsets
 from django.http import JsonResponse
 from rest_framework.decorators import api_view, permission_classes
@@ -17,6 +17,8 @@ from core.services.payutc import PayutcClient
 
 from core import models as core_models
 from core import viewsets as core_viewsets
+from perm import models as perm_models
+from perm import serializers as perm_serializers
 # # from core.services import payutc, excel_generation
 from treso import models as treso_models
 from treso import serializers as treso_serializers
@@ -130,6 +132,24 @@ def tva_info(request, id):
     return JsonResponse({'tva_deductible': tva_deductible,
                      'tva_a_declarer': tva_a_declarer,
                      'tva_a_declarer_total': sum(tva['montant'] for tva in tva_a_declarer)})
+
+
+
+def get_convention(request, id):
+    """
+    Vue qui permet d'afficher la convention de partenariat de perm d'id {id}.
+    On récupère les informations en méthode de l'objet, et on va ensuite juste
+    traiter la template et la render.
+    """
+    creneau = perm_models.Creneau.objects.get(pk=id)
+    print(creneau)
+    serializer = perm_serializers.CreneauSerializer(creneau)
+    info = creneau.get_convention_information()
+    print(serializer.data["perm"]["nom"])
+    return render(request, 'convention.html',
+                  {'creneau': serializer.data, 'articles': info['creneau_articles'], 'date': info["date"],
+                   'montant': round(creneau.get_montant_deco_max(), 2), 'period': info['period']})
+    
 
 
 # # def excel_check_generation(request):

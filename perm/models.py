@@ -17,30 +17,6 @@ class Perm(models.Model):
     mail_resp_2 = models.CharField(null=True, default=None, max_length=255)
     mail_asso = models.CharField(null=True, default=None, max_length=255, blank=True)
 
-    # def get_montant_deco_max(self):
-    #     if self.montantTTCMaxAutorise:
-    #         return self.montantTTCMaxAutorise
-    #     if self.date.weekday() in [3, 4]:
-    #         return 30
-    #     else:
-    #         return 20
-
-    # def get_convention_information(self):
-    #     articles = self.article_set.all()
-    #     perm_articles = list()
-    #     for article in articles:
-    #         perm_articles.append({
-    #             'nom': article.nom, 
-    #             'stock': article.stock,
-    #             'prixTTC': article.prix,
-    #             'prixHT': article.get_price_without_taxes(),
-    #             'TVA': article.tva   
-    #         })
-    #     return {
-    #         'perm': self,
-    #         'articles': articles,
-    #         'perm_articles': perm_articles,
-    #     }
     def __str__(self):
         return f"{self.nom}"
 
@@ -88,6 +64,45 @@ class Creneau(models.Model):
 
     def __str__(self):
         return f"{self.date}:{self.creneau}:{self.id}"
+
+
+    def get_montant_deco_max(self):
+        if self.montantTTCMaxAutorise:
+            return self.montantTTCMaxAutorise
+        if self.date.weekday() in [3, 4]:
+            return 30
+        else:
+            return 20
+
+    def get_convention_information(self):
+        period = "Matin"
+        if self.creneau == "D":
+            period = "Midi"
+        elif self.creneau == "S":
+            period = "Soir"
+
+        date_info = str(self.date).split("-")
+        date = date_info[2] + "/" + date_info[1] + "/" + date_info[0]
+
+        articles = self.article_set.all()
+        creneau_articles = list()
+
+        for article in articles:
+            creneau_articles.append({
+                'nom': article.nom, 
+                'stock': article.stock,
+                'prixTTC': article.prix,
+                'prixHT': article.get_price_without_taxes(),
+                'TVA': article.tva   
+            })
+        return {
+            'creneau': self,
+            'period': period,
+            'date': date,
+            'articles': articles,
+            'creneau_articles': creneau_articles,
+        }
+    
 
 
     def get_justificatif_information(self):
