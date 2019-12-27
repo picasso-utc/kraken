@@ -17,7 +17,6 @@ from constance import config
 from core.settings import CONSTANCE_CONFIG
 from core.services.current_semester import get_current_semester
 from core.services.portal import PortalClient
-from core.services.HtmlPdf import HtmlPdf
 from core.settings import FRONT_URL
 
 
