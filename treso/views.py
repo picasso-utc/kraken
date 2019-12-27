@@ -179,7 +179,7 @@ def get_all_conventions(request):
     for filename in filenames:
         f = open(filename, 'rb')
         input = PdfFileReader(f)
-        merger.append(input)
+        merger.append(input, import_bookmarks=False)
         f.close()
         os.remove(filename)
 
