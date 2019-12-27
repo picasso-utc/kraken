@@ -186,7 +186,8 @@ class UserViewSet(mixins.ListModelMixin,
 		return JsonResponse({'user': user})
 
 
-
+@api_view(['GET'])
+@permission_classes((IsAdminUser, ))
 def get_team(request, format=None):
 
 	queryset = core_models.Member.objects.filter(semester_id=get_current_semester())
