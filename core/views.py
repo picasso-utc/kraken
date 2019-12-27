@@ -198,6 +198,7 @@ def get_team(request, format=None):
 		for astreinte in member["astreinte_set"]:
 			if astreinte["note_orga"] > 0:
 				member["rated_astreintes"] += 1
+		member.pop("astreinte_set")
 
 	return JsonResponse({'team': serializer.data})
 
