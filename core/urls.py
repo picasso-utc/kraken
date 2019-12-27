@@ -30,6 +30,7 @@ urlpatterns = [
 	path('api/core/semester/state', core_views.semestre_state),
 	path('api/core/semester/credit', core_views.semester_beginning_credit),
 	path('api/current/semester', core_views.current_semester),
+	path('api/core/team', core_views.get_team),
 
 	# Include other application urls
 	path('api/perms/', include('perm.urls')),

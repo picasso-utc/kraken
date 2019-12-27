@@ -1,6 +1,8 @@
 from rest_framework import serializers
 
 from core import models as core_models
+from perm import models as perm_models
+from perm import serializers as perm_serializers
 
 class SemestreSerializer(serializers.ModelSerializer):
 	# Serializer des semestres
@@ -36,6 +38,25 @@ class MemberSerializer(serializers.ModelSerializer):
     class Meta:
         model = core_models.Member
         exclude = list()
+
+
+class AstreinteSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = perm_models.Astreinte
+        exclude =  list()
+
+
+class MemberAstreinteSerializer(serializers.ModelSerializer):
+    userright = UserRightSerializer(read_only=True)
+    userright_id = serializers.PrimaryKeyRelatedField(queryset=core_models.UserRight.objects.all(), source="userright")
+    astreinte_set = AstreinteSerializer(many=True, read_only=True)
+    
+    # Serializer des membres existants
+    class Meta:
+        model = core_models.Member
+        exclude = list()
+
 
 class ShortMemberSerializer(serializers.ModelSerializer):
 

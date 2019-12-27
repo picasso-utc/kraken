@@ -11,7 +11,7 @@ from django.db.models import Q
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from core.services.ginger import GingerClient
-
+from core.services.current_semester import get_current_semester
 
 
 from core.services import ginger as g
@@ -184,6 +184,23 @@ class UserViewSet(mixins.ListModelMixin,
 			user['right_detail'] = 'Aucun droit'
 
 		return JsonResponse({'user': user})
+
+
+
+def get_team(request, format=None):
+
+	queryset = core_models.Member.objects.filter(semester_id=get_current_semester())
+	serializer = core_serializers.MemberAstreinteSerializer(queryset, many=True)
+	team = serializer.data
+	for member in team : 
+		member["rated_astreintes"] = 0
+		member["total_asteintes"] = len(member["astreinte_set"])
+		for astreinte in member["astreinte_set"]:
+			if astreinte["note_orga"] > 0:
+				member["rated_astreintes"] += 1
+
+	return JsonResponse({'team': serializer.data})
+
 
 
 def get_constance_params():
