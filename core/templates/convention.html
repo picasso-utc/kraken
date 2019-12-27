@@ -1,0 +1,77 @@
+{% load static %}
+<!doctype html>
+<html>
+	<head>
+		<title>Convention de partenariat</title>
+		<meta charset="utf-8" />
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
+	</head>
+	<body>
+		<div class="container">
+			<div class="row">
+				<div class="col-xs-8">
+					<p id="picassoinfo"><strong>BDE-UTC Pic'Asso</strong><br />
+					Rue Roger Coutollenc<br />
+					60200 COMPIEGNE<br />
+					Siret 397776 725 00012</p>
+					<p><strong>Objet : Convention de partenariat avec {% if creneau.perm.asso %}l'association{% else %}le groupe{% endif %} {{ creneau.perm.nom | upper }}</strong><br />
+					Responsable du partenariat : {{ creneau.perm.nom_resp }}<br />
+					Adresse mail du responsable : {{ creneau.perm.mail_resp }}<br />
+					{% if creneau.perm.asso %}
+						Adresse mail de l'association : {{ creneau.perm.mail_asso }}<br />
+					{% endif %}
+					<p>Date : {{ date}}<br />
+					Période : {{ period }}</p>
+				</div>
+				<div class="col-xs-4">
+					<img class="pull-right" src="{% static 'logo_monochrome.png' %}" />
+				</div>
+			</div>
+			<div class="row" style="margin-top:15px">
+				<div class="col-md-12">
+					<table class="table table-striped table-bordered">
+						<thead>
+							<tr>
+								<th class="col-xs-7">Article</th>
+								<th>Prix HT</th>
+								<th>TVA</th>
+								<th>Prix TTC</th>
+								<th>Qté</th>
+							</tr>
+						</thead>
+						{% for article in articles %}
+                        <tr>
+							<td class="col-xs-7">{{ article.nom }}</td>
+							<td>{{ article.prixHT }}€</td>
+							<td>{{ article.TVA }}%</td>
+							<td>{{ article.prixTTC }}€</td>
+							<td>{{ article.stock }}</td>
+						</tr>
+                        {% endfor %}
+					</table>
+					<p>Le BDE-UTC Pic'Asso s'engage à mettre en vente les articles ci-dessus, et à verser les recettes encaissées à l'association partenaire.</p>
+                    <p>Le rachat de la décoration de la permanence est limité à {{ montant }}€, et doit être accompagné d'une facture à l'ordre de BDE-UTC Pic'Asso.</p>
+				</div>
+			</div>
+			<div class="row" style="margin-top:25px;">
+				<div class="col-xs-4 col-xs-offset-2">
+					<p class="pull-right">Signature du représentant du BDE-UTC Pic'Asso</p>
+				</div>
+				<div class="col-xs-4">
+					<p class="pull-right">Signature du représentant du partenaire</p>
+				</div>
+			</div>
+		</div>
+	</body>
+    <link href='https://fonts.googleapis.com/css?family=Roboto+Slab:400,300,700' rel='stylesheet' type='text/css'>
+    <style>
+        body {
+            font-family: 'Roboto Slab', serif;
+            font-weight: 300;
+            margin-top: 30px;
+        }
+        #picassoinfo {
+            font-weight: 300;
+        }
+    </style>
+</html>
