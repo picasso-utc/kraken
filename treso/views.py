@@ -25,6 +25,7 @@ from perm import serializers as perm_serializers
 from treso import models as treso_models
 from treso import serializers as treso_serializers
 from core.permissions import IsAdminUser, IsAuthenticatedUser, IsMemberUser
+from core.settings import APP_URL
 import pdfkit
 
 
@@ -148,10 +149,10 @@ def get_convention(request, id):
     creneau = perm_models.Creneau.objects.get(pk=id)
     serializer = perm_serializers.CreneauSerializer(creneau)
     info = creneau.get_convention_information()
-    print(serializer.data["perm"]["nom"])
+    logo_url = APP_URL + "/static/logo_monochrome.png"
     return render(request, 'convention.html',
                   {'creneau': serializer.data, 'articles': info['creneau_articles'], 'date': info["date"],
-                   'montant': round(creneau.get_montant_deco_max(), 2), 'period': info['period']})
+                   'montant': round(creneau.get_montant_deco_max(), 2), 'period': info['period'], 'logo_url': logo_url})
 
 
 @api_view(['GET'])
@@ -163,13 +164,12 @@ def get_all_conventions(request):
 
     for index, creneau in enumerate(queryset) :
 
-        html_page = render_convention(creneau)
-
         info = creneau.get_convention_information()
         serializer = perm_serializers.CreneauSerializer(creneau)
+        logo_url = APP_URL + "/static/logo_monochrome.png"
         html_page = render_to_string('convention.html',
                       {'creneau': serializer.data, 'articles': info['creneau_articles'], 'date': info["date"],
-                       'montant': round(creneau.get_montant_deco_max(), 2), 'period': info['period']})
+                       'montant': round(creneau.get_montant_deco_max(), 2), 'period': info['period'], 'logo_url': logo_url})
 
         filename = 'convention_creneau_id_' + str(index) + '.pdf'
         pdf= pdfkit.from_string(html_page, filename)
