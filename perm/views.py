@@ -569,13 +569,12 @@ def get_perm_for_notation(request, perm_id):
 
 
 @api_view(['GET'])
-@permission_classes((IsAuthenticatedUser,))
 def perm_may_be_requested(request):
     return JsonResponse({'perm_may_be_requested': config.__getattr__('PERM_MAY_BE_REQUESTED')})
 
 
 @api_view(['POST'])
-@permission_classes((IsAuthenticatedUser,))
+@permission_classes((IsMemberUser,))
 def update_perm_may_be_requested_setting(request):
     if 'perm_may_be_requested' in request.data:
         perm_may_be_requested = request.data['perm_may_be_requested']
