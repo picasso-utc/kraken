@@ -8,8 +8,8 @@ from django.http import JsonResponse, HttpResponse
 from django.urls import reverse
 from django.shortcuts import redirect
 from core.services.current_semester import get_current_semester
+import requests
 
- 
 # from rest_framework.authentication import BaseAuthentication
 # from django.contrib.auth.backends import ModelBackend
 
@@ -133,7 +133,8 @@ def me(request, format=None):
 def logout(request, format=None):
     """Delete session and redirect to CAS logout"""
     request.session.flush()
-    return redirect("https://cas.utc.fr/cas/logout")
+    requests.request(method='GET', url="https://cas.utc.fr/cas/logout")
+    return JsonResponse({})
 
 def login_user_from_session(request):
 	login = request.session.get('login')
