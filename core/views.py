@@ -194,7 +194,7 @@ def get_team(request, format=None):
 	team = serializer.data
 	for member in team : 
 		member["rated_astreintes"] = 0
-		member["total_asteintes"] = len(member["astreinte_set"])
+		member["total_astreintes"] = len(member["astreinte_set"])
 		for astreinte in member["astreinte_set"]:
 			if astreinte["note_orga"] > 0:
 				member["rated_astreintes"] += 1
