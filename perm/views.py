@@ -419,7 +419,7 @@ def get_perms_for_notation(request):
         # Obtenir la moyenne générale
         mean_note = 0
         mean_keys = 0
-        
+
         if perms[key]["nb_note_deco"] > 0 :
             perms[key]["note_deco"] = round(perms[key]["note_deco"] / perms[key]["nb_note_deco"],2)
             mean_note += perms[key]["note_deco"]
@@ -467,11 +467,17 @@ def get_perm_for_notation(request, perm_id):
             perm["note_anim"] = 0
             perm["note_orga"] = 0
             perm["note_menu"] = 0
+            perm["mean_m"] = 0
+            perm["mean_d"] = 0
+            perm["mean_s"] = 0
             perm["nb_note_deco"] = 0
             perm["nb_note_anim"] = 0
             perm["nb_note_orga"] = 0
             perm["nb_note_menu"] = 0
             perm["nb_astreintes"] = 0
+            perm["nb_note_m"] = 0
+            perm["nb_note_d"] = 0
+            perm["nb_note_s"] = 0
 
         if not any(c for c in perm["creneau"] if c["id"] == creneau["id"]):
 
@@ -487,6 +493,12 @@ def get_perm_for_notation(request, perm_id):
     serializer = perm_serializers.AstreinteSerializer(queryset, many=True)
 
     
+    creneau_keys = {
+        'M': ('mean_m', 'nb_note_m'),
+        'D': ('mean_d', 'nb_note_d'),
+        'S': ('mean_s', 'nb_note_s')
+    }
+
     astreintes = serializer.data
 
     for astreinte in astreintes:
@@ -505,21 +517,42 @@ def get_perm_for_notation(request, perm_id):
             if astreinte["note_deco"] > 0:
                 perm["note_deco"] += astreinte["note_deco"]
                 perm["nb_note_deco"] += 1
+                perm[creneau_keys[astreinte["creneau"]["creneau"]][0]] += astreinte["note_deco"]
+                perm[creneau_keys[astreinte["creneau"]["creneau"]][1]] += 1
             if astreinte["note_anim"] > 0:
                 perm["note_anim"] += astreinte["note_anim"]
                 perm["nb_note_anim"] += 1
+                perm[creneau_keys[astreinte["creneau"]["creneau"]][0]] += astreinte["note_anim"]
+                perm[creneau_keys[astreinte["creneau"]["creneau"]][1]] += 1
             if astreinte["note_orga"] > 0:
                 perm["note_orga"] += astreinte["note_orga"]
                 perm["nb_note_orga"] += 1
+                perm[creneau_keys[astreinte["creneau"]["creneau"]][0]] += astreinte["note_orga"]
+                perm[creneau_keys[astreinte["creneau"]["creneau"]][1]] += 1
             if astreinte["note_menu"] > 0:
                 perm["note_menu"] += astreinte["note_menu"]
                 perm["nb_note_menu"] += 1
+                perm[creneau_keys[astreinte["creneau"]["creneau"]][0]] += astreinte["note_menu"]
+                perm[creneau_keys[astreinte["creneau"]["creneau"]][1]] += 1
             perm["nb_astreintes"] += 1
 
             for creneau in perm["creneau"]:
                 if creneau["id"] == astreinte["creneau"]["id"]:
                     creneau["notation"].append(notation)
                     break
+
+    if perm["nb_note_m"] > 0:
+        perm["mean_m"] = round(perm["mean_m"] / perm["nb_note_m"],2)
+    else :
+        perm["mean_m"] = None
+    if perm["nb_note_d"] > 0:
+        perm["mean_d"] = round(perm["mean_d"] / perm["nb_note_d"],2)
+    else :
+        perm["mean_d"] = None
+    if perm["nb_note_s"] > 0:
+        perm["mean_s"] = round(perm["mean_s"] / perm["nb_note_s"],2)
+    else :
+        perm["mean_s"] = None
 
     if perm["nb_note_deco"] > 0 :
         perm["note_deco"] = round(perm["note_deco"] / perm["nb_note_deco"],2)
