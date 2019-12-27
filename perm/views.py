@@ -18,7 +18,9 @@ from core.settings import CONSTANCE_CONFIG
 from core.services.current_semester import get_current_semester
 from core.services.portal import PortalClient
 from core.settings import FRONT_URL
-
+import pdfkit
+from PyPDF2 import PdfFileMerger, PdfFileReader
+import os
 
 class PermViewSet(viewsets.ModelViewSet):
     serializer_class = perm_serializers.PermSerializer
@@ -689,13 +691,26 @@ class RequestedPermViewSet(viewsets.ViewSet):
 def get_pdf_requested_perms(request):
     queryset = perm_models.RequestedPerm.objects.filter(semestre_id=get_current_semester())
     serializer = perm_serializers.RequestedPermSerializer(queryset, many=True)
-    pdf = HtmlPdf()
+
+    filenames = []
     for requested_perm in serializer.data:
-        requested_perm_content = render_to_string('requested_perm.html', {'requested_perm': requested_perm})
-        pdf.add_page()
-        pdf.write_html(requested_perm_content)
-    response = HttpResponse(pdf.output(dest='S').encode('latin-1'))
-    response['Content-Type'] = 'application/pdf'
+
+        html_page = render_to_string('requested_perm.html', {'requested_perm': requested_perm})
+        filename = 'requested_perm_id_' + str(requested_perm["id"]) + '.pdf'
+        pdf= pdfkit.from_string(html_page, filename)
+        filenames.append(filename)
+
+    merger = PdfFileMerger()
+    for filename in filenames:
+        f = open(filename, 'rb')
+        input = PdfFileReader(f)
+        merger.append(input, import_bookmarks=False)
+        f.close()
+        os.remove(filename)
+
+    response = HttpResponse(content_type='application/pdf')
+    merger.write(response)
+    merger.close()
     return response
 
 
