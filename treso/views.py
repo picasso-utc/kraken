@@ -5,15 +5,17 @@
 # from django.http import HttpResponse
 from django.shortcuts import render
 from rest_framework import viewsets
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from rest_framework.decorators import api_view, permission_classes
+from django.template.loader import render_to_string
 # from rest_framework.renderers import JSONRenderer
 # from rest_framework.response import Response
 # import xlwt
-
+from PyPDF2 import PdfFileMerger, PdfFileReader
 # # from picsous.permissions import IsAdmin, IsAuthorizedUser
 # # from picsous.settings import NEMOPAY_FUNDATION_ID
 from core.services.payutc import PayutcClient
+import os
 
 from core import models as core_models
 from core import viewsets as core_viewsets
@@ -23,6 +25,7 @@ from perm import serializers as perm_serializers
 from treso import models as treso_models
 from treso import serializers as treso_serializers
 from core.permissions import IsAdminUser, IsAuthenticatedUser, IsMemberUser
+import pdfkit
 
 
 class CategorieFactureRecueViewSet(viewsets.ModelViewSet):
@@ -143,13 +146,47 @@ def get_convention(request, id):
     traiter la template et la render.
     """
     creneau = perm_models.Creneau.objects.get(pk=id)
-    print(creneau)
     serializer = perm_serializers.CreneauSerializer(creneau)
     info = creneau.get_convention_information()
     print(serializer.data["perm"]["nom"])
     return render(request, 'convention.html',
                   {'creneau': serializer.data, 'articles': info['creneau_articles'], 'date': info["date"],
                    'montant': round(creneau.get_montant_deco_max(), 2), 'period': info['period']})
+
+
+@api_view(['GET'])
+@permission_classes((IsAdminUser,))
+def get_all_conventions(request):
+
+    queryset = perm_models.Creneau.objects.filter(perm__asso=True)
+    filenames = []
+
+    for index, creneau in enumerate(queryset) :
+
+        html_page = render_convention(creneau)
+
+        info = creneau.get_convention_information()
+        serializer = perm_serializers.CreneauSerializer(creneau)
+        html_page = render_to_string('convention.html',
+                      {'creneau': serializer.data, 'articles': info['creneau_articles'], 'date': info["date"],
+                       'montant': round(creneau.get_montant_deco_max(), 2), 'period': info['period']})
+
+        filename = 'convention_creneau_id_' + str(index) + '.pdf'
+        pdf= pdfkit.from_string(html_page, filename)
+        filenames.append(filename)
+
+    merger = PdfFileMerger()
+    for filename in filenames:
+        f = open(filename, 'rb')
+        input = PdfFileReader(f)
+        merger.append(input)
+        f.close()
+        os.remove(filename)
+
+    response = HttpResponse(content_type='application/pdf')
+    merger.write(response)
+    merger.close()
+    return response
 
 
 
