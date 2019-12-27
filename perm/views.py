@@ -411,16 +411,36 @@ def get_perms_for_notation(request):
                 creneau["notation"].append(notation)
                 break
 
+    
+
     keys = perms.keys()
     for key in keys :
+
+        # Obtenir la moyenne générale
+        mean_note = 0
+        mean_keys = 0
+        
         if perms[key]["nb_note_deco"] > 0 :
             perms[key]["note_deco"] = round(perms[key]["note_deco"] / perms[key]["nb_note_deco"],2)
+            mean_note += perms[key]["note_deco"]
+            mean_keys += 1
         if perms[key]["nb_note_menu"] > 0 :
             perms[key]["note_menu"] = round(perms[key]["note_menu"] / perms[key]["nb_note_menu"],2)
+            mean_note += perms[key]["note_menu"]
+            mean_keys += 1
         if perms[key]["nb_note_orga"] > 0 :
             perms[key]["note_orga"] = round(perms[key]["note_orga"] / perms[key]["nb_note_orga"],2)
+            mean_note += perms[key]["note_orga"]
+            mean_keys += 1
         if perms[key]["nb_note_anim"] > 0 :
             perms[key]["note_anim"] = round(perms[key]["note_anim"] / perms[key]["nb_note_anim"],2)
+            mean_note += perms[key]["note_anim"]
+            mean_keys += 1
+
+        if mean_keys > 0:
+            mean_note = round(mean_note / mean_keys,2)
+        perms[key]["mean_note"] = mean_note
+
 
     return JsonResponse({'perms': list(perms.values())})
 
