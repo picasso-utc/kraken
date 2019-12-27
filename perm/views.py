@@ -18,6 +18,7 @@ from core.settings import CONSTANCE_CONFIG
 from core.services.current_semester import get_current_semester
 from core.services.portal import PortalClient
 from core.services.HtmlPdf import HtmlPdf
+from core.settings import FRONT_URL
 
 
 class PermViewSet(viewsets.ModelViewSet):
@@ -610,9 +611,10 @@ class RequestedPermViewSet(viewsets.ViewSet):
             periode = requested_perm["periode"]
         )
 
+        url = FRONT_URL + "/perm/form?form_id=" + str(new_requested_perm.pk)
         mail_content = "Coucou " + requested_perm["nom_resp"] + "\n\n" \
                         + "Ta demande de perm " +  requested_perm["nom"] + " a bien été enregistrée. Tu peux la modifier ici : \n\n" \
-                        + "https://assos.utc.fr/perm/form?form_id=" + str(new_requested_perm.pk) + "\n\n" \
+                        + url + "\n\n" \
                         + "La bise, et à bientôt au Pic'Asso !"
         email = EmailMessage(
             subject=f"Pic'Asso - Demande de perm",
