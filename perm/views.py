@@ -617,8 +617,8 @@ class RequestedPermViewSet(viewsets.ViewSet):
         )
 
         url = FRONT_URL + "/perm/form?form_id=" + str(new_requested_perm.pk)
-        mail_content = "Coucou " + requested_perm["nom_resp"] + "\n\n" \
-                        + "Ta demande de perm " +  requested_perm["nom"] + " a bien été enregistrée. Tu peux la modifier ici : \n\n" \
+        mail_content = "Coucou,\n\n" \
+                        + "Ta demande de perm " +  requested_perm["nom"] + " a bien été enregistrée. Tu peux la modifier ici : \n" \
                         + url + "\n\n" \
                         + "La bise, et à bientôt au Pic'Asso !"
         email = EmailMessage(
