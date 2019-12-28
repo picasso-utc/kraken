@@ -131,8 +131,6 @@ GINGER_URL = confidentials.GINGER_URL
 GINGER_KEY = confidentials.GINGER_KEY
 PORTAL_URL = confidentials.PORTAL_URL
 
-WKHTMLTOPDF_PATH = confidentials.WKHTMLTOPDF_PATH
-
 CONSTANCE_CONFIG = {
     'GINGER_URL': (confidentials.GINGER_URL, 'Adresse de connexion à Ginger.', str),
     'GINGER_KEY': (confidentials.GINGER_KEY, 'Clé de connexion à Ginger', str),

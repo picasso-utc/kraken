@@ -17,7 +17,6 @@ from constance import config
 from core.settings import CONSTANCE_CONFIG
 from core.services.current_semester import get_current_semester
 from core.services.portal import PortalClient
-from core.services.wkhtmltopdf_config import get_wkhtmltopdf_config
 from core.settings import FRONT_URL
 import pdfkit
 from PyPDF2 import PdfFileMerger, PdfFileReader
@@ -697,7 +696,7 @@ def get_pdf_requested_perms(request):
 
         html_page = render_to_string('requested_perm.html', {'requested_perm': requested_perm})
         filename = 'requested_perm_id_' + str(requested_perm["id"]) + '.pdf'
-        pdf= pdfkit.from_string(html_page, filename, configuration=get_wkhtmltopdf_config())
+        pdf= pdfkit.from_string(html_page, filename)
         filenames.append(filename)
 
     merger = PdfFileMerger()
