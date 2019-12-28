@@ -491,8 +491,9 @@ def get_perm_for_notation(request, perm_id):
             creneau_data["notation"] = []
             perm["creneau"].append(creneau_data)
 
-    queryset = perm_models.Astreinte.objects.all()
+    if "id" in perm :
     serializer = perm_serializers.AstreinteSerializer(queryset, many=True)
+        queryset = perm_models.Astreinte.objects.filter(creneau__perm__id=perm_id)
 
     
     creneau_keys = {
