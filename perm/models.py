@@ -270,7 +270,7 @@ class Astreinte(models.Model):
 
 
     def __str__(self):
-        return f"{self.astreinte_type} - {self.member.userright.name}"
+        return f"{self.astreinte_type} - {self.member.userright.name} - {self.id}"
 
 
 class PermHalloween(models.Model):
