@@ -181,7 +181,7 @@ class Member(models.Model):
     Classe qui regroupe tous les membres du pic
     """
     userright = models.ForeignKey(UserRight, on_delete=models.CASCADE)
-    semester = models.ForeignKey(Semestre, on_delete=models.CASCADE, default=get_current_semester)
+    semestre = models.ForeignKey(Semestre, on_delete=models.CASCADE, default=get_current_semester)
     poste = models.ForeignKey(Poste, null=True, on_delete=models.SET_NULL)
     picture = models.ImageField(upload_to="member", null=True, blank=True, default=None)
 
