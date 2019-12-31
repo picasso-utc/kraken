@@ -190,7 +190,7 @@ class UserViewSet(mixins.ListModelMixin,
 @permission_classes((IsAdminUser, ))
 def get_team(request, format=None):
 
-	queryset = core_models.Member.objects.filter(semester_id=get_current_semester())
+	queryset = core_models.Member.objects.filter(semestre__id=get_current_semester())
 	serializer = core_serializers.MemberAstreinteSerializer(queryset, many=True)
 	team = serializer.data
 	for member in team : 

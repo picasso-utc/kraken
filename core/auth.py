@@ -33,7 +33,7 @@ def _set_session_information(request, username, sessionid, connexion="full"):
         request.session['right'] = user_right.data['right'] 
         
         try:
-            member_queryset = core_models.Member.objects.filter(userright_id= user_right.data['id'], semester_id=get_current_semester()).get()
+            member_queryset = core_models.Member.objects.filter(userright_id= user_right.data['id'], semestre__id=get_current_semester()).get()
             member = core_serializers.MemberSerializer(member_queryset)
         except core_models.Member.DoesNotExist:
             member = None
