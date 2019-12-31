@@ -33,8 +33,10 @@ class PermViewSet(viewsets.ModelViewSet):
 
 class CreneauViewSet(viewsets.ModelViewSet):
     serializer_class = perm_serializers.CreneauSerializer
-    queryset = perm_models.Creneau.objects.all()
     permission_classes = (IsMemberUser,)
+    def get_queryset(self):
+        qs = perm_models.Creneau.objects
+        return get_request_semester(qs, self.request, "perm__semestre__id")
 
 
 @api_view(['GET'])
@@ -51,14 +53,15 @@ class ArticleViewSet(viewsets.ModelViewSet):
 
 class AstreinteViewSet(viewsets.ModelViewSet):
     serializer_class = perm_serializers.AstreinteSerializer
-    queryset = perm_models.Astreinte.objects.all()
     permission_classes = (IsMemberUser,)
+    def get_queryset(self):
+        qs = perm_models.Astreinte.objects
+        return get_request_semester(qs, self.request, "member__semestre__id")
 
 class MenuViewSet(viewsets.ModelViewSet):
     """
     Menu viewset
     """
-    # TO DO Restreindre Méthode
     permission_classes = (CanAccessMenuFunctionnalities,)
     queryset = perm_models.Menu.objects.filter(is_closed=False)
     serializer_class = perm_serializers.MenuSerializer
@@ -228,7 +231,6 @@ def send_mail(request):
             new_creneau = {'date': date, 'creneau_type': creneau_type, 'creneau_index': creneau_index}
             creneaux.append(new_creneau)
 
-        # TO DO Sort creneaux
         sorted_creneaux = sorted(creneaux, key=lambda x: x['creneau_index'])
 
         mail_content = render_to_string('perm_notification.html', {'creneaux': sorted_creneaux})
@@ -340,8 +342,8 @@ def get_creaneau_signature(request, creneau_id):
 @api_view(['GET'])
 @permission_classes((IsMemberUser,))
 def get_perms_for_notation(request):
-
-    queryset = perm_models.Creneau.objects.all()
+    qs = perm_models.Creneau.objects
+    queryset = get_request_semester(qs, request, "perm__semestre__id")
     serializer = perm_serializers.CreneauSerializer(queryset, many=True)
 
     creneaux = serializer.data
@@ -378,45 +380,44 @@ def get_perms_for_notation(request):
             creneau_data["notation"] = []
             perms[perm_id]["creneau"].append(creneau_data)
 
-    queryset = perm_models.Astreinte.objects.all()
+    qs = perm_models.Astreinte.objects
+    queryset = get_request_semester(qs, request, "member__semestre__id")
     serializer = perm_serializers.AstreinteSerializer(queryset, many=True)
 
-    
     astreintes = serializer.data
 
     for astreinte in astreintes:
-
         perm_id = astreinte["creneau"]["perm"]["id"]
 
-        notation  = {
-            "astreinte_type": astreinte["astreinte_type"],
-            "note_deco": astreinte["note_deco"],
-            "note_orga" : astreinte["note_orga"],
-            "note_anim": astreinte["note_anim"],
-            "note_menu": astreinte["note_menu"],
-            "commentaire": astreinte["commentaire"]
-        }
+        if perm_id in perms:
 
-        if astreinte["note_deco"] > 0:
-            perms[perm_id]["note_deco"] += astreinte["note_deco"]
-            perms[perm_id]["nb_note_deco"] += 1
-        if astreinte["note_anim"] > 0:
-            perms[perm_id]["note_anim"] += astreinte["note_anim"]
-            perms[perm_id]["nb_note_anim"] += 1
-        if astreinte["note_orga"] > 0:
-            perms[perm_id]["note_orga"] += astreinte["note_orga"]
-            perms[perm_id]["nb_note_orga"] += 1
-        if astreinte["note_menu"] > 0:
-            perms[perm_id]["note_menu"] += astreinte["note_menu"]
-            perms[perm_id]["nb_note_menu"] += 1
-        perms[perm_id]["nb_astreintes"] += 1
+            notation  = {
+                "astreinte_type": astreinte["astreinte_type"],
+                "note_deco": astreinte["note_deco"],
+                "note_orga" : astreinte["note_orga"],
+                "note_anim": astreinte["note_anim"],
+                "note_menu": astreinte["note_menu"],
+                "commentaire": astreinte["commentaire"]
+            }
 
-        for creneau in perms[perm_id]["creneau"]:
-            if creneau["id"] == astreinte["creneau"]["id"]:
-                creneau["notation"].append(notation)
-                break
+            if astreinte["note_deco"] > 0:
+                perms[perm_id]["note_deco"] += astreinte["note_deco"]
+                perms[perm_id]["nb_note_deco"] += 1
+            if astreinte["note_anim"] > 0:
+                perms[perm_id]["note_anim"] += astreinte["note_anim"]
+                perms[perm_id]["nb_note_anim"] += 1
+            if astreinte["note_orga"] > 0:
+                perms[perm_id]["note_orga"] += astreinte["note_orga"]
+                perms[perm_id]["nb_note_orga"] += 1
+            if astreinte["note_menu"] > 0:
+                perms[perm_id]["note_menu"] += astreinte["note_menu"]
+                perms[perm_id]["nb_note_menu"] += 1
+            perms[perm_id]["nb_astreintes"] += 1
 
-    
+            for creneau in perms[perm_id]["creneau"]:
+                if creneau["id"] == astreinte["creneau"]["id"]:
+                    creneau["notation"].append(notation)
+                    break
 
     keys = perms.keys()
     for key in keys :
