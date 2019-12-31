@@ -11,7 +11,7 @@ from django.db.models import Q
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from core.services.ginger import GingerClient
-from core.services.current_semester import get_current_semester
+from core.services.current_semester import get_current_semester, get_request_semester
 
 
 from core.services import ginger as g
@@ -58,9 +58,11 @@ class PosteViewSet(viewsets.ModelViewSet):
 
 
 class MemberViewSet(viewsets.ModelViewSet):
-    serializer_class = core_serializers.MemberSerializer
-    queryset = core_models.Member.objects.all()
-    permission_classes = (IsAdminUser,)
+	serializer_class = core_serializers.MemberSerializer
+	permission_classes = (IsAdminUser,)
+	def get_queryset(self):
+		qs = core_models.Member.objects
+		return get_request_semester(qs, self.request)
 
 
 @api_view(['GET'])

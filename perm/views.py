@@ -14,8 +14,9 @@ from django.core.mail import EmailMessage
 from tv import models as tv_models
 from tv import serializers as tv_serializers
 from constance import config
+from core import models as core_models
 from core.settings import CONSTANCE_CONFIG
-from core.services.current_semester import get_current_semester
+from core.services.current_semester import get_current_semester, get_request_semester
 from core.services.portal import PortalClient
 from core.settings import FRONT_URL
 import pdfkit
@@ -24,8 +25,10 @@ import os
 
 class PermViewSet(viewsets.ModelViewSet):
     serializer_class = perm_serializers.PermSerializer
-    queryset = perm_models.Perm.objects.all()
     permission_classes = (IsMemberUser,)
+    def get_queryset(self):
+        qs = perm_models.Perm.objects
+        return get_request_semester(qs, self.request)
 
 
 class CreneauViewSet(viewsets.ModelViewSet):

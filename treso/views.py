@@ -26,6 +26,7 @@ from treso import models as treso_models
 from treso import serializers as treso_serializers
 from core.permissions import IsAdminUser, IsAuthenticatedUser, IsMemberUser
 from core.settings import APP_URL
+from core.services.current_semester import get_request_semester
 import pdfkit
 
 
@@ -37,11 +38,10 @@ class CategorieFactureRecueViewSet(viewsets.ModelViewSet):
 class FactureRecueViewSet(viewsets.ModelViewSet):
 
     serializer_class = treso_serializers.FactureRecueSerializer
-    queryset = treso_models.FactureRecue.objects.all()
     permission_classes = (IsAdminUser,)
-    # def get_queryset(self):
-    #     qs = facture_models.FactureRecue.objects
-    #     return core_models.Semestre.filter_queryset(qs, self.request)
+    def get_queryset(self):
+        qs = treso_models.FactureRecue.objects
+        return get_request_semester(qs, self.request)
 
 
 class ChequeViewSet(viewsets.ModelViewSet):
@@ -57,9 +57,6 @@ class FactureEmiseViewSet(core_viewsets.RetrieveSingleInstanceModelViewSet):
     serializer_class = treso_serializers.FactureEmiseSerializer
     queryset = treso_models.FactureEmise.objects.all()
     permission_classes = (IsAdminUser,)
-    # def get_queryset(self):
-    #     qs = facture_models.FactureEmise.objects
-    #     return core_models.Semestre.filter_queryset(qs, self.request)
 
 
 class FactureEmiseRowViewSet(viewsets.ModelViewSet):
@@ -72,11 +69,10 @@ class FactureEmiseRowViewSet(viewsets.ModelViewSet):
 class ReversementEffectueViewSet(viewsets.ModelViewSet):
 
     serializer_class = treso_serializers.ReversementEffectueSerializer
-    queryset = treso_models.ReversementEffectue.objects.all()
     permission_classes = (IsAdminUser,)
-    # def get_queryset(self):
-    #     qs = facture_models.ReversementEffectue.objects
-        # return core_models.Semestre.filter_queryset(qs, self.request)
+    def get_queryset(self):
+        qs = treso_models.ReversementEffectue.objects
+        return get_request_semester(qs, self.request)
 
 
 
