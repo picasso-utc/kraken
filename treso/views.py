@@ -55,8 +55,10 @@ class FactureEmiseViewSet(core_viewsets.RetrieveSingleInstanceModelViewSet):
 
     single_serializer_class = treso_serializers.FactureEmiseWithRowsSerializer
     serializer_class = treso_serializers.FactureEmiseSerializer
-    queryset = treso_models.FactureEmise.objects.all()
     permission_classes = (IsAdminUser,)
+    def get_queryset(self):
+        qs = treso_models.FactureEmise.objects
+        return get_request_semester(qs, self.request)
 
 
 class FactureEmiseRowViewSet(viewsets.ModelViewSet):
