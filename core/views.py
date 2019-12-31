@@ -208,7 +208,6 @@ def get_team(request, format=None):
 
 
 def get_constance_params():
-	# return [{'key': key, 'value': config.__getattr__(key)} for key in CONSTANCE_CONFIG.keys()]
 	return {key: config.__getattr__(key) for key in CONSTANCE_CONFIG.keys()}
 
 
