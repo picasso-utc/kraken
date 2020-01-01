@@ -24,7 +24,7 @@ class FactureRecueSerializer(serializers.ModelSerializer):
     date_remboursement = serializers.DateField(required=False, allow_null=True)
     class Meta:
         model = treso_models.FactureRecue
-        exclude = ('semestre', )
+        exclude = list()
 
 
 class FactureEmiseRowSerializer(serializers.ModelSerializer):
@@ -37,7 +37,7 @@ class FactureEmiseSerializer(serializers.ModelSerializer):
     factureemiserow_set = FactureEmiseRowSerializer(many = True, read_only = True)
     class Meta:
         model = treso_models.FactureEmise
-        exclude = ('semestre', )
+        exclude = list()
 
 # FactureEmiseRowListSerializer = FactureEmiseRowSerializer.many_init
 
@@ -47,7 +47,7 @@ class FactureEmiseWithRowsSerializer(serializers.ModelSerializer):
     # factureemiserow_set = FactureEmiseRowListSerializer()
     class Meta:
         model = treso_models.FactureEmise
-        exclude = ('semestre',)
+        exclude = list()
 
 
 class ReversementEffectueSerializer(serializers.ModelSerializer):
