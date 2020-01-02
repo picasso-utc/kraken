@@ -122,7 +122,6 @@ def vote_survey(request, survey_id=None, item_id=None):
         queryset = survey_models.SurveyItem.objects.filter(id=item_id)
         serializer = survey_serializers.SurveyItemSerializer(queryset, many=True)
         survey_items = serializer.data
-        print(survey_items)
         if len(survey_items) > 0:
             survey_item = survey_items[0]
             vote = [v for v in survey_item['surveyitemvote_set'] if v['login'] == login]
