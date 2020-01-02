@@ -71,10 +71,8 @@ class FactureEmiseRowViewSet(viewsets.ModelViewSet):
 class ReversementEffectueViewSet(viewsets.ModelViewSet):
 
     serializer_class = treso_serializers.ReversementEffectueSerializer
+    queryset = treso_models.ReversementEffectue.objects.all()
     permission_classes = (IsAdminUser,)
-    def get_queryset(self):
-        qs = treso_models.ReversementEffectue.objects
-        return get_request_semester(qs, self.request)
 
 
 
