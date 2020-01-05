@@ -16,7 +16,7 @@ from PyPDF2 import PdfFileMerger, PdfFileReader
 # # from picsous.settings import NEMOPAY_FUNDATION_ID
 from core.services.payutc import PayutcClient
 import os
-
+from core.services.current_semester import get_current_semester
 from core import models as core_models
 from core import viewsets as core_viewsets
 from perm import models as perm_models
@@ -155,7 +155,13 @@ def get_convention(request, id):
 @permission_classes((IsAdminUser,))
 def get_all_conventions(request):
 
-    queryset = perm_models.Creneau.objects.filter(perm__asso=True)
+    semester_wanted = request.GET.get("semestre", False)
+    if semester_wanted != False and int(semester_wanted) > 0:
+        semestre_id = semester_wanted
+    else :
+        semestre_id = get_current_semester()
+    queryset = perm_models.Creneau.objects.filter(perm__asso=True, perm__semestre__id=semestre_id)
+
     filenames = []
 
     for index, creneau in enumerate(queryset) :
