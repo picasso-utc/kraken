@@ -4,6 +4,7 @@ from .import models as survey_models
 from django.http import JsonResponse
 from rest_framework.decorators import api_view, permission_classes
 from core.permissions import IsAdminUser, IsAuthenticatedUser, IsMemberUser, IsMemberUserOrReadOnly, CanAccessMenuFunctionnalities, HasApplicationRight
+import os
 
 @permission_classes((IsMemberUser, ))
 class SurveyViewSet(viewsets.ModelViewSet):
@@ -81,10 +82,18 @@ def delete_survey(request, pk=None):
             # Mise à jour de l'item du sondage en mettant le nombre de votes
             surveyitem_request = survey_models.SurveyItem.objects.get(pk=survey_item_id)
             surveyitem_request.votes = survey_item_votes
+            if surveyitem_request.image:
+                if os.path.isfile(surveyitem_request.image.path):
+                    os.remove(surveyitem_request.image.path)
+                    surveyitem_request.image = None
             surveyitem_request.save()
-            # for survey_item_vote in survey_item["surveyitemvote_set"]:
-            #     # Suppression des votants
-            #     survey_models.SurveyItemVote.objects.filter(survey_item_id=survey_item_id).delete()
+            for survey_item_vote in survey_item["surveyitemvote_set"]:
+                # Suppression des votants
+                survey_models.SurveyItemVote.objects.filter(survey_item_id=survey_item_id).delete()
+        if queryset.image:
+            if os.path.isfile(queryset.image.path):
+                os.remove(queryset.image.path)
+                queryset.image = None
         queryset.total_votes = total_votes
         queryset.completed = True
         queryset.save()
