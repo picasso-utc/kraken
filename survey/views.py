@@ -71,7 +71,8 @@ def get_public_survey(request, id=None):
 def delete_survey(request, pk=None):
         queryset = survey_models.Survey.objects.get(pk=pk)
         if queryset.completed:
-            return JsonResponse({"response": "Le sondage est déjà supprimé."})
+            queryset.delete()
+            return JsonResponse({"response": "Le sondage a été supprimé de l'historique."})
         serializer = survey_serializers.SurveySerializer(queryset)
         survey = serializer.data
         total_votes = 0
