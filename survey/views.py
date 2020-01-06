@@ -68,7 +68,9 @@ def get_public_survey(request, id=None):
 @api_view(['GET'])
 @permission_classes((IsMemberUser, ))
 def delete_survey(request, pk=None):
-        queryset = survey_models.Survey.objects.get(completed=False, pk=pk)
+        queryset = survey_models.Survey.objects.get(pk=pk)
+        if queryset.completed:
+            return JsonResponse({"response": "Le sondage est déjà supprimé."})
         serializer = survey_serializers.SurveySerializer(queryset)
         survey = serializer.data
         total_votes = 0
