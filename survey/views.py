@@ -37,10 +37,19 @@ def get_public_surveys(request):
 
 
 @api_view(['GET'])
+@permission_classes((IsMemberUser, ))
+def get_history_surveys(request):
+    queryset = survey_models.Survey.objects.filter(completed=True)
+    serializer = survey_serializers.SurveySerializer(queryset, many=True)
+    surveys = serializer.data
+    return JsonResponse({'surveys' : surveys})
+
+
+@api_view(['GET'])
 @permission_classes((IsAuthenticatedUser, ))
 def get_public_survey(request, id=None):
     login = request.session['login']
-    queryset = survey_models.Survey.objects.filter(visible=True, id=id)
+    queryset = survey_models.Survey.objects.filter(visible=True, completed=False, id=id)
     serializer = survey_serializers.SurveySerializer(queryset, many=True)
     surveys = serializer.data
     if len(surveys) > 0:
