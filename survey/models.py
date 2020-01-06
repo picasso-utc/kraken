@@ -11,6 +11,8 @@ class Survey(models.Model):
     description = models.TextField()
     visible = models.BooleanField(default=False)
     multi_choice = models.BooleanField(default=False)
+    completed = models.BooleanField(default=False)
+    total_votes = models.IntegerField(default=0)
 
 @receiver(models.signals.post_delete, sender=Survey)
 def auto_delete_file_on_delete(sender, instance, **kwargs):
@@ -50,6 +52,7 @@ class SurveyItem(models.Model):
     image = models.ImageField(upload_to="survey", null=True, blank=True, default=None)
     description = models.TextField(blank=True)
     survey = models.ForeignKey(Survey, on_delete=models.CASCADE)
+    votes = models.IntegerField(default=0)
 
 @receiver(models.signals.post_delete, sender=SurveyItem)
 def auto_delete_file_item_on_delete(sender, instance, **kwargs):
