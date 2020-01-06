@@ -8,7 +8,7 @@ from core.permissions import IsAdminUser, IsAuthenticatedUser, IsMemberUser, IsM
 @permission_classes((IsMemberUser, ))
 class SurveyViewSet(viewsets.ModelViewSet):
     serializer_class = survey_serializers.SurveySerializer
-    queryset = survey_models.Survey.objects.all()
+    queryset = survey_models.Survey.objects.filter(completed=False)
     permission_classes = (IsMemberUser,)
 
 @permission_classes((IsMemberUser, ))
@@ -27,7 +27,7 @@ class SurveyItemVoteViewSet(viewsets.ModelViewSet):
 
 @api_view(['GET'])
 def get_public_surveys(request):
-    queryset = survey_models.Survey.objects.filter(visible=True)
+    queryset = survey_models.Survey.objects.filter(visible=True, completed=False)
     serializer = survey_serializers.SurveySerializer(queryset, many=True)
     surveys = serializer.data
     for survey in surveys:
@@ -69,7 +69,7 @@ def get_public_survey(request, id=None):
 @permission_classes((IsAuthenticatedUser, ))
 def get_survey_results(request, id=None):
     login = request.session['login']
-    queryset = survey_models.Survey.objects.filter(visible=True, id=id)
+    queryset = survey_models.Survey.objects.filter(visible=True, completed=False, id=id)
     serializer = survey_serializers.SurveySerializer(queryset, many=True)
     surveys = serializer.data
     if len(surveys) > 0:
@@ -104,7 +104,7 @@ def get_survey_results(request, id=None):
 def vote_survey(request, survey_id=None, item_id=None):
 
     login = request.session['login']
-    queryset = survey_models.Survey.objects.filter(visible=True, id=survey_id)
+    queryset = survey_models.Survey.objects.filter(visible=True, id=survey_id, completed=False)
     serializer = survey_serializers.SurveySerializer(queryset, many=True)
     surveys = serializer.data
     if len(surveys) > 0:
