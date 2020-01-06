@@ -66,6 +66,29 @@ def get_public_survey(request, id=None):
 
 
 @api_view(['GET'])
+@permission_classes((IsMemberUser, ))
+def delete_survey(request, pk=None):
+        queryset = survey_models.Survey.objects.get(completed=False, pk=pk)
+        serializer = survey_serializers.SurveySerializer(queryset)
+        survey = serializer.data
+        total_votes = 0
+        for survey_item in survey["surveyitem_set"]:
+            survey_item_id = survey_item["id"]
+            survey_item_votes = len(survey_item["surveyitemvote_set"])
+            total_votes += survey_item_votes
+            # Mise à jour de l'item du sondage en mettant le nombre de votes
+            surveyitem_request = survey_models.SurveyItem.objects.get(pk=survey_item_id)
+            surveyitem_request.votes = survey_item_votes
+            surveyitem_request.save()
+            # for survey_item_vote in survey_item["surveyitemvote_set"]:
+            #     # Suppression des votants
+            #     survey_models.SurveyItemVote.objects.filter(survey_item_id=survey_item_id).delete()
+        queryset.total_votes = total_votes
+        queryset.completed = True
+        queryset.save()
+        return JsonResponse({})
+
+@api_view(['GET'])
 @permission_classes((IsAuthenticatedUser, ))
 def get_survey_results(request, id=None):
     login = request.session['login']

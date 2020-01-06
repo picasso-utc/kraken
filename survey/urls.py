@@ -10,4 +10,5 @@ urlpatterns = [
 	path('public/vote/<int:survey_id>/<int:item_id>', survey_views.vote_survey),
 	path('public/vote/cancel/<int:item_id>', survey_views.cancel_vote),
 	path('history', survey_views.get_history_surveys),
+	path('delete/<int:pk>', survey_views.delete_survey)
 ]
