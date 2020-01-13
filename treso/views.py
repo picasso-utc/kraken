@@ -166,16 +166,18 @@ def get_all_conventions(request):
 
     for index, creneau in enumerate(queryset) :
 
-        info = creneau.get_convention_information()
-        serializer = perm_serializers.CreneauSerializer(creneau)
-        logo_url = APP_URL + "/static/logo_monochrome.png"
-        html_page = render_to_string('convention.html',
-                      {'creneau': serializer.data, 'articles': info['creneau_articles'], 'date': info["date"],
-                       'montant': round(creneau.get_montant_deco_max(), 2), 'period': info['period'], 'logo_url': logo_url})
+        if creneau.article_set.exists():
 
-        filename = 'convention_creneau_id_' + str(index) + '.pdf'
-        pdf= pdfkit.from_string(html_page, filename)
-        filenames.append(filename)
+            info = creneau.get_convention_information()
+            serializer = perm_serializers.CreneauSerializer(creneau)
+            logo_url = APP_URL + "/static/logo_monochrome.png"
+            html_page = render_to_string('convention.html',
+                        {'creneau': serializer.data, 'articles': info['creneau_articles'], 'date': info["date"],
+                        'montant': round(creneau.get_montant_deco_max(), 2), 'period': info['period'], 'logo_url': logo_url})
+
+            filename = 'convention_creneau_id_' + str(index) + '.pdf'
+            pdf= pdfkit.from_string(html_page, filename)
+            filenames.append(filename)
 
     merger = PdfFileMerger()
     for filename in filenames:
