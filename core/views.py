@@ -73,7 +73,7 @@ def user_information(request, format=None):
 	user = g.get_user_info(login)
 	if user['status'] == 200:
 		return JsonResponse(user['data'])
-	return JsonResponse({})
+	return JsonResponse({'error': 'Une erreur s\'est produite'}, status=500)
 	
 
 
