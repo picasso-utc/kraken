@@ -266,6 +266,9 @@ class BlockedUserViewSet(viewsets.ViewSet):
 		    name = name,
 		    justification = justification,
 		)
+		queryset = core_models.BlockedUser.objects.get(pk=new_blocked_user.pk)
+		serializer = core_serializers.BlockedUserSerializer(queryset)
+		return JsonResponse({"user": serializer.data})
 
 
 	def destroy(self, request, pk=None):
