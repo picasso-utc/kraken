@@ -189,3 +189,10 @@ class Member(models.Model):
     #     return  self.userright_id.login + ', ' + self.poste_id.name
 
 
+class BlockedUser(models.Model):
+    """
+    Classe qui regroupe tous les utilisateurs bloqués
+    """
+    badge_uid = models.CharField(null=False, default=None, max_length=10, blank=False, unique=True)
+    name = models.CharField(null=False, default=None, max_length=255, blank=False)
+    justification = models.CharField(null=False, default=None, max_length=255, blank=False)
