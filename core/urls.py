@@ -15,8 +15,6 @@ from . import settings
 
 urlpatterns = [
 
-	path('admin/', admin.site.urls),
-
 	# Authentication
 	path('api/auth/login', core_views.login, name='auth.login'),
 	path('api/auth/login_callback', core_views.login_callback, name='auth.login_callback'),
