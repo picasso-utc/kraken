@@ -17,8 +17,7 @@ class Survey(models.Model):
 @receiver(models.signals.post_delete, sender=Survey)
 def auto_delete_file_on_delete(sender, instance, **kwargs):
     """
-    Deletes file from filesystem
-    when corresponding `MediaFile` object is deleted.
+    Suppression du fichier de l'attribut image à la suppresion
     """
     if instance.image:
         if os.path.isfile(instance.image.path):
@@ -28,13 +27,11 @@ def auto_delete_file_on_delete(sender, instance, **kwargs):
 @receiver(models.signals.pre_save, sender=Survey)
 def auto_delete_file_on_change(sender, instance, **kwargs):
     """
-    Deletes old file from filesystem
-    when corresponding `MediaFile` object is updated
-    with new file.
+    Au moment d'une mise à jour, si l'image est différente
+    suppression de l'ancienne
     """
     if not instance.pk:
         return False
-
     try:
         old_file = Survey.objects.get(pk=instance.pk).image
     except Survey.DoesNotExist:
@@ -57,8 +54,7 @@ class SurveyItem(models.Model):
 @receiver(models.signals.post_delete, sender=SurveyItem)
 def auto_delete_file_item_on_delete(sender, instance, **kwargs):
     """
-    Deletes file from filesystem
-    when corresponding `MediaFile` object is deleted.
+    Suppression du fichier de l'attribut image à la suppresion
     """
     if instance.image:
         if os.path.isfile(instance.image.path):
@@ -68,13 +64,11 @@ def auto_delete_file_item_on_delete(sender, instance, **kwargs):
 @receiver(models.signals.pre_save, sender=SurveyItem)
 def auto_delete_file_item_on_change(sender, instance, **kwargs):
     """
-    Deletes old file from filesystem
-    when corresponding `MediaFile` object is updated
-    with new file.
+    Au moment d'une mise à jour, si l'image est différente
+    suppression de l'ancienne
     """
     if not instance.pk:
         return False
-
     try:
         old_file = SurveyItem.objects.get(pk=instance.pk).image
     except SurveyItem.DoesNotExist:
