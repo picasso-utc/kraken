@@ -39,6 +39,11 @@ class MemberSerializer(serializers.ModelSerializer):
         model = core_models.Member
         exclude = list()
 
+class BlockedUserSerializer(serializers.ModelSerializer):
+	# Serializer des postes existants
+    class Meta:
+        model = core_models.BlockedUser
+        exclude = list()
 
 class AstreinteSerializer(serializers.ModelSerializer):
 
