@@ -11,9 +11,6 @@ class UserRight(models.Model):
     On distingue plusieurs types de droits, à travers la valeur de 'right'.
     Par défaut, un utilisateur qui n'a aucun UserRight revient à un utilisateur
     qui a un utilisateur qui a comme right 'USERRIGHT_NONE'
-
-    XXX : distinguer quelqu'un qui a tous les droits sur la tréso (type, l'équipe tréso)
-    de ceux qui tous les droits (type, l'équipe info).
     """
     USERRIGHT_ALL = 'A'
     USERRIGHT_MEMBER = 'M'
@@ -29,36 +26,13 @@ class UserRight(models.Model):
     name = models.CharField(max_length=50, null=True)
     right = models.CharField(max_length=1, choices=USERRIGHT_CHOICES)
     last_login = models.DateTimeField(blank=True, null=True)
-	# email = models.EmailField(unique=True)
-	# first_name = models.CharField(max_length=100)
-	# last_name = models.CharField(max_length=100)
-
-	# # Rights
-	# is_admin = models.BooleanField(default=False)
-
-	# @property
-	# def is_staff(self):
-	# 	return self.is_admin
-
-	# USERNAME_FIELD = 'login'
-	# EMAIL_FIELD = 'email'
-
-	# # Display
-	# def __str__(self):
-	# 	return self.login
-
-	# def get_full_name(self):
-	# 	return self.first_name + ' ' + self.last_name
-
-	# def get_short_name(self):
-	# 	return self.login
 
     def __str__(self):
         return f"{self.name}"
 
 
 class Semestre(models.Model):
-    # Modèle représentant un semestre de cours.
+    """Modèle représentant un semestre de cours."""
     SEMESTRE_AUTOMNE = 'A'
     SEMESTRE_PRINTEMPS = 'P'
 
@@ -75,26 +49,6 @@ class Semestre(models.Model):
 
     def __str__(self):
         return f"{self.periode}{self.annee}"
-
-    # class Meta:
-    #     db_table = "semestre"
-
-    
-
-    # @classmethod
-    # def filter_queryset(cls, qs, request=None):
-        # from picsous.permissions import IsAdmin
-        # from constance import config as live_config
-        # if request:
-        #     semester_wanted = request.GET.get("semester", False)
-        # if request and IsAdmin().has_permission(request, None) and semester_wanted != False:
-        #     if semester_wanted == "all":
-        #         return qs.all()
-        #     elif int(semester_wanted) > 0:
-        #         return qs.filter(semestre__id=int(semester_wanted))
-        # else:
-        #     return qs.filter(semestre__id=live_config.SEMESTER)
-        # return qs.filter(semestre__id=int(semester_wanted))
 
     def get_paid_bills(self):
         from treso.models import FactureEmise, FactureRecue
@@ -130,20 +84,9 @@ class PricedModel(models.Model):
         abstract = True
 
 
-
-# class TimeModel(models.Model):
-#     """ Modèle représentant une période temporelle """
-#     class Meta(object):
-#         """ Représentation en DB """
-#         abstract = True
-
-#     debut = models.DateField()
-#     fin = models.DateField()
-
-
 class PeriodeTVA(models.Model):
     """
-    Période de TVA.
+    Class abstraire, Période de TVA.
     """
     PERIODE_NON_DECLAREE = 'N'
     PERIODE_DECLAREE = 'D'
@@ -162,18 +105,15 @@ class PeriodeTVA(models.Model):
         abstract = False
 
 
-
-
 class Poste(models.Model):
     """
-    Classe qui regroupe tous les postes du pic
+    Classe qui regroupe tous les postes du Pic
     """
     order = models.IntegerField()
     name = models.CharField(max_length=25, unique=True)
 
     def __str__(self):
         return f"{self.name}"
-
 
 
 class Member(models.Model):
@@ -184,9 +124,6 @@ class Member(models.Model):
     semestre = models.ForeignKey(Semestre, on_delete=models.CASCADE, default=get_current_semester)
     poste = models.ForeignKey(Poste, null=True, on_delete=models.SET_NULL)
     picture = models.ImageField(upload_to="member", null=True, blank=True, default=None)
-
-    # def __str__(self):
-    #     return  self.userright_id.login + ', ' + self.poste_id.name
 
 
 class BlockedUser(models.Model):
