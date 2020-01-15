@@ -97,8 +97,10 @@ def delete_survey(request, pk=None):
                 queryset.image = None
         queryset.total_votes = total_votes
         queryset.completed = True
+    queryset.visible = False
         queryset.save()
-        return JsonResponse({})
+    return JsonResponse({})
+
 
 @api_view(['GET'])
 @permission_classes((IsAuthenticatedUser, ))
