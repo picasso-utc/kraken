@@ -12,8 +12,6 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from core.services.ginger import GingerClient
 from core.services.current_semester import get_current_semester, get_request_semester
-
-
 from core.services import ginger as g
 
 
@@ -95,7 +93,6 @@ def user_information(request, format=None):
 	return JsonResponse({'error': 'Une erreur s\'est produite'}, status=500)
 	
 
-
 @api_view(['GET'])
 @permission_classes((IsAdminUser, ))
 def semestre_state(request):
@@ -106,7 +103,6 @@ def semestre_state(request):
 
 
 @api_view(['GET', 'PUT'])
-# TO REVIEW
 @permission_classes((IsAdminUser, ))
 def semester_beginning_credit(request):
     """
@@ -121,9 +117,11 @@ def semester_beginning_credit(request):
         semester.save()
     return JsonResponse({'solde': int(semester.solde_debut)})
 
+
 # ViewSets
 
 class SemestreViewSet(viewsets.ModelViewSet):
+	"""Viewset pour gérer les semestres"""
 	serializer_class = core_serializers.SemestreSerializer
 	queryset = core_models.Semestre.objects.all()
 	permission_classes = (IsMemberUser,)
@@ -131,12 +129,11 @@ class SemestreViewSet(viewsets.ModelViewSet):
 
 class PeriodeTVAViewSet(viewsets.ModelViewSet):
     """
-    PeriodeTVA endpoint
+    PeriodeTVA ViewSet
     """
     permission_classes = (IsAdminUser, )
     queryset = core_models.PeriodeTVA.objects.all()
     serializer_class = core_serializers.PeriodeTVASerializer
-
 
 
 class UserRightViewSet(viewsets.ModelViewSet):
@@ -205,11 +202,12 @@ class UserViewSet(mixins.ListModelMixin,
 @api_view(['GET'])
 @permission_classes((IsAdminUser, ))
 def get_team(request, format=None):
-
+	"""Renvoie les membres de l'équipe du semestre courant"""
 	queryset = core_models.Member.objects.filter(semestre__id=get_current_semester())
 	serializer = core_serializers.MemberAstreinteSerializer(queryset, many=True)
 	team = serializer.data
 	for member in team : 
+		# Nombre d'astreintes notées et totales ajoutées
 		member["rated_astreintes"] = 0
 		member["total_astreintes"] = len(member["astreinte_set"])
 		for astreinte in member["astreinte_set"]:
@@ -220,8 +218,8 @@ def get_team(request, format=None):
 	return JsonResponse({'team': serializer.data})
 
 
-
 def get_constance_params():
+	"""Renvoi les attributs de config"""
 	return {key: config.__getattr__(key) for key in CONSTANCE_CONFIG.keys()}
 
 
@@ -229,7 +227,7 @@ def get_constance_params():
 @permission_classes((IsAdminUser, ))
 def admin_settings(request, format=None):
 	"""
-	Endpoint qui permet d'obtenir tous les paramètres de configuration.
+	Permet d'obtenir ou de mettre à jour tous les paramètres de configuration.
 	"""
 	if request.method == 'GET':
 		return JsonResponse({'settings': get_constance_params()})
@@ -241,11 +239,10 @@ def admin_settings(request, format=None):
 		return JsonResponse({'settings': get_constance_params()})
 
 
-
 @api_view(['GET', 'POST'])
 @permission_classes((IsMemberUser, ))
 def current_semester(request):
-
+	"""Obtenir ou mettre à jour le semestre courant"""
 	if request.method == 'GET':
 		semester = core_models.Semestre.objects.get(pk=config.SEMESTER)
 		return JsonResponse(core_serializers.SemestreSerializer(semester).data)
@@ -258,9 +255,8 @@ def current_semester(request):
 			return JsonResponse(core_serializers.SemestreSerializer(semester).data)
 
 
-# Semester to check
 class BlockedUserViewSet(viewsets.ViewSet):
-
+	"""ViewSet des utilisateurs bloqués"""
 	def list(self, request):
 		queryset = core_models.BlockedUser.objects.all()
 		serializer = core_serializers.BlockedUserSerializer(queryset, many=True)
@@ -268,12 +264,13 @@ class BlockedUserViewSet(viewsets.ViewSet):
 
 	def create(self, request):
 		login = request.data["login"]
-		# Retrieve information from Ginger (badge_uid, name)
+		# Récupération depuis Ginger de badge_uid, name avec login
 		ginger = g.GingerClient()
 		ginger_response = ginger.get_user_info(login)
 		justification = request.data["justification"]
 		name = ginger_response["data"]["prenom"] + " " + ginger_response["data"]["nom"]
 		badge_uid = ginger_response["data"]["badge_uid"]
+		# Création utilisateur bloqué
 		new_blocked_user = core_models.BlockedUser.objects.create(
 		    badge_uid = badge_uid,
 		    name = name,
@@ -283,13 +280,10 @@ class BlockedUserViewSet(viewsets.ViewSet):
 		serializer = core_serializers.BlockedUserSerializer(queryset)
 		return JsonResponse({"user": serializer.data})
 
-
 	def destroy(self, request, pk=None):
-		
 		if pk:
 			core_models.BlockedUser.objects.filter(pk=pk).delete()
 		return JsonResponse({})
-
 
 	def get_permissions(self):
 		"""
