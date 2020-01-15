@@ -21,46 +21,62 @@ from core.services import ginger as g
 
 @api_view(['POST'])
 def login_badge(request, format=None):
-	"""Authenticate with badge_id"""
+	"""Authentification avec le badge_uid et le PIN"""
 	return auth_view.login_badge(request, format)
+
 
 @api_view(['POST'])
 def login_username(request, format=None):
-	"""Authenticate with badge_id"""
+	"""Authentification avec le login et le PIN"""
 	return auth_view.login_username(request, format)
+
 
 @api_view(['GET'])
 def login(request, format=None):
-	"""Redirect to CAS with a callback pointing to login_callback"""
+	"""Redirection vers le CAS pour obtenir un ticket"""
 	return auth_view.login(request, format)
+
 
 @api_view(['GET'])
 def login_callback(request, format=None):
-	"""Try login via PayUTC with CAS ticket"""
+	"""
+		Callback du CAS
+		Connexion à l'API Weezevent avec le ticket du CAS
+		Création d'une session
+	"""
 	return auth_view.login_callback(request, format)
+
 
 @api_view(['GET'])
 @permission_classes((IsAuthenticatedUser, ))
 def logout(request, format=None):
+	"""Déconnexion, destruction de la session"""
 	return auth_view.logout(request, format)
 
 
 @api_view(['GET'])
 @permission_classes((IsAuthenticatedUser, ))
 def me(request, format=None):
+	"""Information d'un utilisateur connecté"""
 	return auth_view.me(request, format)
 
 
 class PosteViewSet(viewsets.ModelViewSet):
-    serializer_class = core_serializers.PosteSerializer
-    queryset = core_models.Poste.objects.all()
-    permission_classes = (IsAdminUser,)
+	"""ViewSet pour les postes disponibles au Pic (prez, treso, ...)"""
+	serializer_class = core_serializers.PosteSerializer
+	queryset = core_models.Poste.objects.all()
+	permission_classes = (IsAdminUser,)
 
 
 class MemberViewSet(viewsets.ModelViewSet):
+	"""
+	Viewset pour les membres du Pic 
+	Membre : combinaison d'un semestre, d'un utilisateur et d'un poste
+	"""
 	serializer_class = core_serializers.MemberSerializer
 	permission_classes = (IsAdminUser,)
 	def get_queryset(self):
+		# Tri par semestre
 		qs = core_models.Member.objects
 		return get_request_semester(qs, self.request)
 
@@ -68,6 +84,9 @@ class MemberViewSet(viewsets.ModelViewSet):
 @api_view(['GET'])
 @permission_classes((IsMemberUser, ))
 def user_information(request, format=None):
+	"""
+	Obtenir des informations via ginger à partir d'un login
+	"""
 	login = request.GET.get('login', '')
 	g = GingerClient()
 	user = g.get_user_info(login)
@@ -81,7 +100,7 @@ def user_information(request, format=None):
 @permission_classes((IsAdminUser, ))
 def semestre_state(request):
     """
-    Endpoint qui renvoie la somme des factures payées du semestre (émises et reçues)
+    Renvoie la somme des factures payées du semestre (émises et reçues)
     """
     return JsonResponse(core_models.Semestre.objects.get(pk=config.SEMESTER).get_paid_bills())
 
@@ -91,20 +110,15 @@ def semestre_state(request):
 @permission_classes((IsAdminUser, ))
 def semester_beginning_credit(request):
     """
-    Endpoint qui renvoie le solde au début du semestre actuel - sauf si 
+    Erenvoie le solde au début du semestre actuel | Sauf si 
     l'utilisateur spécifie un semester (avec le paramètre GET "semester")
     """
     semesterId = request.GET.get("semester", config.SEMESTER)
     semester = core_models.Semestre.objects.get(pk=semesterId)
     serializer = core_serializers.SemestreSerializer(semester)
-    print(serializer)
-    print(request.method)
-    print(semester)
-    print(semester)
     if request.method == 'PUT':
         semester.solde_debut = request.data['solde_debut']
         semester.save()
-        print(semester)
     return JsonResponse({'solde': int(semester.solde_debut)})
 
 # ViewSets

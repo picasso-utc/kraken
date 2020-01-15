@@ -23,6 +23,7 @@ urlpatterns = [
 	path('api/auth/me', core_views.me, name='auth.me'),
 	path('api/auth/logout', core_views.logout, name='auth.logout'),
 	
+	# Application Core
 	path('api/admin/settings', core_views.admin_settings),
 	path('api/core/user', core_views.user_information),
 	path('api/core/semester/state', core_views.semestre_state),
@@ -30,13 +31,25 @@ urlpatterns = [
 	path('api/current/semester', core_views.current_semester),
 	path('api/core/team', core_views.get_team),
 
-	# Include other application urls
+	# Inclusion URL application Perm
 	path('api/perms/', include('perm.urls')),
+
+	# Inclusion URL application Treso
 	path('api/treso/', include('treso.urls')),
+
+	# Inclusion URL application Payutc
 	path('api/payutc/', include('payutc.urls')),
+
+	# Inclusion URL application Survey
 	path('api/surveys/', include('survey.urls')),
+
+	# Inclusion URL application TV
 	path('api/tv/', include('tv.urls')),
 
-	# Include routers
+	# Inclusion fichier Router
+	# Ce dernier contient les Viewset, 1 URL = 1 CRUD
+	# CRUD = Create, Read, Update, Deete 
 	path('api/', include(router.urls)),
+
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# Route pour ajouter les médias
