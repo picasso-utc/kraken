@@ -141,41 +141,55 @@ class PeriodeTVAViewSet(viewsets.ModelViewSet):
 
 class UserRightViewSet(viewsets.ModelViewSet):
     """
-    Userright endpoint
+    UserRight Viewset
     """
     permission_classes = (IsAdminUser, )
     queryset = core_models.UserRight.objects.all()
     serializer_class = core_serializers.UserRightSerializer
 
 
+def get_ginger_info(login, right, ginger=None):
+	"""Renvoie structure de données d'un utilisateur avec Ginger"""
+	if not ginger:
+		ginger = g.GingerClient()
+	ginger_response = ginger.get_user_info(login)
+	data = {'right': right, 'login': login}
+	print(ginger_response)
+	if ginger_response['status'] != 200:
+		data['user'] = None
+	else:
+		data['user'] = ginger_response['data']
+	if right == 'A':
+		data['right_detail'] = 'Admin'
+	elif right == 'M':
+		data['right_detail'] = 'Membre'
+	elif right == 'N':
+		data['right_detail'] = 'Aucun droit'
+	print(data)
+	return data
+
+
 class UserViewSet(mixins.ListModelMixin,
                     mixins.CreateModelMixin,
                     viewsets.GenericViewSet):
+	"""Classe pour gérer les utilisateurs depuis le site"""
 
 	permission_classes = (IsAdminUser,)
 
 	def list(self, request):
+		# Récupération utilisateurs avec droit Admin et Membre
 		queryset = core_models.UserRight.objects.filter(Q(right='A') | Q(right='M'))
 		serializer = core_serializers.UserRightSerializer(queryset, many=True)
-		# Retrieve user from Ginger and add right details
+		# Récupération des informations des utilisateurs via Ginger
+		# Ajout des droits correspondants
 		ginger = g.GingerClient()
+		users = []
 		for i, user in enumerate(serializer.data):
-			login = serializer.data[i]['login']
-			ginger_response = ginger.get_user_info(login)
-
-			if ginger_response['status'] != 200:
-				serializer.data[i]['user'] = None
-			else:
-				serializer.data[i]['user'] = ginger_response['data']
-			right = serializer.data[i]['right']
-			if right == 'A':
-				serializer.data[i]['right_detail'] = 'Admin'
-			elif right == 'M':
-				serializer.data[i]['right_detail'] = 'Membre'
-		return JsonResponse({'users': serializer.data})
-
+			users.append(get_ginger_info(user['login'], user['right'], ginger))
+		return JsonResponse({'users': users})
 
 	def create(self, request):
+		# Création ou mise à jour d'un utilisateur
 		serializer = core_serializers.UserRightSerializer(request.data)
 		user = serializer.data
 
@@ -184,22 +198,7 @@ class UserViewSet(mixins.ListModelMixin,
 	        defaults={'right': user['right']}
 	    )
 		user = core_serializers.UserRightSerializer(new_user).data
-		status = 200
-		if created:
-			status = 201
-		ginger = g.GingerClient()
-		ginger_response = ginger.get_user_info(user['login'])
-		if ginger_response['status'] != 200:
-			user['user'] = None
-		else:
-			user['user'] = ginger_response['data']
-		if user['right'] == 'A':	
-			user['right_detail'] = 'Admin'
-		elif user['right'] == 'M':
-			user['right_detail'] = 'Membre'
-		elif user['right'] == 'N':
-			user['right_detail'] = 'Aucun droit'
-
+		user = get_ginger_info(user['login'], user['right'])
 		return JsonResponse({'user': user})
 
 
