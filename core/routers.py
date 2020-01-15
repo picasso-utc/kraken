@@ -10,6 +10,7 @@ router = routers.DefaultRouter()
 
 router.register('perms', perm_views.PermViewSet, 'perm')
 router.register('users', core_views.UserViewSet, 'user')
+router.register('blocked/users', core_views.BlockedUserViewSet, 'blocked_user')
 router.register('userrights', core_views.UserRightViewSet, 'user')
 router.register('creneau', perm_views.CreneauViewSet, 'creneau')
 router.register('perm/menus', perm_views.MenuViewSet)

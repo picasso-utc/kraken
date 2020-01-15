@@ -87,6 +87,7 @@ def semestre_state(request):
 
 
 @api_view(['GET', 'PUT'])
+# TO REVIEW
 @permission_classes((IsAdminUser, ))
 def semester_beginning_credit(request):
     """
@@ -243,3 +244,43 @@ def current_semester(request):
 			semester = core_models.Semestre.objects.get(pk=semester_id)
 			return JsonResponse(core_serializers.SemestreSerializer(semester).data)
 
+
+# Semester to check
+class BlockedUserViewSet(viewsets.ViewSet):
+
+	def list(self, request):
+		queryset = core_models.BlockedUser.objects.all()
+		serializer = core_serializers.BlockedUserSerializer(queryset, many=True)
+		return JsonResponse({'blocked_users': serializer.data})
+
+	def create(self, request):
+		login = request.data["login"]
+		# Retrieve information from Ginger (badge_uid, name)
+		ginger = g.GingerClient()
+		ginger_response = ginger.get_user_info(login)
+		justification = request.data["justification"]
+		name = ginger_response["data"]["prenom"] + " " + ginger_response["data"]["nom"]
+		badge_uid = ginger_response["data"]["badge_uid"]
+		new_blocked_user = core_models.BlockedUser.objects.create(
+		    badge_uid = badge_uid,
+		    name = name,
+		    justification = justification,
+		)
+
+
+	def destroy(self, request, pk=None):
+		
+		if pk:
+			core_models.BlockedUser.objects.filter(pk=pk).delete()
+		return JsonResponse({})
+
+
+	def get_permissions(self):
+		"""
+		Instantiates and returns the list of permissions that this view requires.
+		"""
+		if self.action == 'list':
+			permission_classes = [IsMemberUser]
+		else:
+			permission_classes = [IsAdminUser]
+		return [permission() for permission in permission_classes]
