@@ -18,6 +18,13 @@ class GoodiesWinnerViewSet(mixins.ListModelMixin,
 					mixins.DestroyModelMixin,
 					mixins.UpdateModelMixin,
                     viewsets.GenericViewSet):
+	"""
+	ViewSet pour gérer les vainqueurs des goodies
+	Création aléatoire à partir d'une date de début et de fin
+	Récupération des vainqueurs
+	Mise à jour du statut (Récupérer ou pas)
+	Suppression
+	"""
 
 	permission_classes = (IsMemberUserOrReadOnly,)
 
@@ -28,7 +35,7 @@ class GoodiesWinnerViewSet(mixins.ListModelMixin,
 
 
 	def create(self, request):
-		"""Méthode pour générer 20 vainqueurs des goodies parmis les non membres du Pic"""
+		"""Méthode pour générer 20 vainqueurs des goodies parmis les non-membres du Pic"""
 
 		# Récupération des ventes entre une date de début et une date de fin
 		# START doit être au format "AAAA-MM-JJ"
@@ -46,6 +53,7 @@ class GoodiesWinnerViewSet(mixins.ListModelMixin,
 		pic_members = []
 		queryset = core_models.UserRight.objects.filter(Q(right='A') | Q(right='M'))
 		serializer = core_serializers.UserRightSerializer(queryset, many=True)
+		# Récupération des logins des membres du Pic pour les supprimer par la suite de la génération
 		for i, user in enumerate(serializer.data):
 			login = serializer.data[i]['login']
 			pic_members.append(login)
@@ -54,10 +62,11 @@ class GoodiesWinnerViewSet(mixins.ListModelMixin,
 		goodies_winners = []
 		nb_sales = len(sales)
 		while (len(goodies_winners) < 20):
+			# Tant qqu'on a pas 20 vainqueurs on itère
 			random_value = random.randint(1, nb_sales)
 			user = sales[int(random_value) - 1]['rows'][0]['payments'][0]['buyer']
 			user_description = user["first_name"] + " " + user["last_name"]
-
+			# Si l'utilisateur n'est pas un membre du Pic ou un login déjà dans la liste des vainqueurs, ajout 
 			if (user["username"] not in pic_members and user_description not in goodies_winners):
 				goodies_winners.append(user_description)
 				payutc_models.GoodiesWinner.objects.create(winner=user_description, picked_up=False)
@@ -83,7 +92,10 @@ class GoodiesWinnerViewSet(mixins.ListModelMixin,
 @api_view(['GET'])
 @permission_classes((IsAuthenticatedUser, ))
 def user_autocomplete(request, query, format=None):
-	"""Authenticate with badge_id"""
+	"""
+	Récupération à parti d'une query string des utilisateurs
+	sur Payutc pouvant être susceptible de ressembler à la query
+	"""
 
 	data = {
 		'queryString': query
@@ -96,6 +108,7 @@ def user_autocomplete(request, query, format=None):
 
 @api_view(['GET'])
 def get_sorted_articles(request, format=None):
+	"""Obtention des articles du Pic en ventes et mise en forme"""
 	p = PayutcClient()
 	articles = p.get_articles()
 
@@ -136,8 +149,10 @@ def get_sorted_articles(request, format=None):
 
 @api_view(['POST'])
 def get_beers_sells(request):
-	"""Get nb sells of product ids"""
-
+	"""
+	Obtention des ventes dans la journée courante des ids mis en paramètres
+	Méthode utilisée publique, utilisée pour le duel des brasseurs en A19 
+	"""
 	beers = request.data['beers']
 	response = dict()
 
