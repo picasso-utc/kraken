@@ -1,4 +1,4 @@
-# Pic'asso API
+# Kraken API
 
 ## Installation
 
@@ -43,9 +43,9 @@ pip install -r requirements.txt
 Now ask a responsible person for the `settings_confidential.py` file containing the foreign APIs identification keys. The file is to be placed next to the `settings.py` file. There is a placeholder file called `settings_confidential.example.py`, you can copy and fill it. 
 
 
-Create your database named `woolly`, set charset to UTF-8 with :
+Create your database named `picasso`, set charset to UTF-8 with :
 ```sql
-ALTER DATABASE `vivaldi` CHARACTER SET utf8;
+ALTER DATABASE `picasso` CHARACTER SET utf8;
 ```
 
 Then you need to migrate, and initialize the database :
