@@ -102,8 +102,6 @@ class Creneau(models.Model):
             'articles': articles,
             'creneau_articles': creneau_articles,
         }
-    
-
 
     def get_justificatif_information(self):
         articles = self.article_set.all()
@@ -134,7 +132,6 @@ class Creneau(models.Model):
         }
 
 
-
 class Article(core_models.PricedModel):
     id_payutc = models.IntegerField(null=True, default=None)
     stock = models.IntegerField(default=0)
@@ -142,7 +139,6 @@ class Article(core_models.PricedModel):
     ventes_last_update = models.DateTimeField(null=True, default=None)
     nom = models.CharField(max_length=255)
     creneau = models.ForeignKey(Creneau, on_delete=models.CASCADE)
-
 
     def create_payutc_article(self):
         if self.id_payutc:
@@ -250,7 +246,6 @@ class Signature(models.Model):
         return self.login
 
 
-
 class Astreinte(models.Model):
     ASTREINTE_TYPE_CHOICES = (
         ('M1', 'Matin 1'),
@@ -267,7 +262,6 @@ class Astreinte(models.Model):
     note_anim = models.IntegerField(default=0)
     note_menu = models.IntegerField(default=0)
     commentaire = models.CharField(null=True, default=None, blank=True, max_length=255)
-
 
     def __str__(self):
         return f"{self.astreinte_type} - {self.member.userright.name} - {self.id}"

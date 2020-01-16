@@ -12,13 +12,12 @@ class RequestedPermSerializer(serializers.ModelSerializer):
 
 class PermSerializer(serializers.ModelSerializer):
     creneaux = serializers.StringRelatedField(many=True, required=False, read_only=True)
-    # semestre = serializers.StringRelatedField(many=False, read_only=True)
-    # semestre_id = serializers.PrimaryKeyRelatedField(queryset=core_models.Semestre.objects.all(), source="semestre")
 
     class Meta:
         model = perm_models.Perm
         exclude_list = list()
         exclude = exclude_list
+
 
 class PermPublicSerializer(serializers.ModelSerializer):
     class Meta:
@@ -45,8 +44,6 @@ class CreneauSerializer(serializers.ModelSerializer):
     class Meta:
         model = perm_models.Creneau
         exclude_list = list()
-        # if not is_admin():
-            # exclude_list = ('state', 'montantTTCMaxAutorise', 'id', 'perm_id')
         exclude = exclude_list
 
 
@@ -89,6 +86,7 @@ class SignatureSerializer(serializers.ModelSerializer):
         model = perm_models.Signature
         exclude_list = list()
         exclude = exclude_list
+
 
 class AstreinteSerializer(serializers.ModelSerializer):
 

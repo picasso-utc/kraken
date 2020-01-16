@@ -23,7 +23,9 @@ import pdfkit
 from PyPDF2 import PdfFileMerger, PdfFileReader
 import os
 
+
 class PermViewSet(viewsets.ModelViewSet):
+    """ViewSet des perms"""
     serializer_class = perm_serializers.PermSerializer
     permission_classes = (IsMemberUser,)
     def get_queryset(self):
@@ -32,6 +34,7 @@ class PermViewSet(viewsets.ModelViewSet):
 
 
 class CreneauViewSet(viewsets.ModelViewSet):
+    """ViewSet des créneaux"""
     serializer_class = perm_serializers.CreneauSerializer
     permission_classes = (IsMemberUser,)
     def get_queryset(self):
@@ -42,6 +45,7 @@ class CreneauViewSet(viewsets.ModelViewSet):
 @api_view(['GET'])
 @permission_classes((IsMemberUser, ))
 def get_creneau_sales(request, id):
+    """Obtenir les ventes d'un créneau"""
     c = perm_models.Creneau.objects.get(pk=id)
     return JsonResponse(c.get_justificatif_information())
 
@@ -52,11 +56,13 @@ class ArticleViewSet(viewsets.ModelViewSet):
     permission_classes = (IsMemberUser,)
 
 class AstreinteViewSet(viewsets.ModelViewSet):
+    """ViewSet Astreinte"""
     serializer_class = perm_serializers.AstreinteSerializer
     permission_classes = (IsMemberUser,)
     def get_queryset(self):
         qs = perm_models.Astreinte.objects
         return get_request_semester(qs, self.request, "member__semestre__id")
+
 
 class MenuViewSet(viewsets.ModelViewSet):
     """
@@ -68,15 +74,18 @@ class MenuViewSet(viewsets.ModelViewSet):
 
 
 class SignatureViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
+    """ViewwSet des signatures de charte"""
     serializer_class = perm_serializers.SignatureSerializer
     queryset = perm_models.Signature.objects.all()
-
 
 
 @api_view(['GET'])
 @permission_classes((IsMemberUser, ))
 def create_payutc_article(request, id):
-    # Endpoint qui permet d'obtenir, pour un article de pk {id}, d'enregistrer l'article dans PayUTC.
+    """
+        Permet d'obtenir, pour un article de pk {id}, d'enregistrer l'article dans PayUTC.
+        On met les TV sur Menu après création
+    """
     article = perm_models.Article.objects.get(pk=id)
     article.create_payutc_article()
 
@@ -95,15 +104,14 @@ def create_payutc_article(request, id):
 @api_view(['GET'])
 @permission_classes((IsMemberUser, ))
 def get_article_sales(request, id):
-    # Endpoint qui permet d'obtenir, pour un article de pk {id}, le nombre de ventes.
+    """Permet d'obtenir, pour un article de pk {id}, le nombre de ventes."""
     article = perm_models.Article.objects.get(pk=id)
     sales = article.update_sales()
     return JsonResponse({'sales': sales})
 
 
 def get_creneau(date):
-
-    # On déterminer si la perm en cours est celle du matin, du midi ou du soir
+    """Déterminer si la perm en cours est celle du matin, du midi ou du soir"""
     hour = date.time().hour
     if hour >= 16 :
         return 'S'
@@ -111,9 +119,11 @@ def get_creneau(date):
         return 'D'
     return 'M'
 
+
 @api_view(['GET'])
 @permission_classes((IsMemberUser, ))
 def get_current_creneau(request):
+    """Obtenir le créneau en cours"""
     date = datetime.now()
     creneau = get_creneau(date)
     queryset = perm_models.Creneau.objects.filter(creneau=creneau, date=date)
@@ -126,6 +136,7 @@ def get_current_creneau(request):
 
 @api_view(['GET'])
 def get_current_public_creneau(request):
+    """Obtenir le créneau en cours (sans être authentifié)"""
     date = datetime.now()
     creneau = get_creneau(date)
     
@@ -140,6 +151,7 @@ def get_current_public_creneau(request):
 @api_view(['GET'])
 @permission_classes((CanAccessMenuFunctionnalities, ))
 def get_order_lines(request, id):
+    """Obtenir les commandes pour un menu à partir de l'id de l'article"""
     menu = perm_models.Menu.objects.get(article__id_payutc=id)
     orders = perm_models.Menu.update_orders(menu)
     orderlines = perm_models.OrderLine.objects.filter(menu__article__id_payutc=id, is_canceled=False, quantity__gt=0)
@@ -153,12 +165,11 @@ def get_order_lines(request, id):
     })
 
 
-
 @api_view(['POST'])
 @permission_classes((CanAccessMenuFunctionnalities, ))
 def set_ordeline_served(request, id):
     """
-    Endpoint qui permet de dire qu'un menu a été donné.
+    Permet de dire qu'un menu a été donné.
     """
     orderline = perm_models.OrderLine.objects.get(id_transaction_payutc=id)
     if orderline.served:
@@ -173,7 +184,7 @@ def set_ordeline_served(request, id):
 @permission_classes((CanAccessMenuFunctionnalities, ))
 def set_ordeline_staff(request, id):
     """
-    Endpoint qui permet de dire qu'un menu a été donné.
+    Permet de dire qu'un menu doit être reporté ou non reporté s'il l'est déjà.
     """
     orderline = perm_models.OrderLine.objects.get(id_transaction_payutc=id)
     if orderline.is_staff:
@@ -187,6 +198,11 @@ def set_ordeline_staff(request, id):
 @api_view(['POST'])
 @permission_classes((CanAccessMenuFunctionnalities, ))
 def set_menu_closed(request, id):
+    """
+    Ferme le menu
+    Article du menu désactivé sur Weez
+    Remet les télés sur l'url par défaut
+    """
     menu = perm_models.Menu.objects.get(article__id_payutc=id)
     if menu.is_closed:
         menu.is_closed = False
@@ -209,7 +225,9 @@ def set_menu_closed(request, id):
 @api_view(['POST'])
 @permission_classes((IsMemberUser, ))
 def send_mail(request):
-    
+    """
+    Envoie l'email d'annonce des perms à toutes les perms de la requête
+    """
     perms = request.data
     for perm in perms:
 
@@ -251,7 +269,7 @@ def send_mail(request):
 @api_view(['GET'])
 @permission_classes((HasApplicationRight,))
 def send_creneau_reminder(request):
-
+    """Envoi un mail de rappel aux créneaux ayant lieu dans 7 jours"""
     # Search for date in one week
     reminder_date = (datetime.now() + timedelta(days=7)).strftime('%Y-%m-%d')
 
@@ -281,7 +299,7 @@ def send_creneau_reminder(request):
 
 @api_view(['POST'])
 def get_week_calendar(request):
-
+    """Obtenir le calendrier publique entre les dates envoyées en paramètre"""
     data = request.data
     queryset = perm_models.Creneau.objects.filter(date__range=(data['start_date'], data['end_date']))
     serializer = perm_serializers.CreneauPublicSerializer(queryset, many=True)
@@ -291,7 +309,7 @@ def get_week_calendar(request):
 @api_view(['GET'])
 @permission_classes((IsMemberUser, ))
 def get_user_astreintes(request):
-
+    """Obtenir les astreintes d'un membre du Pic"""
     member_id = request.session.get('member_id')
 
     if member_id:
@@ -307,13 +325,15 @@ def get_user_astreintes(request):
 @api_view(['POST'])
 @permission_classes((IsMemberUser, ))
 def get_week_astreintes(request):
-
+    """
+    Obtenir les créneaux entre deux dates entrées en paramètre
+    avec astreintes enregistrées sur chaque créneau
+    """
     data = request.data
     queryset = perm_models.Creneau.objects.filter(date__range=(data['start_date'], data['end_date']))
     serializer = perm_serializers.CreneauAstreinteSerializer(queryset, many=True)
     return JsonResponse({'creneaux': serializer.data})
 
-    
 
 class PermHalloweenViewSet(viewsets.ModelViewSet):
     serializer_class = perm_serializers.PermHalloweenSerializer
@@ -324,7 +344,7 @@ class PermHalloweenViewSet(viewsets.ModelViewSet):
 @api_view(['GET'])
 # @permission_classes((IsMemberUser, ))
 def get_halloween_article_count(request):
-
+    """Compte le nb d'enregistrement dans PermHalloween pour un article_id"""
     article_id = request.GET.get("article_id", 1)
     queryset = perm_models.PermHalloween.objects.filter(article_id=article_id)
     return JsonResponse({'count': len(queryset)})
@@ -333,21 +353,20 @@ def get_halloween_article_count(request):
 @api_view(['GET'])
 @permission_classes((IsMemberUser,))
 def get_creaneau_signature(request, creneau_id):
-
+    """Obtenir le nombre de signature pour un créneau donné"""
     queryset = perm_models.Signature.objects.filter(creneau__id=creneau_id)
     return JsonResponse({'signature_count': len(queryset)})
-
 
 
 @api_view(['GET'])
 @permission_classes((IsMemberUser,))
 def get_perms_for_notation(request):
+    """Obtenir les notation de toutes les perms du semestre entré (courant par défaut)"""
     qs = perm_models.Creneau.objects
     queryset = get_request_semester(qs, request, "perm__semestre__id")
     serializer = perm_serializers.CreneauSerializer(queryset, many=True)
 
     creneaux = serializer.data
-
     perms = dict()
 
     for creneau in creneaux : 
@@ -454,6 +473,7 @@ def get_perms_for_notation(request):
 @api_view(['GET'])
 @permission_classes((IsMemberUser,))
 def get_perm_for_notation(request, perm_id):
+    """Obtenir les informations de notation d'une perm entrée en paramètre"""
 
     queryset = perm_models.Creneau.objects.filter(perm__id=perm_id)
     serializer = perm_serializers.CreneauSerializer(queryset, many=True)
@@ -579,25 +599,31 @@ def get_perm_for_notation(request, perm_id):
 
 @api_view(['GET'])
 def perm_may_be_requested(request):
+    """Retourne si les demandes de perm sont activées"""
     return JsonResponse({'perm_may_be_requested': config.__getattr__('PERM_MAY_BE_REQUESTED')})
 
 
 @api_view(['POST'])
 @permission_classes((IsMemberUser,))
 def update_perm_may_be_requested_setting(request):
+    """Mets à jour le paramètre d'activation des demandes de perm"""
     if 'perm_may_be_requested' in request.data:
         perm_may_be_requested = request.data['perm_may_be_requested']
         config.__setattr__('PERM_MAY_BE_REQUESTED', perm_may_be_requested)
     return JsonResponse({})
 
 
+# A revoir pour le semestre courant
 class RequestedPermViewSet(viewsets.ViewSet):
+    """ViewSet à la mano des perms demandées"""
+
 
     def list(self, request):
-        queryset = perm_models.RequestedPerm.objects.filter(semestre_id=get_current_semester())
+        queryset = perm_models.RequestedPerm.objects.filter(semestre__id=get_current_semester())
         serializer = perm_serializers.RequestedPermSerializer(queryset, many=True)
 
         return JsonResponse({'requested_perms': serializer.data})
+
 
     def create(self, request):
         if not self.perm_may_be_requested():
@@ -635,6 +661,7 @@ class RequestedPermViewSet(viewsets.ViewSet):
 
         return JsonResponse({"id": new_requested_perm.pk})
 
+
     def retrieve(self, request, pk=None):
         requested_perm = perm_models.RequestedPerm.objects.get(pk=pk)
         serializer = perm_serializers.RequestedPermSerializer(requested_perm)
@@ -645,6 +672,7 @@ class RequestedPermViewSet(viewsets.ViewSet):
             return JsonResponse({'perm': serializer.data})
 
         return JsonResponse({"error": "Vous n'avez pas la permission d'accéder à cette ressource"}, status=403)
+
 
     def update(self, request, pk=None):
         if not self.perm_may_be_requested():
@@ -674,14 +702,17 @@ class RequestedPermViewSet(viewsets.ViewSet):
         ])
         return JsonResponse({})
 
+
     def partial_update(self, request, pk=None):
         requested_perm = perm_models.RequestedPerm.objects.get(pk=pk)
         requested_perm.added = not requested_perm.added
         requested_perm.save()
         return JsonResponse({})
 
+
     def perm_may_be_requested(self):
         return config.__getattr__('PERM_MAY_BE_REQUESTED')
+
 
     def get_permissions(self):
         """
@@ -697,7 +728,8 @@ class RequestedPermViewSet(viewsets.ViewSet):
 @api_view(['GET'])
 @permission_classes((IsMemberUser,))
 def get_pdf_requested_perms(request):
-    queryset = perm_models.RequestedPerm.objects.filter(semestre_id=get_current_semester())
+    """Obtenir un giga PDF des perms demandées"""
+    queryset = perm_models.RequestedPerm.objects.filter(semestre__id=get_current_semester())
     serializer = perm_serializers.RequestedPermSerializer(queryset, many=True)
 
     filenames = []
@@ -714,6 +746,7 @@ def get_pdf_requested_perms(request):
         input = PdfFileReader(f)
         merger.append(input, import_bookmarks=False)
         f.close()
+    for filename in filenames:
         os.remove(filename)
 
     response = HttpResponse(content_type='application/pdf')
@@ -725,6 +758,7 @@ def get_pdf_requested_perms(request):
 @api_view(['GET'])
 @permission_classes((IsAuthenticatedUser,))
 def get_portal_assos(request):
+    """Obtenir les associations de l'UTC via le Portail des assos"""
     p = PortalClient()
     response = p.get_assos()
     return JsonResponse({'assos': response['data']}, status = response['status'])
