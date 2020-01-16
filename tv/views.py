@@ -8,6 +8,7 @@ from rest_framework.decorators import permission_classes, api_view
 from django.http import JsonResponse, HttpResponse
 from core.permissions import IsAdminUser, IsAuthenticatedUser, IsMemberUser, IsMemberUserOrReadOnly
 import qrcode
+from core.settings import FRONT_URL
 
 
 class WebTVViewSet(viewsets.ModelViewSet):
@@ -81,10 +82,11 @@ def get_tv_public_surveys(request):
         survey['surveyitem_set'] = sorted(survey['surveyitem_set'], key= lambda item: item['vote'], reverse=True)
     return JsonResponse({'surveys' : surveys})
 
+
 @api_view(['GET'])
 def generate_qr_code(request):
     survey_id = request.GET.get("survey_id", None)
-    url = 'https://assos.utc.fr/picasso'
+    url = FRONT_URL
     if survey_id:
         url += ('/poll/' + survey_id)
     img = qrcode.make(url)
