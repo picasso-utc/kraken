@@ -31,12 +31,13 @@ import pdfkit
 
 
 class CategorieFactureRecueViewSet(viewsets.ModelViewSet):
+    """ViewSet des catégories de facture"""
     serializer_class = treso_serializers.CategorieFactureRecueSerializer
     queryset = treso_models.CategorieFactureRecue.objects.all()
     permission_classes = (IsAdminUser,)
 
 class FactureRecueViewSet(viewsets.ModelViewSet):
-
+    """ViewSet des factures reçues"""
     serializer_class = treso_serializers.FactureRecueSerializer
     permission_classes = (IsAdminUser,)
     def get_queryset(self):
@@ -45,14 +46,14 @@ class FactureRecueViewSet(viewsets.ModelViewSet):
 
 
 class ChequeViewSet(viewsets.ModelViewSet):
-
+    """ViewSet des chèques"""
     serializer_class = treso_serializers.ChequeSerializer
     queryset = treso_models.Cheque.objects.all()
     permission_classes = (IsAdminUser,)
 
 
 class FactureEmiseViewSet(core_viewsets.RetrieveSingleInstanceModelViewSet):
-
+    """ViewSet des factures émises"""
     single_serializer_class = treso_serializers.FactureEmiseWithRowsSerializer
     serializer_class = treso_serializers.FactureEmiseSerializer
     permission_classes = (IsAdminUser,)
@@ -62,49 +63,23 @@ class FactureEmiseViewSet(core_viewsets.RetrieveSingleInstanceModelViewSet):
 
 
 class FactureEmiseRowViewSet(viewsets.ModelViewSet):
-
+    """ViewSet des lignes d'une facture émise"""
     serializer_class = treso_serializers.FactureEmiseRowSerializer
     queryset = treso_models.FactureEmiseRow.objects.all()
     permission_classes = (IsAdminUser,)
 
 
 class ReversementEffectueViewSet(viewsets.ModelViewSet):
-
+    """ViewSet des reversements"""
     serializer_class = treso_serializers.ReversementEffectueSerializer
     queryset = treso_models.ReversementEffectue.objects.all()
     permission_classes = (IsAdminUser,)
 
 
-
-
-
-
-
-
-
-
-
-# # def facture(request, id):
-# #     facture = facture_models.FactureEmise.objects.get(pk=id)
-# #     rows = list(facture.factureemiserow_set.all())
-# #     rows_info = list()
-# #     tva_set = Set()
-# #     for row in rows:
-# #         rows_info.append({'nom': row.nom, 'prixHT': row.get_price_without_taxes(), 'qty': row.qty, 'tva': row.tva,
-# #                           'totalHT': row.get_total_ht_price(), 'totalTTC': row.get_total_ttc_price()})
-# #         tva_set.add(row.tva)
-# #     tva_info = list()
-# #     for tva in tva_set:
-# #         tva_rows = [row for row in rows if row.tva == tva]
-# #         tva_info.append({ 'tva': tva, 'amount': round(sum([row.get_total_taxes_for_row() for row in tva_rows]), 2) })
-# #     return render(request, 'facture.html', {'facture': facture, 'rows': rows_info, 'tva_amounts': tva_info,
-# #                                             'total_ht': facture.get_total_ht_price(),
-# #                                             'total_ttc': facture.get_total_ttc_price()})
-
-
 @api_view(['GET'])
 @permission_classes((IsAdminUser, ))
 def tva_info(request, id):
+    """Obtention des informations de la tva"""
     periode = core_models.PeriodeTVA.objects.get(pk=id)
 
     # Pour la TVA déductible : on veut juste obtenir le montant total de TVA
@@ -154,7 +129,11 @@ def get_convention(request, id):
 @api_view(['GET'])
 @permission_classes((IsAdminUser,))
 def get_all_conventions(request):
-
+    """
+    Vue qui permet d'obtenir un pdf des conventions des assos d'un semestre
+    Construit des fichiers pdf à partir d'un html pour chaque créneau tenu par une asso
+    Puis merge le tout dans un géant pdf
+    """
     semester_wanted = request.GET.get("semestre", False)
     if semester_wanted != False and int(semester_wanted) > 0:
         semestre_id = semester_wanted
@@ -191,29 +170,3 @@ def get_all_conventions(request):
     merger.write(response)
     merger.close()
     return response
-
-
-
-# # def excel_check_generation(request):
-# #     # Vue permettant de générer un fichier excel avec la liste des chèques, et des factures associées
-# #     response = HttpResponse(content_type='application/vnd.ms-excel; charset=utf-8')
-# #     response['Content-Disposition'] = 'attachment; filename="Picasso_cheques.xls"'
-
-# #     writer = xlwt.Workbook(encoding="utf-8")
-# #     ws = writer.add_sheet('Chèques')
-# #     excel_dump = excel_generation.generate_checks_xls(ws)
-# #     writer.save(response)
-# #     return response
-
-# # def excel_facture_generation(request):
-# #     # Vue permettant de générer un fichier excel avec la liste des factures, et des perms associées
-# #     response = HttpResponse(content_type='application/vnd.ms-excel; charset=utf-8')
-# #     response['Content-Disposition'] = 'attachment; filename="Picasso_factures_recues.xls"'
-
-# #     writer = xlwt.Workbook(encoding="utf-8")
-# #     ws = writer.add_sheet('Factures reçues')
-# #     excel_dump = excel_generation.generate_receipts_xls(ws)
-# #     writer.save(response)
-# #     return response
-
-

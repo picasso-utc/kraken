@@ -24,7 +24,6 @@ class PricedModel(models.Model):
         abstract = True
 
 
-# Create your models here.
 class CategorieFactureRecue(models.Model):
     nom = models.CharField(max_length=255)
     code = models.CharField(max_length=1, unique=True)
@@ -56,7 +55,6 @@ class FactureRecue(PricedModel):
     immobilisation = models.BooleanField(default=False)
     remarque = models.TextField(null=True, default=None)
     semestre = models.ForeignKey(Semestre, on_delete=models.SET_NULL, null=True, default=get_current_semester)
-    # , default=CURRENT_SEMESTER) 
 
 
 class Cheque(models.Model):
@@ -103,8 +101,6 @@ class FactureEmise(models.Model):
     date_due = models.DateField()
     etat = models.CharField(max_length=1, choices=FACTURE_STATES)
     semestre = models.ForeignKey(Semestre, on_delete=models.SET_NULL, null=True, default=get_current_semester)
-    # , default=CURRENT_SEMESTER)
-    # default=get_current_semester)
 
     def get_total_ht_price(self):
         rows = self.factureemiserow_set.all()
@@ -144,6 +140,4 @@ class ReversementEffectue(PricedModel):
     C'est un PricedModel mais il y a peu d'intérêt à conserver la TVA.
     """
     semestre = models.ForeignKey(Semestre, on_delete=models.SET_NULL, null=True, default=get_current_semester)
-    # , default=CURRENT_SEMESTER)
-    # default=get_current_semester)
     date_effectue = models.DateField(null=True) # Date a laquelle il fut effectue

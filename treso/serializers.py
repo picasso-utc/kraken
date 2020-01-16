@@ -1,5 +1,4 @@
 from rest_framework import serializers
-
 from treso import models as treso_models
 from perm import models as perm_models
 
@@ -39,8 +38,6 @@ class FactureEmiseSerializer(serializers.ModelSerializer):
         model = treso_models.FactureEmise
         exclude = list()
 
-# FactureEmiseRowListSerializer = FactureEmiseRowSerializer.many_init
-
 
 class FactureEmiseWithRowsSerializer(serializers.ModelSerializer):
     factureemiserow_set = FactureEmiseRowSerializer(many = True, read_only = True)
@@ -56,18 +53,6 @@ class ReversementEffectueSerializer(serializers.ModelSerializer):
         exclude = list()
 
 
-# class SimplePermSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = perm_models.Perm
-#         fields = ('id', 'nom')
-
-
-
-
-
-
-
-
 class SimpleFactureRecueSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField()
     class Meta:
@@ -75,14 +60,6 @@ class SimpleFactureRecueSerializer(serializers.ModelSerializer):
         fields = ('id', )
 
 SimpleFactureRecueListSerializer = SimpleFactureRecueSerializer.many_init
-
-
-
-
-
-# FactureRecueListSerializer = FactureRecueSerializer.many_init
-
-
 
 
 
