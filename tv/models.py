@@ -29,8 +29,7 @@ class WebTVMedia(models.Model):
 @receiver(models.signals.post_delete, sender=WebTVMedia)
 def auto_delete_file_on_delete(sender, instance, **kwargs):
     """
-    Deletes file from filesystem
-    when corresponding `MediaFile` object is deleted.
+    Suppression du fichier de l'attribut image à la suppresion
     """
     if instance.media:
         if os.path.isfile(instance.media.path):
@@ -39,13 +38,11 @@ def auto_delete_file_on_delete(sender, instance, **kwargs):
 @receiver(models.signals.pre_save, sender=WebTVMedia)
 def auto_delete_file_on_change(sender, instance, **kwargs):
     """
-    Deletes old file from filesystem
-    when corresponding `MediaFile` object is updated
-    with new file.
+    Au moment d'une mise à jour, si l'image est différente
+    suppression de l'ancienne
     """
     if not instance.pk:
         return False
-
     try:
         old_file = WebTVMedia.objects.get(pk=instance.pk).media
     except WebTVMedia.DoesNotExist:

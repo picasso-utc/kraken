@@ -10,7 +10,6 @@ from core.permissions import IsAdminUser, IsAuthenticatedUser, IsMemberUser, IsM
 import qrcode
 from core.settings import FRONT_URL
 
-
 class WebTVViewSet(viewsets.ModelViewSet):
     """
     WebTV viewset
@@ -40,6 +39,7 @@ class WebTVMediaViewSet (viewsets.ModelViewSet):
 
 @api_view(['GET'])
 def get_public_media(request):
+    """Récupérer les médias qui sont activés"""
     queryset = tv_models.WebTVMedia.objects.filter(activate=True)
     serializer = tv_serializers.WebTVMediaSerializer(queryset, many=True)
     return JsonResponse({'media' : serializer.data})
@@ -47,6 +47,7 @@ def get_public_media(request):
 
 @api_view(['GET'])
 def get_next_order_lines_for_tv(request):
+    """Récupérer les prochains menus à servir"""
     menu = perm_models.Menu.objects.last()
     if menu:
         orders = perm_models.OrderLine.objects.filter(menu_id=menu.id, quantity__gt=0, served=False, menu__is_closed=False, is_canceled=False).order_by('is_staff', 'id_transaction_payutc')
@@ -63,9 +64,9 @@ def get_next_order_lines_for_tv(request):
     })
 
 
-
 @api_view(['GET'])
 def get_tv_public_surveys(request):
+    """Obtenir les sondages qui sont visibles"""
     queryset = survey_models.Survey.objects.filter(visible=True)
     serializer = survey_serializers.SurveySerializer(queryset, many=True)
     surveys = serializer.data
@@ -85,6 +86,7 @@ def get_tv_public_surveys(request):
 
 @api_view(['GET'])
 def generate_qr_code(request):
+    """Générer un qrcode à partir de l'id du sondage"""
     survey_id = request.GET.get("survey_id", None)
     url = FRONT_URL
     if survey_id:
