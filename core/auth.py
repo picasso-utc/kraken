@@ -68,6 +68,7 @@ def _is_user_member(login):
 
 def login_badge(request, format=None):
     """Authenticate with badge_id"""
+    request.session.flush()
     body_content = request.data
     badge_id = body_content["badge_id"]
     pin = body_content["pin"]
@@ -82,6 +83,7 @@ def login_badge(request, format=None):
 
 def login_username(request, format=None):
     """Authenticate with username and pin"""
+    request.session.flush()
     body_content = request.data
     username = body_content["username"]
     pin = body_content["pin"]
