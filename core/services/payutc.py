@@ -26,7 +26,7 @@ BASE_CONFIG = {
 	'sessionid': 		None,
 	'login_method': 	None,
 	'badge_id': 		live_config.PAYUTC_CONNECTION_UID,
-	'pin': 		live_config.PAYUTC_CONNECTION_PIN,
+	'pin': 				live_config.PAYUTC_CONNECTION_PIN,
 	'app_key':			PAYUTC_APP_KEY,
 	'mail': 			None,
 	'password': 		None,
@@ -67,44 +67,11 @@ class PayutcClient:
 		self.config['sessionid'] = sessionid
 
 
-	# ============================================================
-	# 			POINT D'ENTREE
-	# ============================================================
 
+	# ============================================================
+	# 			REQUETE MAKER
+	# ============================================================
 	
-
-	
-
-	# ============================================================
-	# 			LOGIN
-	# ============================================================
-
-	def cas(self, params):
-		# fun_id = self.get_config('fun_id')
-		# app_key = self.get_config('app_key')
-		data = {
-			"service" : params["service"],
-			"ticket" : params["ticket"]
-			# 'fun_id' : fun_id['fun_id']
-		}
-		# data['fun_id'] = str(data['fun_id'])
-		return self.request('post', 'GESARTICLE/loginCas2', data, api='services')
-
-	def badge(self, params):
-		fun_id = self.get_config('fun_id')
-		return self.request('post', 'POSS3/loginBadge2', 
-							data={"badge_id": params["badge_id"], "pin": params["pin"]},
-							api='services')
-	dispatch = {
-    	'login': {
-			'badge' : badge,
-			'cas' : cas,
-		},
-	}
-
-	def process_request(self, service, method, params):
-		return self.dispatch[service][method](self, params)
-
 
 	def request(self, method: str, uri: str, data: dict={}, **kwargs):
 		# Get all request configuration
@@ -125,8 +92,7 @@ class PayutcClient:
 
 		if data.get('fundation') == 'from_config':
 			data['fundation'] = self.config['fun_id']
-		# if data.get('fun_id') == 'from_config':
-		# data['fun_id'] = self.config['fun_id']
+
 		if method == 'get':
 			request_config['params'].update(data)
 		else:
@@ -135,7 +101,6 @@ class PayutcClient:
 			request_config.update(kwargs['request_config'])
 
 		# Make the request
-		
 		request = getattr(requests, method)
 		response = request(url, **request_config)
 
@@ -153,16 +118,16 @@ class PayutcClient:
 		# Or raise an error
 		if not is_success(response.status_code) and kwargs.get('raise_on_error', True):
 			message = f"Error {response.status_code} on {method.upper()} {uri}"
-			# raise NotFound("blbla")
-			# raise APIException()
 			raise PayutcException(message, response, request_config)
 		# Or simply return the response	
 		return response	
+
 
 	def pre_built_request(self, *pre_args, **pre_kwargs):
 		def pre_built(*args, **kwargs):
 			return self.request(*pre_args, *args, **pre_kwargs, **kwargs)
 		return pre_built
+
 
 	def __getattr__(self, name):
 		if name in ALLOWED_ACTIONS_MAP:
@@ -174,23 +139,7 @@ class PayutcClient:
 			if action in ALLOWED_ACTIONS_MAP:
 				http_method = ALLOWED_ACTIONS_MAP[action]
 				return self.pre_built_request(http_method, resource)
-
-		raise AttributeError(f"'{name}' is not a valid request")	
-
-	def list_routes(self, **kwargs):
-		"""List all available routes"""
-		url = kwargs.get('base_url', self.config['base_url']+'/resources')
-		params = kwargs.get('params', { 'system_id': self.config['system_id'] })
-		headers = kwargs.get('headers', {
-			'Content-Type': 'application/json',
-			'nemopay-version': self.config['nemopay_version'],
-		})
-
-		response = requests.get(url, params=params, headers=headers)
-		if is_success(response.status_code):
-			return response.json()
-		raise PayutcException('Cannot list routes', response)
-
+	
 
 	# ============================================================
 	# 			CONFIGURATION
@@ -215,8 +164,31 @@ class PayutcClient:
 	def format_datetime(self, dt: datetime) -> str:
 			return dt.isoformat(timespec='seconds') if type(dt) is datetime else dt
 
+
 	# ============================================================
 	# 			LOGIN
+	# ============================================================
+
+
+	def cas(self, params):
+		data = {
+			"service" : params["service"],
+			"ticket" : params["ticket"]
+		}
+		return self.request('post', 'GESARTICLE/loginCas2', data, api='services')
+
+	def badge(self, params):
+		fun_id = self.get_config('fun_id')
+		return self.request('post', 'POSS3/loginBadge2', 
+			data={"badge_id": params["badge_id"], "pin": params["pin"]},
+			api='services')
+
+
+
+	
+
+	# ============================================================
+	# 			LOGIN, AUTHENTICATION, AUTHORIZATION & ACCOUNT
 	# ============================================================
 
 	def __login(self, response):
@@ -225,17 +197,6 @@ class PayutcClient:
 		self.config['session_id'] = response.get('sessionid')
 		return response
 
-	def login(self, method: str, **kwargs):
-		method = self.__get_and_set_config('method', method)
-		login_function = get_attr(self, f"login_{method}", None)
-		if login_function and callable(login_function):
-			return login_function(**kwargs)
-		else:
-			raise NotImplementedError(f"Login method '{method}' is not implemented")
-
-	def is_loggued(self):
-		return bool(self.config.get('session_id'))
-
 	def get_user_details(self):
 		return self.request('post', 'MYACCOUNT/getUserDetails', api='services')
 
@@ -243,17 +204,6 @@ class PayutcClient:
 		ticket = self.__get_and_set_config('cas_ticket', ticket)
 		service = self.__get_and_set_config('cas_service', service)
 		response = self.request('post', 'SELFPOS/loginCas2', { 'ticket': ticket, 'service': service }, api='services')
-		return self.__login(response)
-
-	def login_app(self, app_key: str=None):
-		app_key = self.__get_and_set_config('app_key', app_key)
-		response = self.request('post', 'POSS3/loginApp', { 'key': app_key }, api='services')
-		return self.__login(response)
-
-	def login_user(self, login: str=None, password: str=None):
-		login = self.__get_and_set_config('mail', login)
-		password = self.__get_and_set_config('password', password)
-		response = self.request('post', 'SELFPOS/login2', { 'login': login, 'password': password }, api='services')
 		return self.__login(response)
 
 	def login_badge(self, pin: int=None, badge_id: str=None, **kwargs):
@@ -270,25 +220,32 @@ class PayutcClient:
 		self.config['sessionid'] = sessionid
 
 
-	def patch_api_rest(self, service, method, id, sessionid=None, params=None, **data):
-		if params is None:
-			params = {'system_id': PAYUTC_SYSTEM_ID, 'sessionid': self.config['sessionid']}
-	    # if self.SESSION_ID is not None:
-            # params['sessionid'] = self.SESSION_ID
-		# params['sessionid'] = sessionid
-		headers = {'nemopay-version': '2018-07-03', 'Content-Type': 'application/json'}
-		url = "https://api.nemopay.net/" + service + "/" + method + "/" + str(id)
-		r = requests.patch(url, json=data, params=params, headers=headers)
-		if r.status_code != 200:
-			raise NemopayClientException(r.text)
-		return json.loads(r.text)
-
-
 	# ============================================================
 	# 			SALES
 	# ============================================================	
 
 	def get_sales(self, **kwargs):
+		"""
+		Récupère les ventes avec possibilité de mettre pas mal de paramètres
+		Date de début et date de fin
+		Choisir des ids de produit ("product_id__in")
+		Choisir dans une catégorie en particulier ("category_id__in")
+		Choisir un acheteur en particulier ("buyer_id__in")
+		Ordre des items
+		L'API renvoie pas toutes les ventes, système de pagination pouant être
+		géré ave offset et row_count. 
+		Exemple: tu as 40 000 ventes que tu veux pas récupérer d'un coup pour pas faire
+		crasher ton app mais par paquet de 10 000 ventes
+		Tu vas mettre dans toutes tes requetes row_count=10000, et successivement
+		mettre offset = 0, offset = 10000, offset= 20000 et offset=30000
+		En fait offset c'est l'index du premier élément que tu veux récupérer et
+		row_count la quantité à partir de cet index que tu veux récupérer.
+		En général tu auras pas le nombre total de ventes donc tu itères jusqu'à
+		que ce que tu récupères soit inférieur à row_count. C'est à dire que
+		là avec row_count=10000 et offset=30000 tu auras 10000 élément mais si tu 
+		continues avec offset=40000 tu auras 0 élément car le 40 000ème élément
+		n'existe pas.
+		"""
 		keys = ('fun_id', 'start', 'end', 'offset', 'row_count', 'order_desc',
 						'product_id__in', 'buyer_id__in', 'category_id__in')
 		data = self.get_values_or_config(kwargs, *keys)
@@ -298,41 +255,14 @@ class PayutcClient:
 			data['end'] = self.format_datetime(data['end'])
 		return self.request('post', 'GESSALES/getSales', data, **kwargs, api='services')
 
-	def get_sales_by_chunk(self, **kwargs):
-		options = kwargs.copy()
-		options['row_count'] = kwargs.get('chunk_size', DEFAULT_CHUNK_SIZE)
-		first = self.get_sales(**options)
-		yield first
-
-		# Iterate over the remaining calls
-		nb_call = ceil(first['count'] / options['row_count'])
-		for i in range(1, nb_call):
-			options['offset'] = options['row_count'] * i
-			yield self.get_sales(**options)
-
 	def get_nb_sell(self, **kwargs):
+		"""Obtiens le nombre de ventes d'un article entre deux dates"""
 		data = self.get_values_or_config(kwargs, 'obj_id', 'fun_id', 'start', 'end')
 		if 'start' in data:
 			data['start'] = self.format_datetime(data['start'])
 		if 'end' in data:
 			data['end'] = self.format_datetime(data['end'])
 		return self.request('post', 'STATS/getNbSell', data, api='services')
-		
-
-	# ============================================================
-	# 			WEB TRANSACTIONS
-	# ============================================================	
-
-	def create_transaction(self, **kwargs):
-		keys = ('items', 'mail', 'return_url', 'fun_id', 'callback_url')
-		data = self.get_values_or_config(kwargs, *keys)
-		data['fun_id'] = str(data['fun_id'])
-		return self.request('post', 'WEBSALE/createTransaction', data, **kwargs, api='services')
-
-	def get_transaction(self, **kwargs):
-		data = self.get_values_or_config(kwargs, 'tra_id', 'fun_id')
-		return self.request('post', 'WEBSALE/getTransactionInfo', data, **kwargs, api='services')
-
 
 
 	# ============================================================
@@ -340,14 +270,9 @@ class PayutcClient:
 	# ============================================================
 
 	def auto_complete(self, data):
+		"""A partir d'un string récupère les utilisateur spouvant y correspondre"""
 		data = {'queryString': data['queryString']}
 		return self.request('post', 'USERRIGHT/userAutocomplete', data, api='services')
-
-
-	# def get_sales(self, data):
-	# 	fun_id = self.get_config('fun_id')
-	# 	data = {'start': data['start'], 'end': data['end'], 'row_count': data['row_count'], 'fun_id': self.config['fun_id']}
-	# 	return self.request('post', 'GESSALES/getSales', data, api='services')
 
 
 	# ============================================================
@@ -355,15 +280,17 @@ class PayutcClient:
 	# ============================================================	
 
 	def get_articles(self):
+		"""Récupère tous les articles sur Weez"""
 		fun_id = self.get_config('fun_id')
 		return self.request('post', 'SELFPOS/getArticles', fun_id, api='services')
 
 	def set_product(self, data = {}):
+		"""Crée un nouvel article sur Weez"""
 		data['fun_id'] = BASE_CONFIG['fun_id']
 		return self.request('post', 'GESARTICLE/setProduct', data, api='services')
 
-
 	def get_export(self, **kwargs):
+		"""Pour la tréso, obtiens un export entre deux dates"""
 		data = self.get_values_or_config(kwargs, 'fun_id', 'start', 'end', 'event_id')
 		if 'start' in data:
 			data['start'] = self.format_datetime(data['start'])
@@ -372,3 +299,34 @@ class PayutcClient:
 		return self.request('post', 'TRESO/getExport', data, api='services')
 
 
+	# ============================================================
+	# 			PATCH
+	# ============================================================	
+
+	def patch_api_rest(self, service, method, id, sessionid=None, params=None, **data):
+		"""
+		Méthode générique pour faire des PATCH sur Weez
+		Qu'est ce qu'un PATCH ? Quand on veut mettre à jour un objet
+		(avec la méthode PUT des services HTTP)
+		on est obligé d'ajouter toutes les valeurs qui le composent.
+		Si par exemple un article a un nom et qu'on envoie pas de nom
+		au moment de l'update, Weez va considérer que le nom de l'article
+		doit maintenant être null. C'est des fois chiant de tout renvoyer
+		pour une mise à jour et en fait la méthode PATCH des services HTTP
+		y remédient. 
+		Si tu as un article avec un prix et un nom et qu'en utilisant PATCH tu
+		renvoies que le nom, seul le nom sera mis à jour
+		Ici la méthode est générique tu peux envoyer n'importe quel servide, méthode,
+		paramètre.
+		Elle est notamment utilisée dans Perm/ Models.py pour les articles
+		Jete un coup d'oeil si ça te paraît utile pour faire une mise à jour pour
+		autre chose
+		"""
+		if params is None:
+			params = {'system_id': PAYUTC_SYSTEM_ID, 'sessionid': self.config['sessionid']}
+		headers = {'nemopay-version': '2018-07-03', 'Content-Type': 'application/json'}
+		url = "https://api.nemopay.net/" + service + "/" + method + "/" + str(id)
+		r = requests.patch(url, json=data, params=params, headers=headers)
+		if r.status_code != 200:
+			raise NemopayClientException(r.text)
+		return json.loads(r.text)
