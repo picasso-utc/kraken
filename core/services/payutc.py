@@ -207,15 +207,16 @@ class PayutcClient:
 		return self.__login(response)
 
 	def login_badge(self, pin: int=None, badge_id: str=None, **kwargs):
-		keys = ('badge_id', 'pin')
-		data = self.get_values_or_config(kwargs, *keys)
+		data = {"badge_id": badge_id, "pin": pin}
 		response = self.request('post', 'POSS3/loginBadge2', data, api='services')
 		return self.__login(response)
 
 	def login_admin(self):
 		sessionid = cache.get('sessionid')
 		if not sessionid:
-			sessionid = self.login_badge()['sessionid']
+			keys = ('badge_id', 'pin')
+			data = self.get_values_or_config(kwargs, *keys)
+			sessionid = self.login_badge(pin=data["pin"], badge_id=data["badge_id"])['sessionid']
 			cache.set('sessionid', sessionid, 30*60)
 		self.config['sessionid'] = sessionid
 
