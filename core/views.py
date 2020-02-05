@@ -145,13 +145,12 @@ class UserRightViewSet(viewsets.ModelViewSet):
     serializer_class = core_serializers.UserRightSerializer
 
 
-def get_ginger_info(login, right, ginger=None):
+def get_ginger_info(login, right, name, ginger=None):
 	"""Renvoie structure de données d'un utilisateur avec Ginger"""
 	if not ginger:
 		ginger = g.GingerClient()
 	ginger_response = ginger.get_user_info(login)
-	data = {'right': right, 'login': login}
-	print(ginger_response)
+	data = {'right': right, 'login': login, 'name': name}
 	if ginger_response['status'] != 200:
 		data['user'] = None
 	else:
@@ -162,7 +161,6 @@ def get_ginger_info(login, right, ginger=None):
 		data['right_detail'] = 'Membre'
 	elif right == 'N':
 		data['right_detail'] = 'Aucun droit'
-	print(data)
 	return data
 
 
@@ -182,7 +180,7 @@ class UserViewSet(mixins.ListModelMixin,
 		ginger = g.GingerClient()
 		users = []
 		for i, user in enumerate(serializer.data):
-			users.append(get_ginger_info(user['login'], user['right'], ginger))
+			users.append(get_ginger_info(user['login'], user['right'], user['name'], ginger))
 		return JsonResponse({'users': users})
 
 	def create(self, request):
@@ -194,7 +192,7 @@ class UserViewSet(mixins.ListModelMixin,
 	        defaults={'right': user['right'], 'name': user['name']}
 	    )
 		user = core_serializers.UserRightSerializer(new_user).data
-		user = get_ginger_info(user['login'], user['right'])
+		user = get_ginger_info(user['login'], user['right'], user['name'])
 		return JsonResponse({'user': user})
 
 
