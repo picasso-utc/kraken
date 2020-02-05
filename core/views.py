@@ -189,10 +189,9 @@ class UserViewSet(mixins.ListModelMixin,
 		# Création ou mise à jour d'un utilisateur
 		serializer = core_serializers.UserRightSerializer(request.data)
 		user = serializer.data
-
 		new_user, created = core_models.UserRight.objects.update_or_create(
 			login=user['login'],
-	        defaults={'right': user['right']}
+	        defaults={'right': user['right'], 'name': user['name']}
 	    )
 		user = core_serializers.UserRightSerializer(new_user).data
 		user = get_ginger_info(user['login'], user['right'])
