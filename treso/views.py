@@ -7,7 +7,7 @@ from rest_framework import viewsets
 from django.http import JsonResponse, HttpResponse
 from rest_framework.decorators import api_view, permission_classes
 from django.template.loader import render_to_string
-import xlwt
+from xlwt import Workbook
 from PyPDF2 import PdfFileMerger, PdfFileReader
 from core.services.payutc import PayutcClient
 import os
@@ -171,7 +171,7 @@ def excel_facture_generation(request):
     response = HttpResponse(content_type='application/vnd.ms-excel; charset=utf-8')
     response['Content-Disposition'] = 'attachment; filename="Picasso_factures_recues.xls"'
 
-    writer = xlwt.Workbook(encoding="utf-8")
+    writer = Workbook(encoding="utf-8")
     ws = writer.add_sheet('Factures reçues')
     excel_dump = excel_generation.generate_receipts_xls(ws)
     writer.save(response)
