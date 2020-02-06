@@ -34,7 +34,7 @@ def generate_receipts_xls(worksheet, request):
                                  facture.nom_entreprise, str(facture.date or "--"),
                                  str(facture.date_paiement or "--"), facture.prix,
                                  facture.get_total_taxes(), facture.get_etat_display(),
-                                 facture.personne_a_rembourser or "", str(facture.date_remboursement) or ""]):
+                                 facture.personne_a_rembourser or "", str(facture.date_remboursement or "--")]):
             worksheet.write(num+1, n, val)
         if facture.perm:
             worksheet.write(num+1, 9, facture.perm.perm.nom)
