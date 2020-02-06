@@ -174,5 +174,13 @@ def excel_facture_generation(request):
     writer = Workbook(encoding="utf-8")
     ws = writer.add_sheet('Factures reçues')
     excel_dump = excel_generation.generate_receipts_xls(ws)
+def excel_cheque_generation(request):
+    # Vue permettant de générer un fichier excel avec la liste des chèques
+    response = HttpResponse(content_type='application/vnd.ms-excel; charset=utf-8')
+    response['Content-Disposition'] = 'attachment; filename="Picasso_cheques_recues.xls"'
+
+    writer = Workbook(encoding="utf-8")
+    ws = writer.add_sheet('Chèques')
+    excel_dump = excel_generation.generate_checks_xls(ws)
     writer.save(response)
     return response
