@@ -26,6 +26,32 @@ class FactureRecueSerializer(serializers.ModelSerializer):
         exclude = list()
 
 
+class FactureRecuePermSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = perm_models.Perm
+        exclude_list = list()
+        exclude = exclude_list
+
+
+class FactureRecueCreneauSerializer(serializers.ModelSerializer):
+    perm = FactureRecuePermSerializer(read_only=True)    
+    class Meta:
+        model = perm_models.Creneau
+        exclude_list = list()
+        exclude = exclude_list
+
+
+class FactureRecueExtendedSerializer(serializers.ModelSerializer):
+    perm = FactureRecueCreneauSerializer(read_only=True)
+    cheque_set = ChequeListSerializer(required=False)
+    personne_a_rembourser = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+    date_paiement = serializers.DateField(required=False, allow_null=True)
+    date_remboursement = serializers.DateField(required=False, allow_null=True)
+    perm 
+    class Meta:
+        model = treso_models.FactureRecue
+        exclude = list()
+
 class FactureEmiseRowSerializer(serializers.ModelSerializer):
     class Meta:
         model = treso_models.FactureEmiseRow
