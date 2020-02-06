@@ -166,6 +166,8 @@ def get_all_conventions(request):
     return response
 
 
+@api_view(['GET'])
+@permission_classes((IsAdminUser,))
 def excel_facture_generation(request):
     # Vue permettant de générer un fichier excel avec la liste des factures, et des perms associées
     response = HttpResponse(content_type='application/vnd.ms-excel; charset=utf-8')
@@ -178,6 +180,8 @@ def excel_facture_generation(request):
     return response
 
 
+@api_view(['GET'])
+@permission_classes((IsAdminUser,))
 def excel_cheque_generation(request):
     # Vue permettant de générer un fichier excel avec la liste des chèques
     response = HttpResponse(content_type='application/vnd.ms-excel; charset=utf-8')
