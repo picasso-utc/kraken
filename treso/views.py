@@ -2,18 +2,13 @@
 
 # # from sets import Set
 
-# from django.http import HttpResponse
 from django.shortcuts import render
 from rest_framework import viewsets
 from django.http import JsonResponse, HttpResponse
 from rest_framework.decorators import api_view, permission_classes
 from django.template.loader import render_to_string
-# from rest_framework.renderers import JSONRenderer
-# from rest_framework.response import Response
-# import xlwt
+import xlwt
 from PyPDF2 import PdfFileMerger, PdfFileReader
-# # from picsous.permissions import IsAdmin, IsAuthorizedUser
-# # from picsous.settings import NEMOPAY_FUNDATION_ID
 from core.services.payutc import PayutcClient
 import os
 from core.services.current_semester import get_current_semester
@@ -21,12 +16,12 @@ from core import models as core_models
 from core import viewsets as core_viewsets
 from perm import models as perm_models
 from perm import serializers as perm_serializers
-# # from core.services import payutc, excel_generation
 from treso import models as treso_models
 from treso import serializers as treso_serializers
 from core.permissions import IsAdminUser, IsAuthenticatedUser, IsMemberUser
 from core.settings import APP_URL
 from core.services.current_semester import get_request_semester
+from core.services import excel_generation
 import pdfkit
 
 
@@ -168,4 +163,16 @@ def get_all_conventions(request):
     response = HttpResponse(content_type='application/pdf')
     merger.write(response)
     merger.close()
+    return response
+
+
+def excel_facture_generation(request):
+    # Vue permettant de générer un fichier excel avec la liste des factures, et des perms associées
+    response = HttpResponse(content_type='application/vnd.ms-excel; charset=utf-8')
+    response['Content-Disposition'] = 'attachment; filename="Picasso_factures_recues.xls"'
+
+    writer = xlwt.Workbook(encoding="utf-8")
+    ws = writer.add_sheet('Factures reçues')
+    excel_dump = excel_generation.generate_receipts_xls(ws)
+    writer.save(response)
     return response
