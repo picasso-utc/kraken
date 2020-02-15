@@ -55,6 +55,7 @@ class FactureRecue(PricedModel):
     immobilisation = models.BooleanField(default=False)
     remarque = models.TextField(null=True, default=None)
     semestre = models.ForeignKey(Semestre, on_delete=models.SET_NULL, null=True, default=get_current_semester)
+    facture_number = models.TextField(null=True, blank=True, default=None)
 
 
 class Cheque(models.Model):
