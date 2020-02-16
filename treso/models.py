@@ -2,6 +2,7 @@ from django.db import models
 from perm.models import Perm, Creneau
 from core.models import Semestre
 from core.services.current_semester import get_current_semester
+from django.dispatch import receiver
 
 
 class PricedModel(models.Model):
@@ -56,6 +57,19 @@ class FactureRecue(PricedModel):
     remarque = models.TextField(null=True, default=None)
     semestre = models.ForeignKey(Semestre, on_delete=models.SET_NULL, null=True, default=get_current_semester)
     facture_number = models.TextField(null=True, blank=True, default=None)
+
+@receiver(models.signals.post_save, sender=FactureRecue)
+def auto_add_facture_number_on_save(sender, instance, **kwargs):
+    if instance.id:
+        code = "" 
+        if instance.categorie:
+            queryset = CategorieFactureRecue.objects.get(pk=instance.categorie_id)
+            code = queryset.code
+        instance.facture_number = code + str(instance.id)
+        models.signals.post_save.disconnect(auto_add_facture_number_on_save, sender=FactureRecue)
+        instance.save()
+        models.signals.post_save.connect(auto_add_facture_number_on_save, sender=FactureRecue)
+
 
 
 class Cheque(models.Model):
