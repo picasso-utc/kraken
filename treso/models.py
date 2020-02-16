@@ -61,14 +61,16 @@ class FactureRecue(PricedModel):
 @receiver(models.signals.post_save, sender=FactureRecue)
 def auto_add_facture_number_on_save(sender, instance, **kwargs):
     if instance.id:
-        code = "" 
-        if instance.categorie:
-            queryset = CategorieFactureRecue.objects.get(pk=instance.categorie_id)
-            code = queryset.code
-        instance.facture_number = code + str(instance.id)
-        models.signals.post_save.disconnect(auto_add_facture_number_on_save, sender=FactureRecue)
-        instance.save()
-        models.signals.post_save.connect(auto_add_facture_number_on_save, sender=FactureRecue)
+        # Assignement des numéros de factures à partir du début du semestre P20
+        if instance.semestre > 13:
+            code = "" 
+            if instance.categorie:
+                queryset = CategorieFactureRecue.objects.get(pk=instance.categorie_id)
+                code = queryset.code
+            instance.facture_number = code + str(instance.id)
+            models.signals.post_save.disconnect(auto_add_facture_number_on_save, sender=FactureRecue)
+            instance.save()
+            models.signals.post_save.connect(auto_add_facture_number_on_save, sender=FactureRecue)
 
 
 
