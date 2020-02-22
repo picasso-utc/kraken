@@ -61,8 +61,8 @@ class FactureRecue(PricedModel):
 @receiver(models.signals.post_save, sender=FactureRecue)
 def auto_add_facture_number_on_save(sender, instance, **kwargs):
     if instance.id:
-        # Assignement des numéros de factures à partir du début du semestre P20
-        if instance.semestre_id > 12:
+        # Assignement des numéros de factures à partir du début du semestre P20, facture 2563
+        if instance.id > 2563:
             code = "" 
             if instance.categorie:
                 queryset = CategorieFactureRecue.objects.get(pk=instance.categorie_id)
