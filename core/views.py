@@ -4,7 +4,7 @@ from django.http import JsonResponse
 from core import serializers as core_serializers
 from core import models as core_models
 from core import auth as auth_view
-from core.permissions import IsAdminUser, IsAuthenticatedUser, IsMemberUser
+from core.permissions import IsAdminUser, IsAuthenticatedUser, IsMemberUser, CanAccessMenuFunctionnalities
 from constance import config
 from core.settings import CONSTANCE_CONFIG
 from django.db.models import Q
@@ -287,7 +287,7 @@ class BlockedUserViewSet(viewsets.ViewSet):
 		Instantiates and returns the list of permissions that this view requires.
 		"""
 		if self.action == 'list':
-			permission_classes = [IsMemberUser]
+			permission_classes = [CanAccessMenuFunctionnalities]
 		else:
 			permission_classes = [IsAdminUser]
 		return [permission() for permission in permission_classes]
