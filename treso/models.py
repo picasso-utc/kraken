@@ -68,7 +68,7 @@ def auto_add_facture_number_on_save(sender, instance, **kwargs):
                 queryset = CategorieFactureRecue.objects.get(pk=instance.categorie_id)
                 code = queryset.code
             queryset = Semestre.objects.get(pk=instance.semestre_id)
-            semestre = queryset.periode + queryset.annee
+            semestre = queryset.periode + str(queryset.annee)
             instance.facture_number = semestre + code + str(instance.id)
             models.signals.post_save.disconnect(auto_add_facture_number_on_save, sender=FactureRecue)
             instance.save()
