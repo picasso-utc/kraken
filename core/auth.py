@@ -66,6 +66,13 @@ def _is_user_member(login):
     return True    
 
 
+def _get_connexion_type(request):
+    connexion_type = "menu"
+    if request.GET.get("full", False):
+        connexion_type = "full"
+    return connexion_type
+
+
 def login_badge(request, format=None):
     """Authenticate with badge_id"""
     request.session.flush()
@@ -76,7 +83,8 @@ def login_badge(request, format=None):
     resp = p.login_badge(badge_id=badge_id, pin=pin)
     if(not _is_user_member(resp["username"])):
         return JsonResponse({"error": "Vous n'êtes pas autorisé à effectuer cette action."}, status=403)
-    _set_session_information(request, resp['username'], resp['sessionid'])
+    connexion_type = _get_connexion_type(request)
+    _set_session_information(request, resp['username'], resp['sessionid'], connexion_type)
     request.session.set_expiry(2*3600) 
     return JsonResponse(resp, status=200)
 
@@ -94,7 +102,8 @@ def login_username(request, format=None):
     badge_id = ginger_response['data']['badge_uid']
     p = PayutcClient()
     resp = p.login_badge(badge_id=badge_id, pin=pin)
-    _set_session_information(request, resp['username'], resp['sessionid'], 'menu')
+    connexion_type = _get_connexion_type(request)
+    _set_session_information(request, resp['username'], resp['sessionid'], connexion_type)
     request.session.set_expiry(2*3600) 
     return JsonResponse(resp, status=200)
 
