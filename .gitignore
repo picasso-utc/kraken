@@ -92,7 +92,7 @@ ENV/
 .idea/
 
 #Confidential identification informations for foreign APIs
-settings_confidential.py
+core/settings_confidential.py
 # db.*
 
 # Static files

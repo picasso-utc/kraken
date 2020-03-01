@@ -7,7 +7,7 @@ from perm import models as perm_models
 from rest_framework.decorators import permission_classes, api_view
 from django.http import JsonResponse, HttpResponse
 from core.permissions import IsAdminUser, IsAuthenticatedUser, IsMemberUser, IsMemberUserOrReadOnly
-import qrcode
+# import qrcode
 from core.settings import FRONT_URL
 
 class WebTVViewSet(viewsets.ModelViewSet):
@@ -91,7 +91,7 @@ def generate_qr_code(request):
     url = FRONT_URL
     if survey_id:
         url += ('/poll/' + survey_id)
-    img = qrcode.make(url)
+    #img = qrcode.make(url)
     response = HttpResponse(content_type="image/png")
-    img.save(response, "PNG")
+    #img.save(response, "PNG")
     return response
