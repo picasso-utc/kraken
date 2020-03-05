@@ -7,7 +7,7 @@ from perm import models as perm_models
 from rest_framework.decorators import permission_classes, api_view
 from django.http import JsonResponse, HttpResponse
 from core.permissions import IsAdminUser, IsAuthenticatedUser, IsMemberUser, IsMemberUserOrReadOnly
-# import qrcode
+#import qrcode
 from core.settings import FRONT_URL
 
 class WebTVViewSet(viewsets.ModelViewSet):
