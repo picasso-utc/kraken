@@ -134,3 +134,12 @@ class BlockedUser(models.Model):
     name = models.CharField(null=False, default=None, max_length=255, blank=False)
     justification = models.CharField(null=False, default=None, max_length=255, blank=False)
     date = models.DateField(auto_now_add = True, blank=True)
+
+class PersonPerHour(models.Model):
+    """
+    Classe qui regroupe toutes les lectures de badges à l'entree du pic #COVID
+    """
+    first_name = models.CharField(null=False, default=None, max_length=255, blank=False)
+    last_name = models.CharField(null=False, default=None, max_length=255, blank=False)
+    user_id = models.CharField(null=False, default=None, max_length=10, blank=False, unique=False)
+    date_time = models.DateTimeField(auto_now_add=True, blank=True)

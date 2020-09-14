@@ -31,6 +31,11 @@ class GingerClient():
         """Méthode pour obtenir des informations à partir d'un login"""
         return self._apiCall(method="GET", path="/" + username)
 
+    def get_badge_info(self, badge_id):
+        """Méthode pour obtenir des informations à partir d'un badge"""
+        return self._apiCall(method="GET", path="/badge/" + badge_id)
+
+
 
     def _apiCall(self, method, path, data = None, parameters = None):
         """Fonction effecutant les appels API sur Ginger/v1"""

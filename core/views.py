@@ -251,6 +251,29 @@ def current_semester(request):
 			semester = core_models.Semestre.objects.get(pk=semester_id)
 			return JsonResponse(core_serializers.SemestreSerializer(semester).data)
 
+#@api_view(['GET'])
+def badge_scan(request):
+	login = None
+	if request.method == 'GET':
+		print(request.GET)
+		badge_id = request.GET['badge_id']
+		# Récupération depuis Ginger de badge_uid, name avec login
+		try :
+			ginger = g.GingerClient()
+			ginger_response = ginger.get_badge_info(badge_id)
+			first_name = ginger_response["data"]["prenom"]
+			last_name = ginger_response["data"]["nom"]
+			login = ginger_response["data"]["login"]
+			new_user = core_models.PersonPerHour.objects.create(
+				user_id=login,
+				first_name=first_name,
+				last_name=last_name,
+			)
+		except:
+			return JsonResponse({"user" : None})
+
+	return JsonResponse({"user": login, "first_name": first_name, "last_name": last_name})
+
 
 class BlockedUserViewSet(viewsets.ViewSet):
 	"""ViewSet des utilisateurs bloqués"""
@@ -280,6 +303,46 @@ class BlockedUserViewSet(viewsets.ViewSet):
 	def destroy(self, request, pk=None):
 		if pk:
 			core_models.BlockedUser.objects.filter(pk=pk).delete()
+		return JsonResponse({})
+
+	def get_permissions(self):
+		"""
+		Instantiates and returns the list of permissions that this view requires.
+		"""
+		if self.action == 'list':
+			permission_classes = [CanAccessMenuFunctionnalities]
+		else:
+			permission_classes = [IsAdminUser]
+		return [permission() for permission in permission_classes]
+
+class PersonPerHourViewSet(viewsets.ViewSet):
+	"""ViewSet des utilisateurs bloqués"""
+	def list(self, request):
+		queryset = core_models.PersonPerHour.objects.all()
+		serializer = core_serializers.PersonPerHourSerializer(queryset, many=True)
+		return JsonResponse({'person_per_hour': serializer.data})
+
+	def create(self, request):
+		badge_id = request.data["badge_id"]
+		# Récupération depuis Ginger de badge_uid, name avec login
+		ginger = g.GingerClient()
+		ginger_response = ginger.get_badge_info(badge_id)
+		first_name = ginger_response["data"]["prenom"]
+		last_name = ginger_response["data"]["nom"]
+		login = ginger_response["data"]["login"]
+
+		# Création de la ligne dans la bdd
+		new_user = core_models.PersonPerHour.objects.create(
+		    user_id = login,
+		    first_name = first_name,
+		    last_name = last_name,
+		)
+		serializer = core_serializers.BlockedUserSerializer(queryset)
+		return JsonResponse({"user": serializer.data})
+
+	def destroy(self, request, pk=None):
+		if pk:
+			core_models.PersonPerHour.objects.filter(pk=pk).delete()
 		return JsonResponse({})
 
 	def get_permissions(self):
