@@ -271,3 +271,36 @@ class PermHalloween(models.Model):
 
     article_id = models.IntegerField(default=0)
     login = models.CharField(null=True, default=None, max_length=10)
+
+
+class Etudiant(models.Model):
+
+    login = models.CharField(null=True, default=None, max_length=10)
+    mail = models.CharField(null=True, default=None, max_length=255)
+    nouvo = models.BooleanField(default=False)
+    nb_resa = models.IntegerField(default=0)
+    nb_resa_conf = models.IntegerField(default=0)
+
+    def __str__(self):
+        return f"{self.login}"
+
+
+class Groupe(models.Model):
+
+    goupe_id = models.CharField(null=True, default=None, max_length=10)
+    login_etu = models.ManyToManyField(Etudiant)
+
+    def __str__(self):
+        return f"{self.goupe_id}"
+
+
+class Reservation(models.Model):
+
+    TABLE_TYPE_CHOICE = (
+        ('EXT', 'Table exterieur'),
+        ('INT', 'Table interieur'),
+    )
+    table_type = models.CharField(choices=TABLE_TYPE_CHOICE, max_length=3)
+    date_resa = models.CharField(null=True, default=None, max_length=10)
+    date_venu = models.CharField(null=True, default=None, max_length=10)
+    groupe = models.ForeignKey(Groupe, on_delete=models.CASCADE)
