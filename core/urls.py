@@ -30,6 +30,7 @@ urlpatterns = [
 	path('api/core/semester/credit', core_views.semester_beginning_credit),
 	path('api/current/semester', core_views.current_semester),
 	path('api/core/team', core_views.get_team),
+	path('api/core/badge_scan', core_views.badge_scan),
 
 	# Inclusion URL application Perm
 	path('api/perms/', include('perm.urls')),

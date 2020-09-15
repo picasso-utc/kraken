@@ -45,6 +45,12 @@ class BlockedUserSerializer(serializers.ModelSerializer):
         model = core_models.BlockedUser
         exclude = list()
 
+class PersonPerHourSerializer(serializers.ModelSerializer):
+	# Serializer
+    class Meta:
+        model = core_models.PersonPerHour
+        exclude = list()
+
 class AstreinteSerializer(serializers.ModelSerializer):
 
     class Meta:

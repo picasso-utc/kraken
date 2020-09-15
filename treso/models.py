@@ -51,7 +51,7 @@ class FactureRecue(PricedModel):
     date = models.DateField()
     date_paiement = models.DateField(null=True, default=None)
     date_remboursement = models.DateField(null=True, default=None)
-    moyen_paiement = models.CharField(null=False, default=None, max_length=255)
+    moyen_paiement = models.CharField(null=True, default=None, max_length=255)
     personne_a_rembourser = models.CharField(null=False, default=None, max_length=255)
     immobilisation = models.BooleanField(default=False)
     remarque = models.TextField(null=True, default=None)
