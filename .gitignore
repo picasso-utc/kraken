@@ -104,3 +104,6 @@ db.sqlite3
 
 .vscode
 
+# MacOS File
+.DS_Store
+core/DS_Store
