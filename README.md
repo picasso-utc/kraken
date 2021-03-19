@@ -67,32 +67,10 @@ You can now play with the server on http://localhost:8000
 
 
 ## Deployment
+There are two files you have to check on the server if there is a problem with kraken: 
+- rc.local in /etc/ : this one allows the server to run the script which launch the screen for kraken.
+- start-kraken.sh in etc/init.d/ : this one contains the command which are run at the launch of the server. It consists in a screen which run kraken permanently after restarting apache2 (because it starts nginx by default). You shoulkd check also if the port 8080 is already occupied by an other app, in order to avoid concurrency with apache2.
 
-Check this deployment checklist : https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
-
-Deploy server using : https://docs.djangoproject.com/en/2.1/howto/deployment/wsgi/
-
-Here, on deployment with use Apache to run the server.
-Install `mod_wsgi` : `sudo apt-get install libapache2-mod-wsgi-py3`
-Restart apache for mod_wsgi to be effective : `sudo systemctl restart apache2`
-
-In an Apache config file (like `/etc/apache2/apache2.conf`), replace `BASE_FOLDER` with the path to where you installed Woolly :
-```ini
-ServerName YOUR_SERVER_NAME
-WSGIScriptAlias / BASE_FOLDER/woolly_api/wsgi.py
-WSGIDaemonProcess woolly-api python-home=BASE_FOLDER/venv python-path=BASE_FOLDER 
-WSGIProcessGroup woolly-api
-WSGIPassAuthorization On
-
-<Directory BASE_FOLDER>
-    <Files wsgi.py>
-        Require all granted
-    </Files>
-</Directory>
-```
-And restart Apache : `sudo systemctl restart apache2`.
-
-You have to restart Apache each time you modify your application for the changes to be applied.
 
 ## License
 
