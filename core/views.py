@@ -258,7 +258,7 @@ def badge_scan(request):
 		print(request.GET)
 		badge_id = request.GET['badge_id']
 		# Récupération depuis Ginger de badge_uid, name avec login
-		try :
+		try:
 			ginger = g.GingerClient()
 			ginger_response = ginger.get_badge_info(badge_id)
 			first_name = ginger_response["data"]["prenom"]
@@ -273,6 +273,18 @@ def badge_scan(request):
 			return JsonResponse({"user" : None})
 
 	return JsonResponse({"user": login, "first_name": first_name, "last_name": last_name})
+
+@api_view(['GET'])
+def covid_stat(request):
+	start_date = request.GET['start_date']
+	end_date = request.GET['end_date']
+	answer = {}
+	all_dates = core_models.PersonPerHour.objects.all().filter(date_time__gte=start_date, date_time__lte=end_date).distinct('date_time__date')
+	for date in all_dates:
+		print(date.date_time.date())
+		count = core_models.PersonPerHour.objects.all().filter(date_time__date=date.date_time.date()).distinct('user_id').count()
+		answer[str(date.date_time.date())] = count
+	return JsonResponse(answer)
 
 
 class BlockedUserViewSet(viewsets.ViewSet):

@@ -31,6 +31,7 @@ urlpatterns = [
 	path('api/current/semester', core_views.current_semester),
 	path('api/core/team', core_views.get_team),
 	path('api/core/badge_scan', core_views.badge_scan),
+	path('api/core/covid_stat', core_views.covid_stat),
 
 	# Inclusion URL application Perm
 	path('api/perms/', include('perm.urls')),
