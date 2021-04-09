@@ -279,7 +279,7 @@ def covid_stat(request):
 	start_date = request.GET['start_date']
 	end_date = request.GET['end_date']
 	answer = {}
-	all_dates = core_models.PersonPerHour.objects.all().filter(date_time__gte=start_date, date_time__lte=end_date).distinct('date_time__date')
+	all_dates = core_models.PersonPerHour.objects.all().filter(date_time__date__gte=start_date, date_time__date__lte=end_date).distinct('date_time__date')
 	for date in all_dates:
 		print(date.date_time.date())
 		count = core_models.PersonPerHour.objects.all().filter(date_time__date=date.date_time.date()).distinct('user_id').count()
