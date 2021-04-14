@@ -1,6 +1,3 @@
-import locale
-from datetime import datetime
-
 from rest_framework import viewsets, mixins
 from rest_framework.decorators import api_view, permission_classes, renderer_classes
 from django.http import JsonResponse
@@ -282,7 +279,6 @@ def covid_stat(request):
 	start_date = request.GET['start_date']
 	end_date = request.GET['end_date']
 	answer = {}
-	locale.setlocale(locale.LC_TIME, 'fr_FR')
 	queryset = core_models.PersonPerHour.objects.all().filter(date_time__date__gte=start_date, date_time__date__lte=end_date).values('date_time__date').annotate(count=Count('user_id', distinct=True))
 	for q in queryset:
 		date = q['date_time__date'].strftime("%A %d %B %Y")
