@@ -1,3 +1,6 @@
+import locale
+from datetime import datetime
+
 from rest_framework import viewsets, mixins
 from rest_framework.decorators import api_view, permission_classes, renderer_classes
 from django.http import JsonResponse
@@ -7,7 +10,7 @@ from core import auth as auth_view
 from core.permissions import IsAdminUser, IsAuthenticatedUser, IsMemberUser, CanAccessMenuFunctionnalities
 from constance import config
 from core.settings import CONSTANCE_CONFIG
-from django.db.models import Q
+from django.db.models import Q, Count
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from core.services.ginger import GingerClient
@@ -279,11 +282,15 @@ def covid_stat(request):
 	start_date = request.GET['start_date']
 	end_date = request.GET['end_date']
 	answer = {}
-	all_dates = core_models.PersonPerHour.objects.all().filter(date_time__date__gte=start_date, date_time__date__lte=end_date).distinct('date_time__date')
-	for date in all_dates:
-		print(date.date_time.date())
-		count = core_models.PersonPerHour.objects.all().filter(date_time__date=date.date_time.date()).distinct('user_id').count()
-		answer[str(date.date_time.date())] = count
+	locale.setlocale(locale.LC_TIME, 'fr_FR')
+	queryset = core_models.PersonPerHour.objects.all().filter(date_time__date__gte=start_date, date_time__date__lte=end_date).values('date_time__date').annotate(count=Count('user_id', distinct=True))
+	for q in queryset:
+		date = q['date_time__date'].strftime("%A %d %B %Y")
+		answer[date] = q['count']
+	#all_dates = core_models.PersonPerHour.objects.all().filter(date_time__date__gte=start_date, date_time__date__lte=end_date).distinct('date_time__date')
+	#for date in all_dates:
+	#	count = core_models.PersonPerHour.objects.all().filter(date_time__date=date.date_time.date()).distinct('user_id').count()
+	#	answer[str(date.date_time.date())] = count
 	return JsonResponse(answer)
 
 
