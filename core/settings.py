@@ -52,6 +52,7 @@ INSTALLED_APPS = [
 	'payutc',
 	'survey',
 	'tv',
+	'covid',
 ]
 
 # AUTH_USER_MODEL = 'core.User'
