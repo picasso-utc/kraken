@@ -7,7 +7,11 @@ from rest_framework.decorators import api_view
 @api_view(['GET'])
 def get_occupation(request):
     answer = {}
-    querySet = covid_models.Person.objects.all().filter(depart__isnull=True).count()
+    queryPerson = covid_models.Person.objects.all().filter(depart__isnull=True).count()
     answer['person'] = querySet
+    queryTableExt = covid_models.Table.objects.all().filter(person__depart__isnull=True,position="EXT").count()
+    answer['tableExt'] = querySet
+    queryTableIn = covid_models.Table.objects.all().filter(person__depart__isnull=True,position="IN").count()
+    answer['tableIn'] = querySet
     return JsonResponse(answer)
 

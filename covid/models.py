@@ -9,7 +9,7 @@ class Table(models.Model):
 
     name = models.CharField(max_length=3)
     position = models.CharField(choices=POSITION_CHOICES, max_length=3)
-    capacite = models.IntegerField
+    capacite = models.IntegerField()
 
 class Person(models.Model):
     login = models.CharField(max_length=150)
