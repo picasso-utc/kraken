@@ -22,7 +22,7 @@ urlpatterns = [
 	path('api/auth/username', core_views.login_username, name="auth.username"),
 	path('api/auth/me', core_views.me, name='auth.me'),
 	path('api/auth/logout', core_views.logout, name='auth.logout'),
-	
+
 	# Application Core
 	path('api/admin/settings', core_views.admin_settings),
 	path('api/core/user', core_views.user_information),
@@ -48,9 +48,12 @@ urlpatterns = [
 	# Inclusion URL application TV
 	path('api/tv/', include('tv.urls')),
 
+	#Inclusion URL covid
+	path('api/covid/', include('covid.urls')),
+
 	# Inclusion fichier Router
 	# Ce dernier contient les Viewset, 1 URL = 1 CRUD
-	# CRUD = Create, Read, Update, Deete 
+	# CRUD = Create, Read, Update, Deete
 	path('api/', include(router.urls)),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
