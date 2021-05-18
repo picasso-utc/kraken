@@ -20,7 +20,7 @@ def get_occupation(request):
     queryCapacityExte = covid_models.Table.objects.filter(position="EXT").count()
     answer['capacityExt'] = queryCapacityExte
 #     queryCapacityIn = covid_models.Table.objects.filter(position="EXT").aggregate(Sum('capacity'))
-    queryCapacityIn = covid_models.Table.objects.filter(position="EXT").count()
+    queryCapacityIn = covid_models.Table.objects.filter(position="In").count()
     answer['capacityIn'] = queryCapacityIn
     return JsonResponse(answer)
 
