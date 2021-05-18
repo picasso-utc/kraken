@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 from covid import models as covid_models
+from django.db.models import Sum
 from rest_framework.decorators import api_view
 
 # Create your views here.
@@ -13,5 +14,11 @@ def get_occupation(request):
     answer['tableExt'] = queryTableExt
     queryTableIn = covid_models.Table.objects.all().filter(person__depart__isnull=True,position="IN").count()
     answer['tableIn'] = queryTableIn
+    queryCapacite = covid_models.Table.objects.aggregate(Sum('capacity'))
+    answer['capacite'] = queryCapacite
+    queryCapacityExte = covid_models.Table.objects.filter(position="EXT").aggregate(Sum('capacity'))
+    answer['capacityExt'] = queryCapaciteExte
+    queryCapaciteIn = covid_models.Table.objects.filter(position="EXT").aggregate(Sum('capacity'))
+    answer['capacityIn'] = queryCapacityIn
     return JsonResponse(answer)
 
