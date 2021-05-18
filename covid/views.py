@@ -14,11 +14,11 @@ def get_occupation(request):
     answer['tableExt'] = queryTableExt
     queryTableIn = covid_models.Table.objects.all().filter(person__depart__isnull=True,position="IN").count()
     answer['tableIn'] = queryTableIn
-    queryCapacite = covid_models.Table.objects.aggregate(Sum('capacity'))
-    answer['capacite'] = queryCapacite
+    queryCapacity = covid_models.Table.objects.aggregate(Sum('capacity'))
+    answer['capacite'] = queryCapacity
     queryCapacityExte = covid_models.Table.objects.filter(position="EXT").aggregate(Sum('capacity'))
-    answer['capacityExt'] = queryCapaciteExte
-    queryCapaciteIn = covid_models.Table.objects.filter(position="EXT").aggregate(Sum('capacity'))
+    answer['capacityExt'] = queryCapacityExte
+    queryCapacityIn = covid_models.Table.objects.filter(position="EXT").aggregate(Sum('capacity'))
     answer['capacityIn'] = queryCapacityIn
     return JsonResponse(answer)
 
