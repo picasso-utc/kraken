@@ -10,9 +10,9 @@ def get_occupation(request):
     answer = {}
     queryPerson = covid_models.Person.objects.all().filter(depart__isnull=True).count()
     answer['person'] = queryPerson
-    queryTableExt = covid_models.Table.objects.all().filter(person__depart__isnull=True,position="EXT").count()
+    queryTableExt = covid_models.Person.objects.all().filter(depart__isnull=True,table__position="EXT").count()
     answer['tableExt'] = queryTableExt
-    queryTableIn = covid_models.Table.objects.all().filter(person__depart__isnull=True,position="IN").count()
+    queryTableIn = covid_models.Person.objects.all().filter(depart__isnull=True,table__position="IN").count()
     answer['tableIn'] = queryTableIn
     queryCapacity = covid_models.Table.objects.aggregate(Sum('capacity'))
     answer['capacity'] = queryCapacity
