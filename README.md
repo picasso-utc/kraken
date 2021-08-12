@@ -42,20 +42,32 @@ pip install -r requirements.txt
 
 Now ask a responsible person for the `settings_confidential.py` file containing the foreign APIs identification keys. The file is to be placed next to the `settings.py` file. There is a placeholder file called `settings_confidential.example.py`, you can copy and fill it. 
 
-Connect to postgres and create the `picasso` database
+Connect to postgres and create the `kraken` database
 
 ```shell
 psql postgres
 ```
 
 ```sql
-CREATE DATABASE picasso ENCODING='UTF8';
+CREATE DATABASE kraken ENCODING='UTF8';
 ```
 
-Then you need to migrate, and initialize the database :
+### You now have 2 choices
+
+#### Start with empty tables
 ```sh
 python manage.py migrate
 ```
+
+#### Take datas from the distant server
+```shell
+# connect to the production server and run
+pg_dump kraken -U postgres -h localhost -F c > backup.sql
+# on your machine
+scp root@37.139.25.111:/root/backup.sql ./
+pg_restore -U victor -d kraken -1 ~/backup.sql
+```
+If you check your local database kraken you should see real data from the production
 
 You also need to generate all static files :
 ```sh
