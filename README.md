@@ -42,10 +42,14 @@ pip install -r requirements.txt
 
 Now ask a responsible person for the `settings_confidential.py` file containing the foreign APIs identification keys. The file is to be placed next to the `settings.py` file. There is a placeholder file called `settings_confidential.example.py`, you can copy and fill it. 
 
+Connect to postgres and create the `picasso` database
 
-Create your database named `picasso`, set charset to UTF-8 with :
+```shell
+psql postgres
+```
+
 ```sql
-ALTER DATABASE `picasso` CHARACTER SET utf8;
+CREATE DATABASE picasso ENCODING='UTF8';
 ```
 
 Then you need to migrate, and initialize the database :

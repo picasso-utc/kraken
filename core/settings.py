@@ -59,6 +59,7 @@ INSTALLED_APPS = [
 ROOT_URLCONF = 'core.urls'
 WSGI_APPLICATION = 'core.wsgi.application'
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 MIDDLEWARE = [
 	'corsheaders.middleware.CorsMiddleware', # preventing CORS rules errors
