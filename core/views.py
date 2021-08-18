@@ -68,7 +68,7 @@ class PosteViewSet(viewsets.ModelViewSet):
 
 class MemberViewSet(viewsets.ModelViewSet):
 	"""
-	Viewset pour les membres du Pic 
+	Viewset pour les membres du Pic
 	Membre : combinaison d'un semestre, d'un utilisateur et d'un poste
 	"""
 	serializer_class = core_serializers.MemberSerializer
@@ -91,7 +91,7 @@ def user_information(request, format=None):
 	if user['status'] == 200:
 		return JsonResponse(user['data'])
 	return JsonResponse({'error': 'Une erreur s\'est produite'}, status=500)
-	
+
 
 @api_view(['GET'])
 @permission_classes((IsAdminUser, ))
@@ -106,7 +106,7 @@ def semestre_state(request):
 @permission_classes((IsAdminUser, ))
 def semester_beginning_credit(request):
     """
-    Erenvoie le solde au début du semestre actuel | Sauf si 
+    Erenvoie le solde au début du semestre actuel | Sauf si
     l'utilisateur spécifie un semester (avec le paramètre GET "semester")
     """
     semesterId = request.GET.get("semester", config.SEMESTER)
@@ -203,7 +203,7 @@ def get_team(request, format=None):
 	queryset = core_models.Member.objects.filter(semestre__id=get_current_semester())
 	serializer = core_serializers.MemberAstreinteSerializer(queryset, many=True)
 	team = serializer.data
-	for member in team : 
+	for member in team :
 		# Nombre d'astreintes notées et totales ajoutées
 		member["rated_astreintes"] = 0
 		member["total_astreintes"] = len(member["astreinte_set"])

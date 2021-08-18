@@ -5,6 +5,7 @@ from perm import views as perm_views
 from payutc import views as payutc_views
 from survey import views as survey_views
 from tv import views as tv_views
+from chopin import views as chopin_views
 
 router = routers.DefaultRouter()
 
@@ -48,3 +49,6 @@ router.register('facture/reversements', treso_views.ReversementEffectueViewSet, 
 router.register('tvs', tv_views.WebTVViewSet)
 router.register('tv/links', tv_views.WebTVLinkViewSet)
 router.register('tv/media', tv_views.WebTVMediaViewSet)
+
+# Application Chopin
+router.register('newsletter', chopin_views.NewsletterViewSet, 'newsletters')

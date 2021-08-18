@@ -5,12 +5,11 @@ from django.utils import timezone
 from core.services.current_semester import get_current_semester
 
 
-
 class Perm(models.Model):
-
     nom = models.CharField(max_length=255)
     asso = models.BooleanField(default=True)  # true if asso
-    semestre = models.ForeignKey(core_models.Semestre, on_delete=models.SET_NULL, null=True, default=get_current_semester)
+    semestre = models.ForeignKey(core_models.Semestre, on_delete=models.SET_NULL, null=True,
+                                 default=get_current_semester)
     nom_resp = models.CharField(null=True, default=None, max_length=255)
     mail_resp = models.CharField(null=True, default=None, max_length=255)
     nom_resp_2 = models.CharField(null=True, default=None, max_length=255)
@@ -20,9 +19,8 @@ class Perm(models.Model):
     def __str__(self):
         return f"{self.nom}"
 
-    
-class RequestedPerm(models.Model):
 
+class RequestedPerm(models.Model):
     nom = models.CharField(max_length=255)
     asso = models.BooleanField(default=True)  # true if asso
     mail_asso = models.CharField(null=True, default=None, max_length=255, blank=True)
@@ -37,11 +35,11 @@ class RequestedPerm(models.Model):
     added = models.BooleanField(default=False)
     founder_login = models.CharField(max_length=8, default=None)
     ambiance = models.IntegerField(default=0)
-    semestre = models.ForeignKey(core_models.Semestre, on_delete=models.SET_NULL, null=True, default=get_current_semester)
+    semestre = models.ForeignKey(core_models.Semestre, on_delete=models.SET_NULL, null=True,
+                                 default=get_current_semester)
 
 
 class Creneau(models.Model):
-
     PERM_TRAITEE = 'T'
     PERM_NON_TRAITEE = 'N'
 
@@ -58,13 +56,12 @@ class Creneau(models.Model):
 
     perm = models.ForeignKey(Perm, related_name="creneaux", on_delete=models.CASCADE)
     date = models.DateField()
-    creneau = models.CharField(max_length = 2, choices = CRENEAU_CHOICES)
+    creneau = models.CharField(max_length=2, choices=CRENEAU_CHOICES)
     state = models.CharField(choices=PERM_STATE_VALUES, max_length=1, default='N')
     montantTTCMaxAutorise = models.FloatField(null=True, default=None)
 
     def __str__(self):
         return f"{self.date}:{self.creneau}:{self.id}"
-
 
     def get_montant_deco_max(self):
         if self.montantTTCMaxAutorise:
@@ -89,11 +86,11 @@ class Creneau(models.Model):
 
         for article in articles:
             creneau_articles.append({
-                'nom': article.nom, 
+                'nom': article.nom,
                 'stock': article.stock,
                 'prixTTC': article.prix,
                 'prixHT': article.get_price_without_taxes(),
-                'TVA': article.tva   
+                'TVA': article.tva
             })
         return {
             'creneau': self,
@@ -109,21 +106,22 @@ class Creneau(models.Model):
         tva = set()
         for article in articles:
             article_info = {
-                'nom': article.nom, 
+                'nom': article.nom,
                 'prix': article.prix,
-                'ventes': article.ventes, 
+                'ventes': article.ventes,
                 'tva': article.tva
             }
             tva.add(article.tva)
             article_info['total'] = article_info['prix'] * article_info['ventes']
             perm_articles.append(article_info)
         tva_amounts = list()
-        total_ht = round(sum([article.get_price_without_taxes()*article.ventes for article in articles]), 2)
+        total_ht = round(sum([article.get_price_without_taxes() * article.ventes for article in articles]), 2)
         for tva_type in tva:
             tva_amounts.append({
                 'tva': tva_type,
-                'amount': round(sum([article.get_total_taxes() * article.ventes for article in articles if article.tva == tva_type]), 2)})
-        total_ttc = round(sum([article.prix*article.ventes for article in articles]), 2)
+                'amount': round(sum([article.get_total_taxes() * article.ventes for article in articles if
+                                     article.tva == tva_type]), 2)})
+        total_ttc = round(sum([article.prix * article.ventes for article in articles]), 2)
         return {
             'perm_articles': perm_articles,
             'total_ht': total_ht,
@@ -152,7 +150,7 @@ class Article(core_models.PricedModel):
             'cotisant': True,
             'name': self.nom + ' - ' + self.creneau.perm.nom,
             'parent': PAYUTC_ARTICLES_CATEGORY,
-            'prix': round(self.prix*100),
+            'prix': round(self.prix * 100),
             'stock': self.stock,
             'tva': self.tva,
             'variable_price': False
@@ -197,7 +195,8 @@ class Menu(models.Model):
         rep = p.get_sales(product_id__in=[self.article.id_payutc])
         for line in rep['transactions']:
             if line['status'] == 'V':
-                orderline, created = OrderLine.objects.get_or_create(id_transaction_payutc=line['id'], defaults={"menu": self})
+                orderline, created = OrderLine.objects.get_or_create(id_transaction_payutc=line['id'],
+                                                                     defaults={"menu": self})
                 if created:
                     for payments in line['rows']:
                         orderline.id_rows_payutc = payments['id']
@@ -214,9 +213,13 @@ class Menu(models.Model):
                         o.is_canceled = True
                         o.save()
         buyers_list = list()
-        orders = OrderLine.objects.filter(menu_id=self.id, quantity__gt=0, is_canceled=False).order_by('served', 'is_staff', 'id_transaction_payutc')
+        orders = OrderLine.objects.filter(menu_id=self.id, quantity__gt=0, is_canceled=False).order_by('served',
+                                                                                                       'is_staff',
+                                                                                                       'id_transaction_payutc')
         for order in orders:
-            buyers_list.append({'last_name': order.buyer_name, 'first_name': order.buyer_first_name, 'quantity': order.quantity, 'served': order.served, 'is_staff': order.is_staff, 'id_transaction': order.id_transaction_payutc})
+            buyers_list.append(
+                {'last_name': order.buyer_name, 'first_name': order.buyer_first_name, 'quantity': order.quantity,
+                 'served': order.served, 'is_staff': order.is_staff, 'id_transaction': order.id_transaction_payutc})
         return buyers_list
 
 
@@ -268,13 +271,11 @@ class Astreinte(models.Model):
 
 
 class PermHalloween(models.Model):
-
     article_id = models.IntegerField(default=0)
     login = models.CharField(null=True, default=None, max_length=10)
 
 
 class Etudiant(models.Model):
-
     login = models.CharField(null=True, default=None, max_length=10)
     mail = models.CharField(null=True, default=None, max_length=255)
     nouvo = models.BooleanField(default=False)
@@ -286,7 +287,6 @@ class Etudiant(models.Model):
 
 
 class Groupe(models.Model):
-
     goupe_id = models.CharField(null=True, default=None, max_length=10)
     login_etu = models.ManyToManyField(Etudiant)
 
@@ -295,7 +295,6 @@ class Groupe(models.Model):
 
 
 class Reservation(models.Model):
-
     TABLE_TYPE_CHOICE = (
         ('EXT', 'Table exterieur'),
         ('INT', 'Table interieur'),

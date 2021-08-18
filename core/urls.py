@@ -51,6 +51,9 @@ urlpatterns = [
 	#Inclusion URL covid
 	path('api/covid/', include('covid.urls')),
 
+	#Inclusion URL mobile app related (Chopin)
+	path('api/chopin/', include('chopin.urls')),
+
 	# Inclusion fichier Router
 	# Ce dernier contient les Viewset, 1 URL = 1 CRUD
 	# CRUD = Create, Read, Update, Deete

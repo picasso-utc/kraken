@@ -87,16 +87,3 @@ class SimpleFactureRecueSerializer(serializers.ModelSerializer):
 
 SimpleFactureRecueListSerializer = SimpleFactureRecueSerializer.many_init
 
-
-
-
-
-
-
-
-
-
-
-
-# class TvaInfo(serializers.Serializer):
-#     pass
