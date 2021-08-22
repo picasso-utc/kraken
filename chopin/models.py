@@ -1,8 +1,5 @@
 from django.db import models
 
-# Create your models here.
-from core.models import UserRight
-
 
 class Newsletter(models.Model):
     id = models.BigAutoField(primary_key=True)
@@ -11,3 +8,12 @@ class Newsletter(models.Model):
     creation_date = models.DateTimeField(auto_now=True)
     publication_date = models.DateTimeField()
     content = models.TextField()
+
+class Calendar(models.Model):
+    nom = models.CharField(max_length=255)
+    date = models.DateField()
+    periode = models.TextField(null=True, default=None)
+
+    def __str__(self):
+        return f"{self.nom}"
+

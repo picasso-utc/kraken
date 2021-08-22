@@ -59,7 +59,3 @@ class NewsletterViewSet(viewsets.ModelViewSet):
         else:
             chopin_models.Newsletter.objects.filter(id=id).delete()
             return JsonResponse({})
-
-
-
-
