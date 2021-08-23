@@ -52,3 +52,4 @@ router.register('tv/media', tv_views.WebTVMediaViewSet)
 
 # Application Chopin
 router.register('newsletter', chopin_views.NewsletterViewSet, 'newsletters')
+router.register('calendar', chopin_views.CalendarViewSet, 'calendar_app')
