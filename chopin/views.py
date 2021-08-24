@@ -95,7 +95,6 @@ class CalendarViewSet(viewsets.ModelViewSet):
             return JsonResponse({})
 
     def get_permissions(self):
-        print(self.request.method)
         if self.request.method == "GET":
             return []
         elif self.request.method == "POST":
