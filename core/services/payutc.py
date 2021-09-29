@@ -75,7 +75,6 @@ class PayutcClient:
 
 	def request(self, method: str, uri: str, data: dict={}, **kwargs):
 		# Get all request configuration
-
 		api = kwargs.get('api', 'resources')
 		url = f"{self.config['base_url']}/{api}/{uri}"
 		request_config = {
@@ -103,7 +102,6 @@ class PayutcClient:
 		# Make the request
 		request = getattr(requests, method)
 		response = request(url, **request_config)
-
 		# Keep details if needed
 		request_config['url'] = url
 		request_config['data'] = data
@@ -273,6 +271,7 @@ class PayutcClient:
 	def auto_complete(self, data):
 		"""A partir d'un string récupère les utilisateur spouvant y correspondre"""
 		data = {'queryString': data['queryString']}
+		print('AUTOCOMPLETE')
 		return self.request('post', 'USERRIGHT/userAutocomplete', data, api='services')
 
 

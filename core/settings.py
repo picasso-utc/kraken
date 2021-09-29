@@ -53,7 +53,8 @@ INSTALLED_APPS = [
 	'survey',
 	'tv',
 	'covid',
-	'chopin'
+	'chopin',
+	'shotgun'
 ]
 
 # AUTH_USER_MODEL = 'core.User'

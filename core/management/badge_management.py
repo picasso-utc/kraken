@@ -29,14 +29,14 @@ class PersonPerHourViewSet(viewsets.ViewSet):
 		ginger = g.GingerClient()
 		ginger_response = ginger.get_badge_info(badge_id)
 		first_name = ginger_response["data"]["prenom"]
-        last_name = ginger_response["data"]["nom"]
-        username = ginger_response["data"]["username"]
+		last_name = ginger_response["data"]["nom"]
+		username = ginger_response["data"]["username"]
 
 		# Création de la ligne dans la bdd
 		new_user = core_models.PersonPerHour.objects.create(
-		    user_id = badge_uid,
-		    first_name = first_name,
-		    last_name = last_name,
+			user_id = badge_id,
+			first_name = first_name,
+			last_name = last_name,
 		)
 		serializer = core_serializers.BlockedUserSerializer(queryset)
 		return JsonResponse({"user": serializer.data})

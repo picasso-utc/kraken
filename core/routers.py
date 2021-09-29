@@ -6,6 +6,7 @@ from payutc import views as payutc_views
 from survey import views as survey_views
 from tv import views as tv_views
 from chopin import views as chopin_views
+from shotgun import views as shotgun_views
 
 router = routers.DefaultRouter()
 
@@ -53,3 +54,11 @@ router.register('tv/media', tv_views.WebTVMediaViewSet)
 # Application Chopin
 router.register('newsletter', chopin_views.NewsletterViewSet, 'newsletters')
 router.register('calendar', chopin_views.CalendarViewSet, 'calendar_app')
+router.register('planning_day_type', chopin_views.TypeDayViewSet, 'planning type day')
+router.register('planning_creneau', chopin_views.CreneauViewSet, 'planning creneau')
+router.register('planning_cota', chopin_views.CotaViwSet, 'planning cota')
+router.register('planning_job', chopin_views.JobViewSet, 'planning job')
+
+#Shotgun app
+router.register('shotgun/creneau',shotgun_views.CreneauViewSet, 'creneau shotgun')
+router.register('shotgun/persons', shotgun_views.UserInShotgunViewSet, 'person in shotgun')

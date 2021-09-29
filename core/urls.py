@@ -54,6 +54,9 @@ urlpatterns = [
 	#Inclusion URL mobile app related (Chopin)
 	path('api/chopin/', include('chopin.urls')),
 
+	#include shotgun lib
+	path('api/shotgun/', include('shotgun.urls')),
+
 	# Inclusion fichier Router
 	# Ce dernier contient les Viewset, 1 URL = 1 CRUD
 	# CRUD = Create, Read, Update, Deete

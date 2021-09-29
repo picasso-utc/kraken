@@ -230,7 +230,6 @@ def send_mail(request):
     """
     perms = request.data
     for perm in perms:
-
         creneaux = []
         for creneau in perm["creneaux"]:
             creneau_information = creneau.split(":")
