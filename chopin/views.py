@@ -1,5 +1,6 @@
 from datetime import date, timedelta
 
+from django.db.models import F
 from django.http import JsonResponse
 from rest_framework.response import Response
 from rest_framework import viewsets
@@ -70,6 +71,7 @@ class NewsletterViewSet(viewsets.ModelViewSet):
 class CalendarViewSet(viewsets.ModelViewSet):
     queryset = chopin_models.Calendar.objects.all()
     serializer_class = chopin_serializers.CalendarSerializer
+
     def list(self, request, *args, **kwargs):
         try:
             nb = int(self.request.query_params.get('nb'))
@@ -77,14 +79,15 @@ class CalendarViewSet(viewsets.ModelViewSet):
             nb = 7
         startdate = date.today()
         enddate = startdate + timedelta(days=nb)
-        queryset = perms_models.Creneau.objects.select_related('perm').filter(perm__semestre=get_current_semester()).filter(date__range=[startdate, enddate])
+        queryset = perms_models.Creneau.objects.select_related('perm').filter(
+            perm__semestre=get_current_semester()).filter(date__range=[startdate, enddate])
         serializer = PermToCalendar(queryset, many=True)
-        queryset = chopin_models.Calendar.objects.all().filter(semestre=get_current_semester()).filter(date__range=[startdate, enddate])
+        queryset = chopin_models.Calendar.objects.all().filter(semestre=get_current_semester()).filter(
+            date__range=[startdate, enddate])
         value = serializer.data
         serializer = CalendarSerializer(queryset, many=True)
         value += serializer.data
         return Response(value)
-
 
     def delete(self, request, ):
         id = self.request.query_params.get('id')
@@ -104,3 +107,36 @@ class CalendarViewSet(viewsets.ModelViewSet):
         else:
             return []
 
+
+class TypeDayViewSet(viewsets.ModelViewSet):
+    queryset = chopin_models.PlanningTypeJour.objects.all()
+    serializer_class = chopin_serializers.TypeDaySerializer
+
+
+class CreneauViewSet(viewsets.ModelViewSet):
+    queryset = chopin_models.PlanningCreneau.objects.all()
+    serializer_class = chopin_serializers.CreneauSerializer
+
+
+class JobViewSet(viewsets.ModelViewSet):
+    queryset = chopin_models.PlanningJob.objects.all()
+    serializer_class = chopin_serializers.JobSerializer
+
+    def list(self, request, *args, **kwargs):
+        try:
+            nb = int(self.request.query_params.get('id_day'))
+        except TypeError:
+            nb = 0
+        if nb != 0:
+            queryset = chopin_models.PlanningCota.objects.filter(id_typejour=nb).values('id_job__titre','id_job__id','id_job__description','nb','id_creneau__hour','id_creneau__duree').distinct()
+            serializer = chopin_serializers.ListJobDay(queryset, many=True)
+            return Response(serializer.data)
+        else:
+            queryset = chopin_models.PlanningJob.objects.all()
+            serializer = chopin_serializers.JobSerializer(queryset, many=True)
+            return Response(serializer.data)
+
+
+class CotaViwSet(viewsets.ModelViewSet):
+    queryset = chopin_models.PlanningCota.objects.all()
+    serializer_class = chopin_serializers.CotaSerializer

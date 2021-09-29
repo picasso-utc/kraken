@@ -65,7 +65,7 @@ python manage.py migrate
 pg_dump kraken -U postgres -h localhost -F c > backup.sql
 # on your machine
 scp root@37.139.25.111:/root/backup.sql ./
-pg_restore -U victor -d kraken -1 ~/backup.sql
+pg_restore -U victor -d kraken -1 ./backup.sql
 ```
 If you have problems with some migrations 'contains null values', update the database (in local) that got the issue
 ```
