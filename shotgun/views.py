@@ -29,26 +29,48 @@ class CreneauViewSet(viewsets.ModelViewSet):
         else:
             return Response(status=403)
 
+    def list(self, request, pk=None):
+        right = request.session.get('right')
+        login = request.session.get('login')
+        has_full_connexion = request.session.get('connexion') == FULL_CONNEXION
+        if (right == 'M' or right == 'A') and (
+        UserRight.objects.filter(login=login, right=right).count()) and has_full_connexion:
+            queryset = shotgun_models.Creneau.objects.all()
+            serializer = shotgun_serializers.CreneauSerializer(queryset, many=True)
+            return Response(serializer.data)
+        else:
+            return Response(status=403)
+
 
 class UserInShotgunViewSet(viewsets.ModelViewSet):
     queryset = shotgun_models.UserInShotgun.objects.all()
     serializer_class = shotgun_serializers.UserInShotgunSerializer
 
-    def create(self, request, *args, **kwargs):
+    def make_shotgun(self,request):
         p = PayutcClient()
         p.login_admin()
-        creneau = shotgun_models.Creneau.objects.filter(id=request.data['id_creneau']).values('actif', 'max_people','shotgunDate')
-        if creneau[0]['actif'] and creneau[0]['shotgunDate'] < timezone.now():
-            liste = p.auto_complete({'queryString': request.data['login']})
-            if len(liste) == 1:
-                data_temp = request.data.copy()
-                data_temp['email'] = liste[0]['email']
-                serializer = self.get_serializer(data=data_temp)
-                serializer.is_valid(raise_exception=True)
-                self.perform_create(serializer)
-                headers = self.get_success_headers(serializer.data)
-                return Response({"Success": "shotgun réalisé"},status=200, headers=headers)
-            else:
-                return Response({"Fail": "votre login est invalide"},status=422)
+        data_temp = request.data.copy()
+        liste = p.auto_complete({'queryString': request.data['login']})
+        if len(liste) == 1:
+            data_temp['email'] = liste[0]['email']
+            serializer = self.get_serializer(data=data_temp)
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+            headers = self.get_success_headers(serializer.data)
+            return Response({"Success": "shotgun réalisé"}, status=200, headers=headers)
         else:
-            return Response({"Fail": "Le shotgun est terminé / n'a pas commencé"}, status=451)
+            return Response({"Fail": "votre login est invalide"}, status=422)
+
+    def create(self, request, *args, **kwargs):
+        right = request.session.get('right')
+        login = request.session.get('login')
+        has_full_connexion = request.session.get('connexion') == FULL_CONNEXION
+        if (right == 'M' or right == 'A') and (
+                UserRight.objects.filter(login=login, right=right).count()) and has_full_connexion:
+            return self.make_shotgun(request)
+        else:
+            creneau = shotgun_models.Creneau.objects.filter(id=request.data['id_creneau']).values('actif', 'max_people','shotgunDate')
+            if creneau[0]['actif'] and creneau[0]['shotgunDate'] < timezone.now():
+                return self.make_shotgun(request)
+            else:
+                return Response({"Fail": "Le shotgun est terminé / n'a pas commencé"}, status=451)
