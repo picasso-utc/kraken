@@ -271,7 +271,6 @@ class PayutcClient:
 	def auto_complete(self, data):
 		"""A partir d'un string récupère les utilisateur spouvant y correspondre"""
 		data = {'queryString': data['queryString']}
-		print('AUTOCOMPLETE')
 		return self.request('post', 'USERRIGHT/userAutocomplete', data, api='services')
 
 

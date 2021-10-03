@@ -46,6 +46,7 @@ class CreneauViewSet(viewsets.ModelViewSet):
             return Response(status=403)
 
 
+
 class UserInShotgunViewSet(viewsets.ModelViewSet):
     queryset = shotgun_models.UserInShotgun.objects.all()
     serializer_class = shotgun_serializers.UserInShotgunSerializer
@@ -78,6 +79,7 @@ class UserInShotgunViewSet(viewsets.ModelViewSet):
             return Response({"Fail": "votre login est invalide"}, status=422)
 
     def create(self, request, *args, **kwargs):
+        print('cc')
         if hasRight(request):
             creneau = shotgun_models.Creneau.objects.filter(id=request.data['id_creneau']).values('max_people')
             return self.make_shotgun(request,creneau[0]['max_people'])
@@ -88,3 +90,4 @@ class UserInShotgunViewSet(viewsets.ModelViewSet):
                 return self.make_shotgun(request,creneau[0]['max_people'])
             else:
                 return Response({"Fail": "Le shotgun est terminé / n'a pas commencé"}, status=451)
+
