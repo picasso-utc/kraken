@@ -1,6 +1,4 @@
 from datetime import date, timedelta
-
-from django.db.models import F
 from django.http import JsonResponse
 from rest_framework.response import Response
 from rest_framework import viewsets
@@ -128,7 +126,10 @@ class JobViewSet(viewsets.ModelViewSet):
         except TypeError:
             nb = 0
         if nb != 0:
-            queryset = chopin_models.PlanningCota.objects.filter(id_typejour=nb).values('id_job__titre','id_job__id','id_job__description','nb','id_creneau__hour','id_creneau__duree').distinct()
+            queryset = chopin_models.PlanningCota.objects.filter(id_typejour=nb).values('id_job__titre', 'id_job__id',
+                                                                                        'id_job__description', 'nb',
+                                                                                        'id_creneau__hour',
+                                                                                        'id_creneau__duree').distinct()
             serializer = chopin_serializers.ListJobDay(queryset, many=True)
             return Response(serializer.data)
         else:

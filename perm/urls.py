@@ -1,13 +1,12 @@
-from django.urls import path, include
-from rest_framework import routers
+from django.urls import path
 
 from perm import views as perm_views
 
 urlpatterns = [
-	path('payutc/article/<int:id>', perm_views.create_payutc_article),
-	path('sales/article/<int:id>', perm_views.get_article_sales),
-	path('sales/<int:id>', perm_views.get_creneau_sales),
-	path('current/creneau', perm_views.get_current_creneau),
+    path('payutc/article/<int:id>', perm_views.create_payutc_article),
+    path('sales/article/<int:id>', perm_views.get_article_sales),
+    path('sales/<int:id>', perm_views.get_creneau_sales),
+    path('current/creneau', perm_views.get_current_creneau),
     path('current/public/creneau', perm_views.get_current_public_creneau),
     path('menu/orders/<int:id>', perm_views.get_order_lines),
     path('menu/served/<int:id>', perm_views.set_ordeline_served),

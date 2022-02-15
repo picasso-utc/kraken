@@ -52,11 +52,10 @@ class ListJobDay(serializers.ModelSerializer):
     hour = serializers.CharField(source='id_creneau__hour')
     duree = serializers.CharField(source='id_creneau__duree')
 
-
     class Meta:
         model = chopin_models.PlanningJob
         exclude = list()
-        fields = ('id','titre','description','nb','hour','duree')
+        fields = ('id', 'titre', 'description', 'nb', 'hour', 'duree')
 
 
 class CotaSerializer(serializers.ModelSerializer):

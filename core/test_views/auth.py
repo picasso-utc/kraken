@@ -12,16 +12,16 @@ def login_cas(request, format=None):
         Récupération username et sessionid sur Weez
         Crée une session dans l'API
     """
-    
+
     service = "http://localhost:8000" + request.path
     ticket = request.GET.get('ticket')
 
     if ticket is None:
         url = f"https://cas.utc.fr/cas/login?service={service}"
         return redirect(url)
-    
+
     payutc = PayutcClient()
-    response = payutc.cas({"ticket":ticket, "service":service})
+    response = payutc.cas({"ticket": ticket, "service": service})
     request.session["username"] = response['username']
     request.session["sessionid"] = response['sessionid']
 
@@ -39,7 +39,7 @@ def login_badge(request, format=None):
 
     payutc = PayutcClient()
     response = payutc.badge({"badge_id": body_content["badge_id"], "pin": body_content["pin"]})
-    
+
     request.session["username"] = response['username']
     request.session["sessionid"] = response['sessionid']
     request.session["permission"] = "admin"
@@ -52,7 +52,7 @@ def is_login(request, format=None):
     """Vérifie que l'utilisateur est bien connecté en regardant la session"""
 
     if request.session.get("username") and request.session.get("sessionid") and request.session.get("permission"):
-        return Response({"login" : True})
+        return Response({"login": True})
     return Response({"login": False})
 
 
@@ -62,6 +62,7 @@ def get_user_permissions(request, format=None):
     permission = request.session.get("permission")
     return Response({"permission": permission})
 
+
 @api_view(['GET'])
 def get_user_details(request, format=None):
     """Récupère les informations d'un utilisateur"""
@@ -69,7 +70,7 @@ def get_user_details(request, format=None):
     routes = payutc.list_routes()
     # print(routes)
     # details = payutc.get_user_details
-    
+
     # print(details.json())
     # print("ok")
     return Response(routes)
@@ -83,6 +84,3 @@ def logout(request, format=None):
     for key in session_keys:
         del request.session[key]
     return Response({})
-    
-    
-

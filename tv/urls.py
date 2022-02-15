@@ -1,5 +1,4 @@
-from django.urls import path, include
-from rest_framework import routers
+from django.urls import path
 
 from tv import views as tv_views
 
