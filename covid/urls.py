@@ -1,8 +1,7 @@
-from django.urls import path, include
-from rest_framework import routers
+from django.urls import path
 
 from covid import views as covid_view
 
 urlpatterns = [
-	path('occupation', covid_view.get_occupation)
+    path('occupation', covid_view.get_occupation)
 ]

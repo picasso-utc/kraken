@@ -4,6 +4,7 @@ from treso import serializers as treso_serializers
 from core import serializers as core_serializers
 from core import models as core_models
 
+
 class RequestedPermSerializer(serializers.ModelSerializer):
     class Meta:
         model = perm_models.RequestedPerm
@@ -26,7 +27,7 @@ class PermPublicSerializer(serializers.ModelSerializer):
 
 
 class ArticleSerializer(serializers.ModelSerializer):
-    creneau = serializers.PrimaryKeyRelatedField(queryset = perm_models.Creneau.objects.all())
+    creneau = serializers.PrimaryKeyRelatedField(queryset=perm_models.Creneau.objects.all())
     menu = serializers.StringRelatedField(many=True, read_only=True)
 
     class Meta:
@@ -35,9 +36,8 @@ class ArticleSerializer(serializers.ModelSerializer):
 
 
 class CreneauSerializer(serializers.ModelSerializer):
-    
-    perm = PermSerializer(read_only=True)    
-    facturerecue_set = treso_serializers.FactureRecueSerializer(many = True, read_only = True)
+    perm = PermSerializer(read_only=True)
+    facturerecue_set = treso_serializers.FactureRecueSerializer(many=True, read_only=True)
     article_set = ArticleSerializer(many=True, read_only=True)
     perm_id = serializers.PrimaryKeyRelatedField(queryset=perm_models.Perm.objects.all(), source="perm")
 
@@ -48,7 +48,6 @@ class CreneauSerializer(serializers.ModelSerializer):
 
 
 class CreneauAstreinteSerializer(serializers.ModelSerializer):
-    
     perm = PermPublicSerializer(read_only=True)
     astreintes = serializers.StringRelatedField(many=True, required=False, read_only=True)
 
@@ -58,13 +57,12 @@ class CreneauAstreinteSerializer(serializers.ModelSerializer):
 
 
 class CreneauPublicSerializer(serializers.ModelSerializer):
-    
-    perm = PermPublicSerializer(read_only=True)    
+    perm = PermPublicSerializer(read_only=True)
 
     class Meta:
         model = perm_models.Creneau
         fields = ('id', 'perm', 'creneau', 'date')
-    
+
 
 class OrderLinesSerializer(serializers.ModelSerializer):
     class Meta:
@@ -78,10 +76,11 @@ class MenuSerializer(serializers.ModelSerializer):
         model = perm_models.Menu
         fields = ('article',)
 
-        
+
 class SignatureSerializer(serializers.ModelSerializer):
-    creneau = CreneauSerializer(read_only=True) 
+    creneau = CreneauSerializer(read_only=True)
     creneau_id = serializers.PrimaryKeyRelatedField(queryset=perm_models.Creneau.objects.all(), source="creneau")
+
     class Meta:
         model = perm_models.Signature
         exclude_list = list()
@@ -89,19 +88,17 @@ class SignatureSerializer(serializers.ModelSerializer):
 
 
 class AstreinteSerializer(serializers.ModelSerializer):
-
-    creneau = CreneauSerializer(read_only=True) 
+    creneau = CreneauSerializer(read_only=True)
     creneau_id = serializers.PrimaryKeyRelatedField(queryset=perm_models.Creneau.objects.all(), source="creneau")
     member = core_serializers.ShortMemberSerializer(read_only=True)
     member_id = serializers.PrimaryKeyRelatedField(queryset=core_models.Member.objects.all(), source="member")
 
     class Meta:
         model = perm_models.Astreinte
-        exclude =  list()
+        exclude = list()
 
 
 class PermHalloweenSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = perm_models.PermHalloween
         fields = ('id', 'login', 'article_id')

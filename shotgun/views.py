@@ -46,7 +46,6 @@ class CreneauViewSet(viewsets.ModelViewSet):
             return Response(status=403)
 
 
-
 class UserInShotgunViewSet(viewsets.ModelViewSet):
     queryset = shotgun_models.UserInShotgun.objects.all()
     serializer_class = shotgun_serializers.UserInShotgunSerializer
@@ -59,14 +58,15 @@ class UserInShotgunViewSet(viewsets.ModelViewSet):
         else:
             return Response(status=403)
 
-    def make_shotgun(self, request,max):
+    def make_shotgun(self, request, max):
         p = PayutcClient()
         p.login_admin()
         data_temp = request.data.copy()
         liste = p.auto_complete({'queryString': request.data['login']})
         if len(liste) == 1:
             data_temp['email'] = liste[0]['email']
-            nbListe = shotgun_models.Creneau.objects.select_related('user').filter(userinshotgun__id_creneau=request.data['id_creneau']).count()
+            nbListe = shotgun_models.Creneau.objects.select_related('user').filter(
+                userinshotgun__id_creneau=request.data['id_creneau']).count()
             if nbListe < max:
                 serializer = self.get_serializer(data=data_temp)
                 serializer.is_valid(raise_exception=True)
@@ -82,12 +82,11 @@ class UserInShotgunViewSet(viewsets.ModelViewSet):
         print('cc')
         if hasRight(request):
             creneau = shotgun_models.Creneau.objects.filter(id=request.data['id_creneau']).values('max_people')
-            return self.make_shotgun(request,creneau[0]['max_people'])
+            return self.make_shotgun(request, creneau[0]['max_people'])
         else:
             creneau = shotgun_models.Creneau.objects.filter(id=request.data['id_creneau']).values('actif', 'max_people',
-                                                                        'shotgunDate')
+                                                                                                  'shotgunDate')
             if creneau[0]['actif'] and creneau[0]['shotgunDate'] < timezone.now():
-                return self.make_shotgun(request,creneau[0]['max_people'])
+                return self.make_shotgun(request, creneau[0]['max_people'])
             else:
                 return Response({"Fail": "Le shotgun est terminé / n'a pas commencé"}, status=451)
-

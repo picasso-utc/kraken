@@ -2,6 +2,8 @@ from django.db import models
 from core import models as core_models
 from perm import models as perm_models
 from core.services.current_semester import get_current_semester
+
+
 class Newsletter(models.Model):
     id = models.BigAutoField(primary_key=True)
     author_id = models.CharField(max_length=20)

@@ -59,6 +59,6 @@ router.register('planning_creneau', chopin_views.CreneauViewSet, 'planning crene
 router.register('planning_cota', chopin_views.CotaViwSet, 'planning cota')
 router.register('planning_job', chopin_views.JobViewSet, 'planning job')
 
-#Shotgun app
-router.register('shotgun/creneau',shotgun_views.CreneauViewSet, 'creneau shotgun')
+# Shotgun app
+router.register('shotgun/creneau', shotgun_views.CreneauViewSet, 'creneau shotgun')
 router.register('shotgun/persons', shotgun_views.UserInShotgunViewSet, 'person in shotgun')

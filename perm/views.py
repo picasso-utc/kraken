@@ -1,33 +1,31 @@
-from rest_framework.decorators import api_view, permission_classes
-from django.http import JsonResponse, HttpResponse
-from rest_framework import viewsets, mixins
-from . import serializers as perm_serializers
-from django.template.loader import get_template, render_to_string
-from .import models as perm_models
-from django.shortcuts import render
-from core.permissions import IsAdminUser, IsAuthenticatedUser, IsMemberUser, IsMemberUserOrReadOnly, CanAccessMenuFunctionnalities, HasApplicationRight
 import datetime
-from core.settings import DEFAULT_FROM_EMAIL
-from django.core.mail import send_mail
-from datetime import date, datetime, timedelta
-from django.core.mail import EmailMessage
-from tv import models as tv_models
-from tv import serializers as tv_serializers
-from constance import config
-from core import models as core_models
-from core.settings import CONSTANCE_CONFIG
-from core.services.current_semester import get_current_semester, get_request_semester
-from core.services.portal import PortalClient
-from core.settings import FRONT_URL
+import os
+from datetime import datetime, timedelta
+
 import pdfkit
 from PyPDF2 import PdfFileMerger, PdfFileReader
-import os
+from constance import config
+from django.core.mail import EmailMessage
+from django.http import JsonResponse, HttpResponse
+from django.template.loader import render_to_string
+from rest_framework import viewsets, mixins
+from rest_framework.decorators import api_view, permission_classes
+
+from core.permissions import IsAuthenticatedUser, IsMemberUser, CanAccessMenuFunctionnalities, HasApplicationRight
+from core.services.current_semester import get_current_semester, get_request_semester
+from core.services.portal import PortalClient
+from core.settings import DEFAULT_FROM_EMAIL
+from core.settings import FRONT_URL
+from tv import models as tv_models
+from . import models as perm_models
+from . import serializers as perm_serializers
 
 
 class PermViewSet(viewsets.ModelViewSet):
     """ViewSet des perms"""
     serializer_class = perm_serializers.PermSerializer
     permission_classes = (IsMemberUser,)
+
     def get_queryset(self):
         qs = perm_models.Perm.objects
         return get_request_semester(qs, self.request)
@@ -37,13 +35,14 @@ class CreneauViewSet(viewsets.ModelViewSet):
     """ViewSet des créneaux"""
     serializer_class = perm_serializers.CreneauSerializer
     permission_classes = (IsMemberUser,)
+
     def get_queryset(self):
         qs = perm_models.Creneau.objects
         return get_request_semester(qs, self.request, "perm__semestre__id")
 
 
 @api_view(['GET'])
-@permission_classes((IsMemberUser, ))
+@permission_classes((IsMemberUser,))
 def get_creneau_sales(request, id):
     """Obtenir les ventes d'un créneau"""
     c = perm_models.Creneau.objects.get(pk=id)
@@ -55,10 +54,12 @@ class ArticleViewSet(viewsets.ModelViewSet):
     queryset = perm_models.Article.objects.all()
     permission_classes = (IsMemberUser,)
 
+
 class AstreinteViewSet(viewsets.ModelViewSet):
     """ViewSet Astreinte"""
     serializer_class = perm_serializers.AstreinteSerializer
     permission_classes = (IsMemberUser,)
+
     def get_queryset(self):
         qs = perm_models.Astreinte.objects
         return get_request_semester(qs, self.request, "member__semestre__id")
@@ -80,7 +81,7 @@ class SignatureViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
 
 
 @api_view(['GET'])
-@permission_classes((IsMemberUser, ))
+@permission_classes((IsMemberUser,))
 def create_payutc_article(request, id):
     """
         Permet d'obtenir, pour un article de pk {id}, d'enregistrer l'article dans PayUTC.
@@ -97,12 +98,12 @@ def create_payutc_article(request, id):
     tv_1.save()
     tv_2.link = menu_link
     tv_2.save()
-    
+
     return JsonResponse({})
 
 
 @api_view(['GET'])
-@permission_classes((IsMemberUser, ))
+@permission_classes((IsMemberUser,))
 def get_article_sales(request, id):
     """Permet d'obtenir, pour un article de pk {id}, le nombre de ventes."""
     article = perm_models.Article.objects.get(pk=id)
@@ -113,7 +114,7 @@ def get_article_sales(request, id):
 def get_creneau(date):
     """Déterminer si la perm en cours est celle du matin, du midi ou du soir"""
     hour = date.time().hour
-    if hour >= 16 :
+    if hour >= 16:
         return 'S'
     elif hour >= 11:
         return 'D'
@@ -121,7 +122,7 @@ def get_creneau(date):
 
 
 @api_view(['GET'])
-@permission_classes((IsMemberUser, ))
+@permission_classes((IsMemberUser,))
 def get_current_creneau(request):
     """Obtenir le créneau en cours"""
     date = datetime.now()
@@ -139,7 +140,7 @@ def get_current_public_creneau(request):
     """Obtenir le créneau en cours (sans être authentifié)"""
     date = datetime.now()
     creneau = get_creneau(date)
-    
+
     queryset = perm_models.Creneau.objects.filter(creneau=creneau, date=date)
     serializer = perm_serializers.CreneauPublicSerializer(queryset, many=True)
     current_creneau = dict()
@@ -149,7 +150,7 @@ def get_current_public_creneau(request):
 
 
 @api_view(['GET'])
-@permission_classes((CanAccessMenuFunctionnalities, ))
+@permission_classes((CanAccessMenuFunctionnalities,))
 def get_order_lines(request, id):
     """Obtenir les commandes pour un menu à partir de l'id de l'article"""
     menu = perm_models.Menu.objects.get(article__id_payutc=id)
@@ -159,14 +160,15 @@ def get_order_lines(request, id):
     orderlines_served = orderlines.filter(served=True)
     served_quantity = sum(order.quantity for order in orderlines_served)
     return JsonResponse({
-        'menu': {'name': menu.article.nom, 'quantity': menu.article.stock, 'id_payutc': id, 'total_quantity': total_quantity,
+        'menu': {'name': menu.article.nom, 'quantity': menu.article.stock, 'id_payutc': id,
+                 'total_quantity': total_quantity,
                  'served_quantity': served_quantity},
         'orders': orders
     })
 
 
 @api_view(['POST'])
-@permission_classes((CanAccessMenuFunctionnalities, ))
+@permission_classes((CanAccessMenuFunctionnalities,))
 def set_ordeline_served(request, id):
     """
     Permet de dire qu'un menu a été donné.
@@ -181,7 +183,7 @@ def set_ordeline_served(request, id):
 
 
 @api_view(['POST'])
-@permission_classes((CanAccessMenuFunctionnalities, ))
+@permission_classes((CanAccessMenuFunctionnalities,))
 def set_ordeline_staff(request, id):
     """
     Permet de dire qu'un menu doit être reporté ou non reporté s'il l'est déjà.
@@ -196,7 +198,7 @@ def set_ordeline_staff(request, id):
 
 
 @api_view(['POST'])
-@permission_classes((CanAccessMenuFunctionnalities, ))
+@permission_classes((CanAccessMenuFunctionnalities,))
 def set_menu_closed(request, id):
     """
     Ferme le menu
@@ -223,7 +225,7 @@ def set_menu_closed(request, id):
 
 
 @api_view(['POST'])
-@permission_classes((IsMemberUser, ))
+@permission_classes((IsMemberUser,))
 def send_mail(request):
     """
     Envoie l'email d'annonce des perms à toutes les perms de la requête
@@ -257,7 +259,7 @@ def send_mail(request):
             from_email=DEFAULT_FROM_EMAIL,
             to=[perm['mail_resp']],
         )
-        email.content_subtype = "html" # this is the crucial part 
+        email.content_subtype = "html"  # this is the crucial part
         email.attach_file('core/templates/exemple_planning.xlsx')
         email.send()
         print(f"Envoi du mail {perm['nom']}")
@@ -288,7 +290,7 @@ def send_creneau_reminder(request):
             from_email=DEFAULT_FROM_EMAIL,
             to=[creneau['perm']['mail_resp']],
         )
-        email.content_subtype = "html" # this is the crucial part 
+        email.content_subtype = "html"  # this is the crucial part
         if creneau['creneau'] == 'S':
             email.attach_file('core/templates/exemple_planning.xlsx')
         email.send()
@@ -306,15 +308,15 @@ def get_week_calendar(request):
 
 
 @api_view(['GET'])
-@permission_classes((IsMemberUser, ))
+@permission_classes((IsMemberUser,))
 def get_user_astreintes(request):
     """Obtenir les astreintes d'un membre du Pic"""
     member_id = request.session.get('member_id')
 
     if member_id:
         print(member_id)
-        astreinte_queryset = perm_models.Astreinte.objects.filter(member_id = member_id)
-        astreintes = perm_serializers.AstreinteSerializer(astreinte_queryset, many = True)
+        astreinte_queryset = perm_models.Astreinte.objects.filter(member_id=member_id)
+        astreintes = perm_serializers.AstreinteSerializer(astreinte_queryset, many=True)
 
         return JsonResponse({'astreintes': astreintes.data})
 
@@ -322,7 +324,7 @@ def get_user_astreintes(request):
 
 
 @api_view(['POST'])
-@permission_classes((IsMemberUser, ))
+@permission_classes((IsMemberUser,))
 def get_week_astreintes(request):
     """
     Obtenir les créneaux entre deux dates entrées en paramètre
@@ -368,12 +370,11 @@ def get_perms_for_notation(request):
     creneaux = serializer.data
     perms = dict()
 
-    for creneau in creneaux : 
+    for creneau in creneaux:
 
         perm_id = creneau["perm"]["id"]
 
-        if perm_id not in perms : 
-
+        if perm_id not in perms:
             perms[perm_id] = {}
             perms[perm_id] = creneau["perm"]
             perms[perm_id].pop("creneaux")
@@ -389,7 +390,6 @@ def get_perms_for_notation(request):
             perms[perm_id]["nb_astreintes"] = 0
 
         if not any(c for c in perms[perm_id]["creneau"] if c["id"] == creneau["id"]):
-
             creneau_data = creneau
             creneau_data.pop("perm")
             creneau_data.pop("state")
@@ -409,10 +409,10 @@ def get_perms_for_notation(request):
 
         if perm_id in perms:
 
-            notation  = {
+            notation = {
                 "astreinte_type": astreinte["astreinte_type"],
                 "note_deco": astreinte["note_deco"],
-                "note_orga" : astreinte["note_orga"],
+                "note_orga": astreinte["note_orga"],
                 "note_anim": astreinte["note_anim"],
                 "note_menu": astreinte["note_menu"],
                 "commentaire": astreinte["commentaire"]
@@ -438,33 +438,32 @@ def get_perms_for_notation(request):
                     break
 
     keys = perms.keys()
-    for key in keys :
+    for key in keys:
 
         # Obtenir la moyenne générale
         mean_note = 0
         mean_keys = 0
 
-        if perms[key]["nb_note_deco"] > 0 :
-            perms[key]["note_deco"] = round(perms[key]["note_deco"] / perms[key]["nb_note_deco"],2)
+        if perms[key]["nb_note_deco"] > 0:
+            perms[key]["note_deco"] = round(perms[key]["note_deco"] / perms[key]["nb_note_deco"], 2)
             mean_note += perms[key]["note_deco"]
             mean_keys += 1
-        if perms[key]["nb_note_menu"] > 0 :
-            perms[key]["note_menu"] = round(perms[key]["note_menu"] / perms[key]["nb_note_menu"],2)
+        if perms[key]["nb_note_menu"] > 0:
+            perms[key]["note_menu"] = round(perms[key]["note_menu"] / perms[key]["nb_note_menu"], 2)
             mean_note += perms[key]["note_menu"]
             mean_keys += 1
-        if perms[key]["nb_note_orga"] > 0 :
-            perms[key]["note_orga"] = round(perms[key]["note_orga"] / perms[key]["nb_note_orga"],2)
+        if perms[key]["nb_note_orga"] > 0:
+            perms[key]["note_orga"] = round(perms[key]["note_orga"] / perms[key]["nb_note_orga"], 2)
             mean_note += perms[key]["note_orga"]
             mean_keys += 1
-        if perms[key]["nb_note_anim"] > 0 :
-            perms[key]["note_anim"] = round(perms[key]["note_anim"] / perms[key]["nb_note_anim"],2)
+        if perms[key]["nb_note_anim"] > 0:
+            perms[key]["note_anim"] = round(perms[key]["note_anim"] / perms[key]["nb_note_anim"], 2)
             mean_note += perms[key]["note_anim"]
             mean_keys += 1
 
         if mean_keys > 0:
-            mean_note = round(mean_note / mean_keys,2)
+            mean_note = round(mean_note / mean_keys, 2)
         perms[key]["mean_note"] = mean_note
-
 
     return JsonResponse({'perms': list(perms.values())})
 
@@ -481,10 +480,9 @@ def get_perm_for_notation(request, perm_id):
 
     perm = dict()
 
-    for creneau in creneaux : 
+    for creneau in creneaux:
 
-        if "creneau" not in perm : 
-
+        if "creneau" not in perm:
             perm = creneau["perm"]
             perm.pop("creneaux")
             perm["creneau"] = []
@@ -505,7 +503,6 @@ def get_perm_for_notation(request, perm_id):
             perm["nb_note_s"] = 0
 
         if not any(c for c in perm["creneau"] if c["id"] == creneau["id"]):
-
             creneau_data = creneau
             creneau_data.pop("perm")
             creneau_data.pop("state")
@@ -514,12 +511,11 @@ def get_perm_for_notation(request, perm_id):
             creneau_data["notation"] = []
             perm["creneau"].append(creneau_data)
 
-    if "id" in perm :
+    if "id" in perm:
 
         queryset = perm_models.Astreinte.objects.filter(creneau__perm__id=perm_id)
         serializer = perm_serializers.AstreinteSerializer(queryset, many=True)
 
-        
         creneau_keys = {
             'M': ('mean_m', 'nb_note_m'),
             'D': ('mean_d', 'nb_note_d'),
@@ -532,10 +528,10 @@ def get_perm_for_notation(request, perm_id):
 
             if perm_id == astreinte["creneau"]["perm"]["id"]:
 
-                notation  = {
+                notation = {
                     "astreinte_type": astreinte["astreinte_type"],
                     "note_deco": astreinte["note_deco"],
-                    "note_orga" : astreinte["note_orga"],
+                    "note_orga": astreinte["note_orga"],
                     "note_anim": astreinte["note_anim"],
                     "note_menu": astreinte["note_menu"],
                     "commentaire": astreinte["commentaire"]
@@ -569,30 +565,30 @@ def get_perm_for_notation(request, perm_id):
                         break
 
         if perm["nb_note_m"] > 0:
-            perm["mean_m"] = round(perm["mean_m"] / perm["nb_note_m"],2)
-        else :
+            perm["mean_m"] = round(perm["mean_m"] / perm["nb_note_m"], 2)
+        else:
             perm["mean_m"] = None
         if perm["nb_note_d"] > 0:
-            perm["mean_d"] = round(perm["mean_d"] / perm["nb_note_d"],2)
-        else :
+            perm["mean_d"] = round(perm["mean_d"] / perm["nb_note_d"], 2)
+        else:
             perm["mean_d"] = None
         if perm["nb_note_s"] > 0:
-            perm["mean_s"] = round(perm["mean_s"] / perm["nb_note_s"],2)
-        else :
+            perm["mean_s"] = round(perm["mean_s"] / perm["nb_note_s"], 2)
+        else:
             perm["mean_s"] = None
 
-        if perm["nb_note_deco"] > 0 :
-            perm["note_deco"] = round(perm["note_deco"] / perm["nb_note_deco"],2)
-        if perm["nb_note_menu"] > 0 :
-            perm["note_menu"] = round(perm["note_menu"] / perm["nb_note_menu"],2)
-        if perm["nb_note_orga"] > 0 :
-            perm["note_orga"] = round(perm["note_orga"] / perm["nb_note_orga"],2)
-        if perm["nb_note_anim"] > 0 :
-            perm["note_anim"] = round(perm["note_anim"] / perm["nb_note_anim"],2)
+        if perm["nb_note_deco"] > 0:
+            perm["note_deco"] = round(perm["note_deco"] / perm["nb_note_deco"], 2)
+        if perm["nb_note_menu"] > 0:
+            perm["note_menu"] = round(perm["note_menu"] / perm["nb_note_menu"], 2)
+        if perm["nb_note_orga"] > 0:
+            perm["note_orga"] = round(perm["note_orga"] / perm["nb_note_orga"], 2)
+        if perm["nb_note_anim"] > 0:
+            perm["note_anim"] = round(perm["note_anim"] / perm["nb_note_anim"], 2)
 
         return JsonResponse(perm)
 
-    else : 
+    else:
         return JsonResponse({})
 
 
@@ -613,16 +609,27 @@ def update_perm_may_be_requested_setting(request):
 
 
 # A revoir pour le semestre courant
+def retrieve(request, pk=None):
+    requested_perm = perm_models.RequestedPerm.objects.get(pk=pk)
+    serializer = perm_serializers.RequestedPermSerializer(requested_perm)
+
+    # Check if the user is the founder of the requested_perm object
+    login = request.session.get('login')
+    if login == serializer.data["founder_login"]:
+        return JsonResponse({'perm': serializer.data})
+
+    return JsonResponse({"error": "Vous n'avez pas la permission d'accéder à cette ressource"}, status=403)
+
+
 class RequestedPermViewSet(viewsets.ViewSet):
     """ViewSet à la mano des perms demandées"""
 
-
-    def list(self, request):
+    @staticmethod
+    def list(request):
         queryset = perm_models.RequestedPerm.objects.filter(semestre__id=get_current_semester())
         serializer = perm_serializers.RequestedPermSerializer(queryset, many=True)
 
         return JsonResponse({'requested_perms': serializer.data})
-
 
     def create(self, request):
         if not self.perm_may_be_requested():
@@ -630,26 +637,27 @@ class RequestedPermViewSet(viewsets.ViewSet):
         serializer = perm_serializers.RequestedPermSerializer(request.data)
         requested_perm = serializer.data
         new_requested_perm = perm_models.RequestedPerm.objects.create(
-            nom = requested_perm["nom"],
-            asso = requested_perm["asso"],
-            mail_asso = requested_perm["mail_asso"],
-            nom_resp = requested_perm["nom_resp"],
-            mail_resp = requested_perm["mail_resp"],
-            nom_resp_2 = requested_perm["nom_resp_2"],
-            mail_resp_2 = requested_perm["mail_resp_2"],
-            theme = requested_perm["theme"],
-            description = requested_perm["description"],
-            membres = requested_perm["membres"],
-            founder_login = requested_perm["founder_login"],
-            ambiance = requested_perm["ambiance"],
-            periode = requested_perm["periode"]
+            nom=requested_perm["nom"],
+            asso=requested_perm["asso"],
+            mail_asso=requested_perm["mail_asso"],
+            nom_resp=requested_perm["nom_resp"],
+            mail_resp=requested_perm["mail_resp"],
+            nom_resp_2=requested_perm["nom_resp_2"],
+            mail_resp_2=requested_perm["mail_resp_2"],
+            theme=requested_perm["theme"],
+            description=requested_perm["description"],
+            membres=requested_perm["membres"],
+            founder_login=requested_perm["founder_login"],
+            ambiance=requested_perm["ambiance"],
+            periode=requested_perm["periode"]
         )
 
         url = FRONT_URL + "/perm/form?form_id=" + str(new_requested_perm.pk)
         mail_content = "Coucou,\n\n" \
-                        + "Ta demande de perm " +  requested_perm["nom"] + " a bien été enregistrée. Tu peux la modifier ici : \n" \
-                        + url + "\n\n" \
-                        + "La bise, et à bientôt au Pic'Asso !"
+                       + "Ta demande de perm " + requested_perm[
+                           "nom"] + " a bien été enregistrée. Tu peux la modifier ici : \n" \
+                       + url + "\n\n" \
+                       + "La bise, et à bientôt au Pic'Asso !"
         email = EmailMessage(
             subject=f"Pic'Asso - Demande de perm",
             body=mail_content,
@@ -660,25 +668,12 @@ class RequestedPermViewSet(viewsets.ViewSet):
 
         return JsonResponse({"id": new_requested_perm.pk})
 
-
-    def retrieve(self, request, pk=None):
-        requested_perm = perm_models.RequestedPerm.objects.get(pk=pk)
-        serializer = perm_serializers.RequestedPermSerializer(requested_perm)
-
-        #Check if the user is the founder of the requested_perm object
-        login = request.session.get('login')
-        if login == serializer.data["founder_login"]:
-            return JsonResponse({'perm': serializer.data})
-
-        return JsonResponse({"error": "Vous n'avez pas la permission d'accéder à cette ressource"}, status=403)
-
-
     def update(self, request, pk=None):
         if not self.perm_may_be_requested():
             return JsonResponse({'error': 'Il n\'est pas possible de mettre à jour une perm.'})
         requested_perm = perm_models.RequestedPerm.objects.get(pk=pk)
 
-        #Check if the user is the founder of the requested_perm object
+        # Check if the user is the founder of the requested_perm object
         login = request.session.get('login')
         if login != requested_perm.founder_login:
             return JsonResponse({"error": "Vous n'avez pas la permission d'accéder à cette ressource"}, status=403)
@@ -696,22 +691,22 @@ class RequestedPermViewSet(viewsets.ViewSet):
         requested_perm.ambiance = request.data["ambiance"]
         requested_perm.periode = request.data["periode"]
         requested_perm.save(update_fields=[
-            'nom', 'asso', 'mail_asso', 'nom_resp', 'mail_resp', 'nom_resp_2', 'mail_resp_2', 'theme', 'description', 'membres', 'founder_login',
-            'ambiance', 'periode'    
+            'nom', 'asso', 'mail_asso', 'nom_resp', 'mail_resp', 'nom_resp_2', 'mail_resp_2', 'theme', 'description',
+            'membres', 'founder_login',
+            'ambiance', 'periode'
         ])
         return JsonResponse({})
 
-
-    def partial_update(self, request, pk=None):
+    @staticmethod
+    def partial_update(request, pk=None):
         requested_perm = perm_models.RequestedPerm.objects.get(pk=pk)
         requested_perm.added = not requested_perm.added
         requested_perm.save()
         return JsonResponse({})
 
-
-    def perm_may_be_requested(self):
+    @staticmethod
+    def perm_may_be_requested():
         return config.__getattr__('PERM_MAY_BE_REQUESTED')
-
 
     def get_permissions(self):
         """
@@ -733,10 +728,9 @@ def get_pdf_requested_perms(request):
 
     filenames = []
     for requested_perm in serializer.data:
-
         html_page = render_to_string('requested_perm.html', {'requested_perm': requested_perm})
         filename = 'requested_perm_id_' + str(requested_perm["id"]) + '.pdf'
-        pdf= pdfkit.from_string(html_page, filename)
+        pdf = pdfkit.from_string(html_page, filename)
         filenames.append(filename)
 
     merger = PdfFileMerger()
@@ -760,4 +754,4 @@ def get_portal_assos(request):
     """Obtenir les associations de l'UTC via le Portail des assos"""
     p = PortalClient()
     response = p.get_assos()
-    return JsonResponse({'assos': response['data']}, status = response['status'])
+    return JsonResponse({'assos': response['data']}, status=response['status'])
