@@ -92,15 +92,15 @@ class GoodiesWinnerViewSet(mixins.ListModelMixin,
 @permission_classes((IsAuthenticatedUser,))
 def user_autocomplete(request, query, format=None):
     """
-	Récupération à parti d'une query string des utilisateurs
-	sur Payutc pouvant être susceptible de ressembler à la query
-	"""
+    Récupération à parti d'une query string des utilisateurs
+    sur Payutc pouvant être susceptible de ressembler à la query
+    """
 
     data = {
         'queryString': query
     }
     sessionid = request.session['payutc_session']
-    p = PayutcClient()
+    p = PayutcClient(sessionid)
     p.login_admin()
     return JsonResponse({'users': p.auto_complete(data)})
 

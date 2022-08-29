@@ -82,7 +82,7 @@ def login_badge(request, format=None):
     pin = body_content["pin"]
     p = PayutcClient()
     resp = p.login_badge(badge_id=badge_id, pin=pin)
-    if (not _is_user_member(resp["username"])):
+    if not _is_user_member(resp["username"]):
         return JsonResponse({"error": "Vous n'êtes pas autorisé à effectuer cette action."}, status=403)
     connexion_type = _get_connexion_type(request)
     _set_session_information(request, resp['username'], resp['sessionid'], connexion_type)
@@ -96,7 +96,7 @@ def login_username(request, format=None):
     body_content = request.data
     username = body_content["username"]
     pin = body_content["pin"]
-    if (not _is_user_member(username)):
+    if not _is_user_member(username):
         return JsonResponse({"error": "Vous n'êtes pas autorisé à effectuer cette action."}, status=403)
     ginger = GingerClient()
     ginger_response = ginger.get_user_info(username)

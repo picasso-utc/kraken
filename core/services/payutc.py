@@ -56,16 +56,19 @@ class PayutcClient:
     The Payutc Client for Weezevent
     """
 
-    def __init__(self, sessionid=None, config: dict = {}):
-        self.config = {**BASE_CONFIG, **config}
-        self.config['sessionid'] = sessionid
+    def __init__(self, sessionid=None, config=None):
+        if config is None:
+            config = {}
+        self.config = {**BASE_CONFIG, **config, 'sessionid': sessionid}
 
     # ============================================================
     # 			REQUETE MAKER
     # ============================================================
 
-    def request(self, method: str, uri: str, data: dict = {}, **kwargs):
+    def request(self, method: str, uri: str, data=None, **kwargs):
         # Get all request configuration
+        if data is None:
+            data = {}
         api = kwargs.get('api', 'resources')
         url = f"{self.config['base_url']}/{api}/{uri}"
         request_config = {
@@ -148,7 +151,8 @@ class PayutcClient:
             self.config[key] = value
         return self.config[key]
 
-    def format_datetime(self, dt: datetime) -> str:
+    @staticmethod
+    def format_datetime(dt: datetime) -> str:
         return dt.isoformat(timespec='seconds') if type(dt) is datetime else dt
 
     # ============================================================
@@ -164,9 +168,12 @@ class PayutcClient:
 
     def badge(self, params):
         fun_id = self.get_config('fun_id')
-        return self.request('post', 'POSS3/loginBadge2',
-                            data={"badge_id": params["badge_id"], "pin": params["pin"]},
-                            api='services')
+        return self.request(
+            'post',
+            'POSS3/loginBadge2',
+            data={"badge_id": params["badge_id"], "pin": params["pin"]},
+            api='services'
+        )
 
     # ============================================================
     # 			LOGIN, AUTHENTICATION, AUTHORIZATION & ACCOUNT
@@ -264,8 +271,10 @@ class PayutcClient:
         fun_id = self.get_config('fun_id')
         return self.request('post', 'SELFPOS/getArticles', fun_id, api='services')
 
-    def set_product(self, data={}):
+    def set_product(self, data=None):
         """Crée un nouvel article sur Weez"""
+        if data is None:
+            data = {}
         data['fun_id'] = BASE_CONFIG['fun_id']
         return self.request('post', 'GESARTICLE/setProduct', data, api='services')
 
@@ -282,7 +291,7 @@ class PayutcClient:
     # 			PATCH
     # ============================================================
 
-    def patch_api_rest(self, service, method, id, sessionid=None, params=None, **data):
+    def patch_api_rest(self, service, method, id, params=None, **data):
         """
         Méthode générique pour faire des PATCH sur Weez
         Qu'est-ce qu'un PATCH ? Quand on veut mettre à jour un objet
