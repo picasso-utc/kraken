@@ -9,8 +9,8 @@ class PricedModel(models.Model):
     """
     Classe abstraite qui représente tout objet qui a un prix.
     """
-    tva = models.FloatField(default=0) # TVA en decimal, type 5.5, 20...
-    prix = models.FloatField(default=0) # prix TTC
+    tva = models.FloatField(default=0)  # TVA en decimal, type 5.5, 20...
+    prix = models.FloatField(default=0)  # prix TTC
 
     def get_price_without_taxes(self):
         """ À partir du prix TTC sauvegardé de l'objet, obtenir le prix HT """
@@ -31,7 +31,6 @@ class CategorieFactureRecue(models.Model):
 
 
 class FactureRecue(PricedModel):
-
     FACTURE_A_PAYER = 'D'
     FACTURE_A_REMBOURSER = 'R'
     FACTURE_EN_ATTENTE = 'E'
@@ -58,12 +57,13 @@ class FactureRecue(PricedModel):
     semestre = models.ForeignKey(Semestre, on_delete=models.SET_NULL, null=True, default=get_current_semester)
     facture_number = models.TextField(null=True, blank=True, default=None)
 
+
 @receiver(models.signals.post_save, sender=FactureRecue)
 def auto_add_facture_number_on_save(sender, instance, **kwargs):
     if instance.id:
         # Assignement des numéros de factures à partir du début du semestre P20, facture 2563
         if instance.id > 2563:
-            code = "" 
+            code = ""
             if instance.categorie:
                 queryset = CategorieFactureRecue.objects.get(pk=instance.categorie_id)
                 code = queryset.code
@@ -73,7 +73,6 @@ def auto_add_facture_number_on_save(sender, instance, **kwargs):
             models.signals.post_save.disconnect(auto_add_facture_number_on_save, sender=FactureRecue)
             instance.save()
             models.signals.post_save.connect(auto_add_facture_number_on_save, sender=FactureRecue)
-
 
 
 class Cheque(models.Model):
@@ -100,7 +99,6 @@ class Cheque(models.Model):
 
 
 class FactureEmise(models.Model):
-
     FACTURE_DUE = 'D'
     FACTURE_ANNULEE = 'A'
     FACTURE_PARTIELLEMENT_PAYEE = 'T'
@@ -159,4 +157,4 @@ class ReversementEffectue(PricedModel):
     C'est un PricedModel mais il y a peu d'intérêt à conserver la TVA.
     """
     semestre = models.ForeignKey(Semestre, on_delete=models.SET_NULL, null=True, default=get_current_semester)
-    date_effectue = models.DateField(null=True) # Date a laquelle il fut effectue
+    date_effectue = models.DateField(null=True)  # Date a laquelle il fut effectue

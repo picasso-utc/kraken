@@ -1,6 +1,6 @@
-import requests
 import pandas as pd
-import json
+import requests
+
 from core import settings_confidential as confidentials
 
 API_SESSION_ENDPOINT = "https://kraken.picasso-utc.fr/api/auth/badge?full=true"

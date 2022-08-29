@@ -14,7 +14,7 @@ class Creneau(models.Model):
 class UserInShotgun(models.Model):
     id = models.BigAutoField(primary_key=True)
     login = models.CharField(max_length=30)
-    email = models.CharField(max_length=150,null=True)
+    email = models.CharField(max_length=150, null=True)
     id_creneau = models.ForeignKey(Creneau, on_delete=models.SET_NULL, null=True)
 
     class Meta:

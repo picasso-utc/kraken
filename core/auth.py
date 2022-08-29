@@ -1,13 +1,13 @@
-from core.services.payutc import PayutcClient, PayutcException
-from core.services.ginger import GingerClient
+import requests
+from django.http import JsonResponse
+from django.shortcuts import redirect
+
 from core import models as core_models
 from core import serializers as core_serializers
-from core.settings import LOGIN_REDIRECT_URL
-from django.http import JsonResponse, HttpResponse
-from django.urls import reverse
-from django.shortcuts import redirect
 from core.services.current_semester import get_current_semester
-import requests
+from core.services.ginger import GingerClient
+from core.services.payutc import PayutcClient, PayutcException
+from core.settings import LOGIN_REDIRECT_URL
 
 
 def _set_session_information(request, username, sessionid, connexion="full"):
@@ -17,7 +17,7 @@ def _set_session_information(request, username, sessionid, connexion="full"):
     request.session['connexion'] = connexion
     # Check for user rights into the database
     try:
-        user_right_queryset = core_models.UserRight.objects.get(login = username)
+        user_right_queryset = core_models.UserRight.objects.get(login=username)
         user_right = core_serializers.UserRightSerializer(user_right_queryset)
     except core_models.UserRight.DoesNotExist:
         user_right = None
@@ -26,7 +26,8 @@ def _set_session_information(request, username, sessionid, connexion="full"):
     if user_right is not None and user_right.data and user_right.data['right'] != 'N':
         request.session['right'] = user_right.data['right']
         try:
-            member_queryset = core_models.Member.objects.filter(userright_id= user_right.data['id'], semestre__id=get_current_semester()).get()
+            member_queryset = core_models.Member.objects.filter(userright_id=user_right.data['id'],
+                                                                semestre__id=get_current_semester()).get()
             member = core_serializers.MemberSerializer(member_queryset)
         except core_models.Member.DoesNotExist:
             member = None
@@ -41,7 +42,7 @@ def _set_session_information(request, username, sessionid, connexion="full"):
 
     request.session['user'] = ginger_response['data']
     # Ajout 2h de session
-    request.session.set_expiry(2*3600)
+    request.session.set_expiry(2 * 3600)
     return request
 
 
@@ -53,10 +54,11 @@ def _get_params(request, format=None):
     service += '?redirect=' + redirection
     return ticket, service, redirection
 
+
 def _is_user_member(login):
     """Check if the login has right"""
     try:
-        user_queryset = core_models.UserRight.objects.filter(login= login).get()
+        user_queryset = core_models.UserRight.objects.filter(login=login).get()
         user = core_serializers.UserRightSerializer(user_queryset)
     except core_models.UserRight.DoesNotExist:
         return False
@@ -80,11 +82,11 @@ def login_badge(request, format=None):
     pin = body_content["pin"]
     p = PayutcClient()
     resp = p.login_badge(badge_id=badge_id, pin=pin)
-    if(not _is_user_member(resp["username"])):
+    if not _is_user_member(resp["username"]):
         return JsonResponse({"error": "Vous n'êtes pas autorisé à effectuer cette action."}, status=403)
     connexion_type = _get_connexion_type(request)
     _set_session_information(request, resp['username'], resp['sessionid'], connexion_type)
-    request.session.set_expiry(2*3600)
+    request.session.set_expiry(2 * 3600)
     return JsonResponse(resp, status=200)
 
 
@@ -94,7 +96,7 @@ def login_username(request, format=None):
     body_content = request.data
     username = body_content["username"]
     pin = body_content["pin"]
-    if(not _is_user_member(username)):
+    if not _is_user_member(username):
         return JsonResponse({"error": "Vous n'êtes pas autorisé à effectuer cette action."}, status=403)
     ginger = GingerClient()
     ginger_response = ginger.get_user_info(username)
@@ -103,7 +105,7 @@ def login_username(request, format=None):
     resp = p.login_badge(badge_id=badge_id, pin=pin)
     connexion_type = _get_connexion_type(request)
     _set_session_information(request, resp['username'], resp['sessionid'], connexion_type)
-    request.session.set_expiry(2*3600)
+    request.session.set_expiry(2 * 3600)
     return JsonResponse(resp, status=200)
 
 
@@ -126,8 +128,7 @@ def login_callback(request, format=None):
     # Else return error
     except PayutcException as error:
         return JsonResponse(error.response.json().get('error', {}),
-                                                status_code=status.HTTP_400_BAD_REQUEST)
-
+                            status_code=400)
 
 
 def me(request, format=None):
@@ -150,4 +151,3 @@ def logout(request, format=None):
     request.session.flush()
     requests.request(method='GET', url="https://cas.utc.fr/cas/logout")
     return JsonResponse({})
-

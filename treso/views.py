@@ -2,27 +2,29 @@
 
 # # from sets import Set
 
-from django.shortcuts import render
-from rest_framework import viewsets
-from django.http import JsonResponse, HttpResponse
-from rest_framework.decorators import api_view, permission_classes
-from django.template.loader import render_to_string
-from xlwt import Workbook
-from PyPDF2 import PdfFileMerger, PdfFileReader
-from core.services.payutc import PayutcClient
 import os
-from core.services.current_semester import get_current_semester
+
+import pdfkit
+from PyPDF2 import PdfFileMerger, PdfFileReader
+from django.http import JsonResponse, HttpResponse
+from django.shortcuts import render
+from django.template.loader import render_to_string
+from rest_framework import viewsets
+from rest_framework.decorators import api_view, permission_classes
+from xlwt import Workbook
+
 from core import models as core_models
 from core import viewsets as core_viewsets
+from core.permissions import IsAdminUser
+from core.services import excel_generation
+from core.services.current_semester import get_current_semester
+from core.services.current_semester import get_request_semester
+from core.services.payutc import PayutcClient
+from core.settings import APP_URL
 from perm import models as perm_models
 from perm import serializers as perm_serializers
 from treso import models as treso_models
 from treso import serializers as treso_serializers
-from core.permissions import IsAdminUser, IsAuthenticatedUser, IsMemberUser
-from core.settings import APP_URL
-from core.services.current_semester import get_request_semester
-from core.services import excel_generation
-import pdfkit
 
 
 class CategorieFactureRecueViewSet(viewsets.ModelViewSet):
@@ -31,10 +33,12 @@ class CategorieFactureRecueViewSet(viewsets.ModelViewSet):
     queryset = treso_models.CategorieFactureRecue.objects.all()
     permission_classes = (IsAdminUser,)
 
+
 class FactureRecueViewSet(viewsets.ModelViewSet):
     """ViewSet des factures reçues"""
     serializer_class = treso_serializers.FactureRecueSerializer
     permission_classes = (IsAdminUser,)
+
     def get_queryset(self):
         qs = treso_models.FactureRecue.objects
         return get_request_semester(qs, self.request)
@@ -52,6 +56,7 @@ class FactureEmiseViewSet(core_viewsets.RetrieveSingleInstanceModelViewSet):
     single_serializer_class = treso_serializers.FactureEmiseWithRowsSerializer
     serializer_class = treso_serializers.FactureEmiseSerializer
     permission_classes = (IsAdminUser,)
+
     def get_queryset(self):
         qs = treso_models.FactureEmise.objects
         return get_request_semester(qs, self.request)
@@ -72,14 +77,14 @@ class ReversementEffectueViewSet(viewsets.ModelViewSet):
 
 
 @api_view(['GET'])
-@permission_classes((IsAdminUser, ))
+@permission_classes((IsAdminUser,))
 def tva_info(request, id):
     """Obtention des informations de la tva"""
     periode = core_models.PeriodeTVA.objects.get(pk=id)
 
     # Pour la TVA déductible : on veut juste obtenir le montant total de TVA
     tva_deductible = sum([facture.get_total_taxes() for facture
-        in treso_models.FactureRecue.objects.filter(date__gte=periode.debut, date__lte=periode.fin)])
+                          in treso_models.FactureRecue.objects.filter(date__gte=periode.debut, date__lte=periode.fin)])
 
     # Pour la TVA à déclarer :
     #   * On récupère toute la TVA sur PayUTC pendant cette période.
@@ -90,18 +95,23 @@ def tva_info(request, id):
     sales = p.get_export(start=periode.debut.isoformat(), end=periode.fin.isoformat(), event_id=1)
     payutc_tva_types = set(sale['pur_tva'] for sale in sales)
 
-    factures_emises = treso_models.FactureEmiseRow.objects.prefetch_related('facture').filter(facture__date_creation__gte=periode.debut, facture__date_creation__lte=periode.fin)
+    factures_emises = treso_models.FactureEmiseRow.objects.prefetch_related('facture').filter(
+        facture__date_creation__gte=periode.debut, facture__date_creation__lte=periode.fin)
     tva_types = payutc_tva_types.union(set(facture.tva for facture in factures_emises))
 
     tva_a_declarer = list()
     for tva_type in tva_types:
         tva_a_declarer.append({'pourcentage': tva_type,
-                               'montant': sum([(1 - (100 / (100 + sale['pur_tva'])))*sale['total']*0.01 for sale in sales if sale['pur_tva'] == tva_type])
-                               + sum(facture.get_total_taxes() * facture.qty for facture in factures_emises if facture.tva == tva_type)})
+                               'montant': sum(
+                                   [(1 - (100 / (100 + sale['pur_tva']))) * sale['total'] * 0.01 for sale in sales if
+                                    sale['pur_tva'] == tva_type])
+                                          + sum(
+                                   facture.get_total_taxes() * facture.qty for facture in factures_emises if
+                                   facture.tva == tva_type)})
 
     return JsonResponse({'tva_deductible': tva_deductible,
-                     'tva_a_declarer': tva_a_declarer,
-                     'tva_a_declarer_total': sum(tva['montant'] for tva in tva_a_declarer)})
+                         'tva_a_declarer': tva_a_declarer,
+                         'tva_a_declarer_total': sum(tva['montant'] for tva in tva_a_declarer)})
 
 
 @api_view(['GET'])
@@ -130,9 +140,9 @@ def get_all_conventions(request):
     Puis merge le tout dans un géant pdf
     """
     semester_wanted = request.GET.get("semestre", False)
-    if semester_wanted != False and int(semester_wanted) > 0:
+    if not semester_wanted and int(semester_wanted) > 0:
         semestre_id = semester_wanted
-    else :
+    else:
         semestre_id = get_current_semester()
     queryset = perm_models.Creneau.objects.filter(perm__asso=True, perm__semestre__id=semestre_id)
 
@@ -144,11 +154,13 @@ def get_all_conventions(request):
             serializer = perm_serializers.CreneauSerializer(creneau)
             logo_url = APP_URL + "/static/logo_monochrome.png"
             html_page = render_to_string('convention.html',
-                        {'creneau': serializer.data, 'articles': info['creneau_articles'], 'date': info["date"],
-                        'montant': round(creneau.get_montant_deco_max(), 2), 'period': info['period'], 'logo_url': logo_url})
+                                         {'creneau': serializer.data, 'articles': info['creneau_articles'],
+                                          'date': info["date"],
+                                          'montant': round(creneau.get_montant_deco_max(), 2), 'period': info['period'],
+                                          'logo_url': logo_url})
 
             filename = 'convention_creneau_id_' + str(serializer.data["id"]) + '.pdf'
-            pdf= pdfkit.from_string(html_page, filename)
+            pdf = pdfkit.from_string(html_page, filename)
             filenames.append(filename)
 
     merger = PdfFileMerger()

@@ -5,7 +5,6 @@ from core.services.current_semester import get_current_semester
 
 # class User(AbstractBaseUser):
 class UserRight(models.Model):
-
     """
     Modèle de gestion des droits utilisateurs.
     On distingue plusieurs types de droits, à travers la valeur de 'right'.
@@ -68,8 +67,8 @@ class PricedModel(models.Model):
     """
     Classe abstraite qui représente tout objet qui a un prix.
     """
-    tva = models.FloatField(default=0) # TVA en decimal, type 5.5, 20...
-    prix = models.FloatField(default=0) # prix TTC
+    tva = models.FloatField(default=0)  # TVA en decimal, type 5.5, 20...
+    prix = models.FloatField(default=0)  # prix TTC
 
     def get_price_without_taxes(self):
         """ À partir du prix TTC sauvegardé de l'objet, obtenir le prix HT """
@@ -133,7 +132,8 @@ class BlockedUser(models.Model):
     badge_uid = models.CharField(null=False, default=None, max_length=10, blank=False, unique=True)
     name = models.CharField(null=False, default=None, max_length=255, blank=False)
     justification = models.CharField(null=False, default=None, max_length=255, blank=False)
-    date = models.DateField(auto_now_add = True, blank=True)
+    date = models.DateField(auto_now_add=True, blank=True)
+
 
 class PersonPerHour(models.Model):
     """
