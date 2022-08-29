@@ -16,7 +16,7 @@ def get_request_semester(qs, request=None, attribute=None):
         attribute = "semestre__id"
     if request:
         semester_wanted = request.GET.get("semestre", False)
-    if request and not semester_wanted:
+    if request and semester_wanted != False:
         if semester_wanted == "all":
             return qs.all()
         elif int(semester_wanted) > 0:
