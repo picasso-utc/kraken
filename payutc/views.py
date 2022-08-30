@@ -112,30 +112,19 @@ def get_sorted_articles(request, format=None):
     articles = p.get_articles()
 
     sorted_articles = {
-        3: ('softs', []),
-        11: ('bieresPression', []),
-        10: ('bieresBouteille', []),
-        9: ('snacksSucres', []),
-        17: ('snacksSales', []),
-        184: ('glace', []),
-        221: ('petitDej', []),
-        199: ('pampryls', []),
+        3: ('Softs', []),
+        11: ('Pressions', []),
+        10: ('Bouteilles', []),
+        450: ('Repas', []),
+        384: ('Fruits', []),
+        825: ('Vrac', []),
+        221: ('Petit Dej', []),
+        199: ('Pampryls', []),
     }
 
     for article in articles:
 
-        # IDs des catégories
-        # ==================
-        # Softs : 3
-        # Bières pression : 11
-        # Bières bouteille : 10
-        # Snacks sucrés : 9
-        # Snacks salés : 17
-        # Glacé : 184
-        # Petit dej : 221
-        # Pampryls : 199
-
-        if (article["active"]):
+        if article["active"] and article["price_mode"]:
             bin = sorted_articles.get(article["categorie_id"])
             if bin is not None:
                 bin[1].append({
@@ -144,7 +133,6 @@ def get_sorted_articles(request, format=None):
                 })
 
     return JsonResponse(dict(sorted_articles.values()), status=200)
-
 
 @api_view(['POST'])
 def get_beers_sells(request):
