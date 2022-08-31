@@ -111,28 +111,30 @@ def get_sorted_articles(request, format=None):
     p = PayutcClient()
     articles = p.get_articles()
 
-    sorted_articles = {
-        3: ('Softs', []),
-        11: ('Pressions', []),
-        10: ('Bouteilles', []),
-        450: ('Repas', []),
-        384: ('Fruits', []),
-        825: ('Vrac', []),
-        221: ('Petit Dej', []),
-        199: ('Pampryls', []),
-    }
+    sorted_articles = [
+        {'id': 3, 'name': 'Softs', 'products': []},
+        {'id': 11, 'name': 'Pressions', 'products': []},
+        {'id': 10, 'name': 'Bouteilles', 'products': []},
+        {'id': 450, 'name': 'Repas', 'products': []},
+        {'id': 384, 'name': 'Fruits', 'products': []},
+        {'id': 825, 'name': 'Vrac', 'products': []},
+        {'id': 221, 'name': 'Petit Dej', 'products': []},
+        {'id': 199, 'name': 'Pampryls', 'products': []}
+    ]
 
     for article in articles:
-
         if article["active"] and article["price_mode"]:
-            bin = sorted_articles.get(article["categorie_id"])
+            for i in range(len(sorted_articles)):
+                if sorted_articles[i]['id'] == article["categorie_id"]: dic = i
+            bin = sorted_articles[dic]
             if bin is not None:
-                bin[1].append({
+                bin['products'].append({
                     'name': article["name"],
-                    'price': article["price"]
+                    'price': article["price"],
+                    'id': article["id"]
                 })
 
-    return JsonResponse(dict(sorted_articles.values()), status=200)
+    return JsonResponse(sorted_articles, status=200, safe=False)
 
 @api_view(['POST'])
 def get_beers_sells(request):
