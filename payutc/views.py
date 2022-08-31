@@ -111,30 +111,31 @@ def get_sorted_articles(request, format=None):
     p = PayutcClient()
     articles = p.get_articles()
 
-    sorted_articles = [
-        {'id': 3, 'name': 'Softs', 'products': []},
-        {'id': 11, 'name': 'Pressions', 'products': []},
-        {'id': 10, 'name': 'Bouteilles', 'products': []},
-        {'id': 450, 'name': 'Repas', 'products': []},
-        {'id': 384, 'name': 'Fruits', 'products': []},
-        {'id': 825, 'name': 'Vrac', 'products': []},
-        {'id': 221, 'name': 'Petit Dej', 'products': []},
-        {'id': 199, 'name': 'Pampryls', 'products': []}
-    ]
+    sorted_articles = {
+        3: {'id': 3, 'name': 'Softs', 'products': []},
+        11: {'id': 11, 'name': 'Pressions', 'products': []},
+        10: {'id': 10, 'name': 'Bouteilles', 'products': []},
+        450: {'id': 450, 'name': 'Repas', 'products': []},
+        384: {'id': 384, 'name': 'Fruits', 'products': []},
+        825: {'id': 825, 'name': 'Vrac', 'products': []},
+        221: {'id': 221, 'name': 'Petit Dej', 'products': []},
+        199: {'id': 199, 'name': 'Pampryls', 'products': []},
+        9: {'id': 9, 'name': 'Snacks Sucrés', 'products': []},
+    }
 
     for article in articles:
         if article["active"] and article["price_mode"]:
-            for i in range(len(sorted_articles)):
-                if sorted_articles[i]['id'] == article["categorie_id"]: dic = i
-            bin = sorted_articles[dic]
-            if bin is not None:
-                bin['products'].append({
-                    'name': article["name"],
-                    'price': article["price"],
-                    'id': article["id"]
-                })
+            cat = sorted_articles.get(article["categorie_id"])
+            if cat:
+                cat['products'].append(
+                    {
+                        'name': article["name"],
+                        'price': article["price"],
+                        'id': article["id"]
+                    }
+                )
 
-    return JsonResponse(sorted_articles, status=200, safe=False)
+    return JsonResponse(list(sorted_articles.values()), status=200, safe=False)
 
 @api_view(['POST'])
 def get_beers_sells(request):
