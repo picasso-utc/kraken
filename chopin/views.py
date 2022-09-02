@@ -6,9 +6,9 @@ from chopin import models as chopin_models
 from core.services.current_semester import get_current_semester
 from perm import models as perms_models
 from chopin import serializers as chopin_serializers
-from chopin.serializers import NewsLetterSerializer, PermToCalendar, CalendarSerializer
+from chopin.serializers import NewsLetterSerializer, PermToCalendar, CalendarSerializer, TrendingProductSerializer
 from core.models import UserRight
-from core.permissions import FULL_CONNEXION, IsAdminUser
+from core.permissions import FULL_CONNEXION, IsAdminUser, IsMemberUser
 
 
 class NewsletterViewSet(viewsets.ModelViewSet):
@@ -104,6 +104,22 @@ class CalendarViewSet(viewsets.ModelViewSet):
             return [IsAdminUser()]
         else:
             return []
+
+
+class TrendingProductViewSet(viewsets.ModelViewSet):
+    queryset = chopin_models.TrendingProduct.objects.all()
+    serializer_class = chopin_serializers.TrendingProductSerializer
+
+    if chopin_models.TrendingProduct.objects.count() == 1:
+        http_method_names = ["put", "get"]
+    else:
+        http_method_names = ["get", "post"]
+
+    def get_permissions(self):
+        permission_classes = []
+        if self.request.method == "POST" or self.request.method == "PUT":
+            permission_classes = [IsMemberUser()]
+        return permission_classes
 
 
 class TypeDayViewSet(viewsets.ModelViewSet):

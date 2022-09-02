@@ -14,6 +14,12 @@ class CalendarSerializer(serializers.ModelSerializer):
         exclude = list()
 
 
+class TrendingProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = chopin_models.TrendingProduct
+        exclude = list()
+
+
 class PermToCalendar(serializers.ModelSerializer):
     responsable = serializers.CharField(source='perm.nom_resp')
     semestre = serializers.IntegerField(source='perm.semestre_id')

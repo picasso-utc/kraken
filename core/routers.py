@@ -54,6 +54,7 @@ router.register('tv/media', tv_views.WebTVMediaViewSet)
 # Application Chopin
 router.register('newsletter', chopin_views.NewsletterViewSet, 'newsletters')
 router.register('calendar', chopin_views.CalendarViewSet, 'calendar_app')
+router.register('trending_product', chopin_views.TrendingProductViewSet, 'trending')
 router.register('planning_day_type', chopin_views.TypeDayViewSet, 'planning type day')
 router.register('planning_creneau', chopin_views.CreneauViewSet, 'planning creneau')
 router.register('planning_cota', chopin_views.CotaViwSet, 'planning cota')
