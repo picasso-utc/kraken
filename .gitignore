@@ -107,3 +107,17 @@ db.sqlite3
 # MacOS File
 .DS_Store
 core/DS_Store
+
+# migrations
+chopin/migrations/*
+core/migrations/*
+covid/migrations/*
+payutc/migrations/*
+perm/migrations/*
+shotgun/migrations/*
+survey/migrations/*
+treso/migrations/*
+tv/migrations/*
+
+
+backup.sql
