@@ -28,6 +28,13 @@ class Calendar(models.Model):
         return f"{self.nom}"
 
 
+class TrendingProduct(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    nom_produit = models.CharField(max_length=255)
+    description = models.TextField(null=True)
+    nom_categorie = models.CharField(max_length=255)
+
+
 class PlanningTypeJour(models.Model):
     id = models.BigAutoField(primary_key=True)
     nom = models.CharField(max_length=255)
