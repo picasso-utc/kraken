@@ -1,4 +1,5 @@
 from datetime import date, timedelta
+from typing import OrderedDict
 from django.http import JsonResponse
 from rest_framework.response import Response
 from rest_framework import viewsets
@@ -72,20 +73,33 @@ class CalendarViewSet(viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         try:
-            nb = int(self.request.query_params.get('nb'))
+            start_days = int(self.request.query_params.get('startDays'))
+            end_days = int(self.request.query_params.get('endDays'))
+
         except TypeError:
-            nb = 7
-        startdate = date.today()
-        enddate = startdate + timedelta(days=nb)
+            start_days = 0
+            end_days = 7
+
+        today = date.today()
+        start_date = today + timedelta(days=start_days)
+        end_date = today + timedelta(days=end_days)
+
         queryset = perms_models.Creneau.objects.select_related('perm').filter(
-            perm__semestre=get_current_semester()).filter(date__range=[startdate, enddate])
-        serializer = PermToCalendar(queryset, many=True)
-        queryset = chopin_models.Calendar.objects.all().filter(semestre=get_current_semester()).filter(
-            date__range=[startdate, enddate])
-        value = serializer.data
-        serializer = CalendarSerializer(queryset, many=True)
-        value += serializer.data
-        return Response(value)
+            perm__semestre=get_current_semester()).filter(date__range=[start_date, end_date])
+        perm_serializer = PermToCalendar(queryset, many=True)
+        value = perm_serializer.data
+
+        periode_sorted_perm_list= sorted(value, key=lambda X: 3 if X['periode']=="S" else 2 if X['periode']=='D' else 1)
+        sorted_perm_list = sorted(periode_sorted_perm_list, key=lambda X:X['date'])
+        sorted_perm_calendar={}
+
+        for perm in sorted_perm_list:
+            if perm['date'] in sorted_perm_calendar.keys():
+                sorted_perm_calendar[perm['date']].append(perm)
+            else:
+                sorted_perm_calendar[perm['date']]=[perm]
+
+        return JsonResponse(sorted_perm_calendar)
 
     def delete(self, request, ):
         id = self.request.query_params.get('id')

@@ -5,7 +5,6 @@ __pycache__/
 
 # C extensions
 *.so
-
 # Distribution / packaging
 .Python
 env/
@@ -101,12 +100,13 @@ core/settings_confidential.py
 
 db.sqlite3
 
+/backup.sql
 
 .vscode
 
 # MacOS File
 .DS_Store
-core/DS_Store
+core/.DS_Store
 
 # migrations
 chopin/migrations/*
