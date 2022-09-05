@@ -47,6 +47,9 @@ urlpatterns = [
     # include shotgun lib
     path('api/shotgun/', include('shotgun.urls')),
 
+    # include elo system lib
+    path('api/elo/', include('elo.urls')),
+
     # Inclusion fichier Router
     # Ce dernier contient les Viewset, 1 URL = 1 CRUD
     # CRUD = Create, Read, Update, Delete
