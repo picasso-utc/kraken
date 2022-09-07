@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from core.services.ginger import GingerClient
-from elo.helper import evaluate_first_elo, calculate_new_elo, get_ranked_matches
+from elo.helper import evaluate_first_elo, calculate_new_elo, get_ranked_matches, update_matches
 from elo.models import SoloRankedMatches, DuoRankedMatches, SoloEloRanking, DuoEloRanking
 
 
@@ -39,10 +39,14 @@ class DuoEloRankingSerializer(serializers.ModelSerializer):
         return DuoEloRanking.objects.create(**validated_data)
 
     def validate(self, data):
+        login_a = data['login_a']
+        login_b = data['login_b']
+        support = data['support']
+
         g = GingerClient()
 
         try:
-            user_a = g.get_user_info(data['login_a'])
+            user_a = g.get_user_info(login_a)
 
             data['first_name_a'] = user_a['data']['prenom']
             data['last_name_a'] = user_a['data']['nom']
@@ -51,13 +55,16 @@ class DuoEloRankingSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Login a not found")
 
         try:
-            user_b = g.get_user_info(data['login_b'])
+            user_b = g.get_user_info(login_b)
 
             data['first_name_b'] = user_b['data']['prenom']
             data['last_name_b'] = user_b['data']['nom']
 
         except Exception:
             raise serializers.ValidationError("Login b not found")
+
+        if DuoEloRanking.objects.filter(login_a=login_b, login_b=login_a, support=support).count() == 1:
+            raise serializers.ValidationError("Team already exist")
 
         return data
 
@@ -87,8 +94,7 @@ class RankedMatchesSerializer(serializers.ModelSerializer):
             validated_data.pop('winner_score', None)
             validated_data.pop('looser_score', None)
 
-        winner_score = validated_data.get('winner_score', 5)
-        looser_score = validated_data.get('looser_score', 0)
+        looser_score = validated_data.get('looser_score', 5)
 
         if winner.nb_game > 5 and looser.nb_game > 5:
             winner.elo, looser.elo = calculate_new_elo(
@@ -96,33 +102,22 @@ class RankedMatchesSerializer(serializers.ModelSerializer):
                 looser_elo=looser.elo,
                 winner_nb_game=winner.nb_game,
                 looser_nb_game=looser.nb_game,
-                winner_score=winner_score,
                 looser_score=looser_score
             )
 
         if winner.nb_game == 5:
-            ranked_matches = get_ranked_matches(
-                RankedMatchesModel=RankedMatchesModel,
-                support=support,
-                team=winner,
-                opponent_elo=looser_elo,
-                score_difference=winner_score - looser_score,
-                win=True
-            )
+            ranked_matches = get_ranked_matches(RankedMatchesModel=RankedMatchesModel, team=winner)
+            ranked_matches.append(RankedMatchesModel(**validated_data))
 
-            winner.elo = evaluate_first_elo(ranked_matches)
+            winner.elo = evaluate_first_elo(winner, ranked_matches)
+            update_matches(winner, ranked_matches)
 
         if looser.nb_game == 5:
-            ranked_matches = get_ranked_matches(
-                RankedMatchesModel=RankedMatchesModel,
-                support=support,
-                team=looser,
-                opponent_elo=winner_elo,
-                score_difference=winner_score - looser_score,
-                win=False
-            )
+            ranked_matches = get_ranked_matches(RankedMatchesModel=RankedMatchesModel, team=looser)
+            ranked_matches.append(RankedMatchesModel(**validated_data))
 
-            looser.elo = evaluate_first_elo(ranked_matches)
+            looser.elo = evaluate_first_elo(looser, ranked_matches)
+            update_matches(looser, ranked_matches)
 
         winner.save()
         looser.save()
@@ -132,7 +127,6 @@ class RankedMatchesSerializer(serializers.ModelSerializer):
     def validate(self, data):
         winner = data.get('winner')
         looser = data.get('looser')
-        score_winner = data.get('score_winner')
         score_looser = data.get('score_looser')
         support = data.get('support')
 
@@ -145,10 +139,10 @@ class RankedMatchesSerializer(serializers.ModelSerializer):
         if winner == looser:
             raise serializers.ValidationError("Players must be different")
 
-        if support == 'B' and (score_winner is None or score_looser is None):
+        if support == 'B' and score_looser is None:
             raise serializers.ValidationError("Babyfoot matches must have score")
 
-        if support == 'B' and (score_winner < 0 or score_winner > 10 or score_looser < 0 or score_looser > 10):
+        if support == 'B' and (score_looser < 0 or score_looser > 10):
             raise serializers.ValidationError("Scores must be between 0 and 10")
 
         return data
