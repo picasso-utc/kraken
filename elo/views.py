@@ -12,10 +12,11 @@ class EloSystemViewSet(ListCreateAPIView):
     def get_permissions(self):
         permission_classes = []
 
-        #if self.request.method == 'POST':
-        #    permission_classes = [IsAdminUser()]
+        if self.request.method == 'POST':
+            permission_classes = [IsAdminUser()]
 
         return permission_classes
+
 
 # Elo Ranking ViewSets #
 
