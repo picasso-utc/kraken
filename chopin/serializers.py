@@ -20,6 +20,11 @@ class TrendingProductSerializer(serializers.ModelSerializer):
         exclude = list()
 
 
+class EvenementSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = chopin_models.Evenements
+        exclude = list()
+
 class PermToCalendar(serializers.ModelSerializer):
     responsable = serializers.CharField(source='perm.nom_resp')
     semestre = serializers.IntegerField(source='perm.semestre_id')

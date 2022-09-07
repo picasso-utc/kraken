@@ -7,7 +7,7 @@ from chopin import models as chopin_models
 from core.services.current_semester import get_current_semester
 from perm import models as perms_models
 from chopin import serializers as chopin_serializers
-from chopin.serializers import NewsLetterSerializer, PermToCalendar, CalendarSerializer, TrendingProductSerializer
+from chopin.serializers import NewsLetterSerializer, PermToCalendar, CalendarSerializer
 from core.models import UserRight
 from core.permissions import FULL_CONNEXION, IsAdminUser, IsMemberUser
 
@@ -124,14 +124,29 @@ class TrendingProductViewSet(viewsets.ModelViewSet):
     queryset = chopin_models.TrendingProduct.objects.all()
     serializer_class = chopin_serializers.TrendingProductSerializer
 
-    if chopin_models.TrendingProduct.objects.count() == 1:
-        http_method_names = ["put", "get"]
-    else:
-        http_method_names = ["get", "post"]
+    def create(self, request, *args, **kwargs):
+        right = request.session.get('right')
+        login = request.session.get('login')
+        has_full_connexion = request.session.get('connexion') == FULL_CONNEXION
+        if right == 'A' and (UserRight.objects.filter(login=login, right=right).count()) and has_full_connexion:
+            if chopin_models.TrendingProduct.objects.count() > 0:
+                chopin_models.TrendingProduct.objects.all().delete()
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+            headers = self.get_success_headers(serializer.data)
+            return Response(serializer.data, status=201, headers=headers)
+        else:
+            return Response(status=403)
+
+
+class EvenementsViewSet(viewsets.ModelViewSet):
+    queryset = chopin_models.Evenements.objects.all()
+    serializer_class = chopin_serializers.EvenementSerializer
 
     def get_permissions(self):
         permission_classes = []
-        if self.request.method == "POST" or self.request.method == "PUT":
+        if self.request.method in ["POST", "PUT", "DELETE"]:
             permission_classes = [IsMemberUser()]
         return permission_classes
 
