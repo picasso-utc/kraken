@@ -35,6 +35,17 @@ class TrendingProduct(models.Model):
     nom_categorie = models.CharField(max_length=255)
 
 
+class Evenements(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    name = models.CharField(max_length=255)
+    date = models.DateField()
+    semestre = models.ForeignKey(
+        core_models.Semestre,
+        on_delete=models.SET_NULL,
+        null=True,
+        default=get_current_semester)
+
+
 class PlanningTypeJour(models.Model):
     id = models.BigAutoField(primary_key=True)
     nom = models.CharField(max_length=255)
