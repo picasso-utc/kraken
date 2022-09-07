@@ -53,7 +53,6 @@ class RankedMatches(models.Model):
     date = models.DateTimeField(auto_now_add=True)
     elo_winner = models.IntegerField(null=True, blank=True)
     elo_looser = models.IntegerField(null=True, blank=True)
-    score_winner = models.IntegerField(null=True)
     score_looser = models.IntegerField(null=True)
     support = models.CharField(max_length=1, choices=SUPPORT_CHOICES)
 
@@ -63,7 +62,9 @@ class SoloRankedMatches(RankedMatches):
     looser = models.ForeignKey(SoloEloRanking, related_name='looser', on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
-        return f"{self.date} | {self.winner} vs {self.looser} | {self.score_winner} - {self.score_looser}"
+        if self.support == 'B':
+            return f"{self.date} | {self.winner} vs {self.looser} | 10 - {self.score_looser}"
+        return f"{self.date} | {self.winner} vs {self.looser}"
 
     class Meta:
         ordering = ['-date']
@@ -74,7 +75,9 @@ class DuoRankedMatches(RankedMatches):
     looser = models.ForeignKey(DuoEloRanking, related_name='looser_team', on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
-        return f"{self.date} | {self.winner} vs {self.looser} | {self.score_winner} - {self.score_looser}"
+        if self.support == 'B':
+            return f"{self.date} | {self.winner} vs {self.looser} | 10 - {self.score_looser}"
+        return f"{self.date} | {self.winner} vs {self.looser}"
 
     class Meta:
         ordering = ['-date']
