@@ -11,6 +11,7 @@ class Newsletter(models.Model):
     creation_date = models.DateTimeField(auto_now=True)
     publication_date = models.DateTimeField()
     content = models.TextField()
+    image = models.FileField(upload_to="newsletter", null=True, blank=True, default=None)
 
 
 class Calendar(models.Model):
