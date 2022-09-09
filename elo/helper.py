@@ -44,7 +44,7 @@ def calculate_new_elo(winner_elo, looser_elo, winner_nb_game, looser_nb_game, lo
         win=False,
     ))
 
-    return new_winner_elo, new_looser_elo
+    return max(new_winner_elo, 0), max(new_looser_elo, 0)
 
 
 def evaluate_first_elo(player: EloRanking, game_list: List[Union[SoloRankedMatches, DuoRankedMatches]]):
@@ -70,7 +70,7 @@ def evaluate_first_elo(player: EloRanking, game_list: List[Union[SoloRankedMatch
     else:
         player_first_elo = int(elo_avg)
 
-    return player_first_elo
+    return max(player_first_elo, 0)
 
 
 def get_ranked_matches(RankedMatchesModel: RankedMatches, team: Union[SoloEloRanking, DuoEloRanking]):
