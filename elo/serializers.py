@@ -149,9 +149,6 @@ class RankedMatchesSerializer(serializers.ModelSerializer):
 
 
 class SoloRankedMatchesSerializer(RankedMatchesSerializer):
-    winner = serializers.StringRelatedField()
-    looser = serializers.StringRelatedField()
-
     def create(self, validated_data):
         return super().process_validated_data(SoloRankedMatches, validated_data)
 
@@ -161,9 +158,6 @@ class SoloRankedMatchesSerializer(RankedMatchesSerializer):
 
 
 class DuoRankedMatchesSerializer(RankedMatchesSerializer):
-    winner = serializers.StringRelatedField()
-    looser = serializers.StringRelatedField()
-
     def create(self, validated_data):
         return super().process_validated_data(DuoRankedMatches, validated_data)
 
