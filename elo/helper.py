@@ -108,10 +108,11 @@ def update_matches(player: EloRanking, game_list: List[Union[SoloRankedMatches, 
                 opponent = game.looser
                 opponent.elo = new_looser_elo
             else:
-                opponent = game.looser
+                opponent = game.winner
                 opponent.elo = new_winner_elo
 
             opponent.save()
 
-        game.save()
+        if game != game_list[-1]:
+            game.save()
 

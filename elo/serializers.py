@@ -112,12 +112,16 @@ class RankedMatchesSerializer(serializers.ModelSerializer):
             winner.elo = evaluate_first_elo(winner, ranked_matches)
             update_matches(winner, ranked_matches)
 
+            validated_data['elo_winner'] = winner.elo
+
         if looser.nb_game == 5:
             ranked_matches = get_ranked_matches(RankedMatchesModel=RankedMatchesModel, team=looser)
             ranked_matches.append(RankedMatchesModel(**validated_data))
 
             looser.elo = evaluate_first_elo(looser, ranked_matches)
             update_matches(looser, ranked_matches)
+
+            validated_data['elo_looser'] = looser.elo
 
         winner.save()
         looser.save()
