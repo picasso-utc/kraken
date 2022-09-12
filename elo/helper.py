@@ -57,8 +57,10 @@ def evaluate_first_elo(player: EloRanking, game_list: List[Union[SoloRankedMatch
         player_elo = game.elo_winner if win else game.elo_looser
         score_difference = 10 - game.score_looser if game.support == 'B' else 10
         opponents_elo_sum += 1000 if player_elo is None else player_elo
-        nb_win += 0.5 if win else 0
-        nb_win += 0.5 - score_difference / 20
+        if win:
+            nb_win += 0.5 + score_difference / 20
+        else:
+            nb_win += 0.5 - score_difference / 20
 
     win_proba = nb_win / nb_game
     elo_avg = opponents_elo_sum / nb_game
