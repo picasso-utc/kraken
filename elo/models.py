@@ -23,7 +23,7 @@ class SoloEloRanking(EloRanking):
     support = models.CharField(max_length=1, choices=SUPPORT_CHOICES)
 
     def __str__(self):
-        return f"{self.support} - {self.first_name} {self.last_name}"
+        return f"{self.login} - {self.support}"
 
     class Meta:
         unique_together = (('login', 'support'),)
@@ -40,7 +40,7 @@ class DuoEloRanking(EloRanking):
     support = models.CharField(max_length=1, choices=SUPPORT_CHOICES)
 
     def __str__(self):
-        return f"{self.support} - {self.first_name_a} {self.last_name_a} & {self.first_name_b} {self.last_name_b}"
+        return f"{self.login_a} & {self.login_b} - {self.support}"
 
     class Meta:
         unique_together = (('login_a', 'login_b', 'support'),)
