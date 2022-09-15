@@ -1,11 +1,9 @@
 #  # -*- coding: utf-8 -*-
-
-# # from sets import Set
-
 import os
 
 import pdfkit
 from PyPDF2 import PdfFileMerger, PdfFileReader
+from django.db.models import Sum
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
 from django.template.loader import render_to_string
@@ -204,3 +202,20 @@ def excel_cheque_generation(request):
     excel_dump = excel_generation.generate_checks_xls(ws)
     writer.save(response)
     return response
+
+
+@api_view(['POST'])
+@permission_classes((IsAdminUser,))
+def get_categories_stats(request):
+    start_date = request.data.get('start_date')
+    end_date = request.data.get('end_date')
+
+    try:
+        queryset = treso_models.FactureRecue.objects.filter(
+            date__gte=start_date, date__lte=end_date
+        ).values('categorie__nom').order_by('categorie').annotate(total_price=Sum('prix'))
+
+        return JsonResponse(list(queryset), safe=False)
+
+    except Exception as err:
+        return JsonResponse({"error": str(err)}, status=400)
