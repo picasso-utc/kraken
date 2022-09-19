@@ -7,7 +7,7 @@ from chopin import models as chopin_models
 from core.services.current_semester import get_current_semester
 from perm import models as perms_models
 from chopin import serializers as chopin_serializers
-from chopin.serializers import NewsLetterSerializer, PermToCalendar, CalendarSerializer
+from chopin.serializers import BeerInfoSerializer, NewsLetterSerializer, PermToCalendar, CalendarSerializer, TrendingProductSerializer
 from core.models import UserRight
 from core.permissions import FULL_CONNEXION, IsAdminUser, IsMemberUser
 
@@ -145,11 +145,28 @@ class EvenementsViewSet(viewsets.ModelViewSet):
     serializer_class = chopin_serializers.EvenementSerializer
 
     def get_permissions(self):
-        permission_classes = []
-        if self.request.method in ["POST", "PUT", "DELETE"]:
-            permission_classes = [IsMemberUser()]
-        return permission_classes
+        if self.request.method == "GET":
+            return []
+        elif self.request.method == "POST":
+            return [IsAdminUser()]
+        elif self.request.method == "DELETE":
+            return [IsAdminUser()]
+        else:
+            return []
 
+class BeerInfoViewSet(viewsets.ModelViewSet):
+    queryset = chopin_models.BeerInfo.objects.all()
+    serializer_class = chopin_serializers.BeerInfoSerializer
+
+    def get_permissions(self):
+        if self.request.method == "GET":
+            return []
+        elif self.request.method == "POST":
+            return [IsAdminUser()]
+        elif self.request.method == "DELETE":
+            return [IsAdminUser()]
+        else:
+            return []
 
 class TypeDayViewSet(viewsets.ModelViewSet):
     queryset = chopin_models.PlanningTypeJour.objects.all()
