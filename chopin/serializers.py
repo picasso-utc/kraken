@@ -19,6 +19,10 @@ class TrendingProductSerializer(serializers.ModelSerializer):
         model = chopin_models.TrendingProduct
         exclude = list()
 
+class BeerInfoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = chopin_models.BeerInfo
+        exclude = list()
 
 class EvenementSerializer(serializers.ModelSerializer):
     class Meta:

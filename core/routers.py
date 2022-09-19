@@ -60,6 +60,7 @@ router.register('planning_day_type', chopin_views.TypeDayViewSet, 'planning type
 router.register('planning_creneau', chopin_views.CreneauViewSet, 'planning creneau')
 router.register('planning_cota', chopin_views.CotaViwSet, 'planning cota')
 router.register('planning_job', chopin_views.JobViewSet, 'planning job')
+router.register('beer_info',chopin_views.BeerInfoViewSet,'beer info')
 
 # Shotgun app
 router.register('shotgun/creneau', shotgun_views.CreneauViewSet, 'creneau shotgun')
