@@ -35,6 +35,15 @@ class TrendingProduct(models.Model):
     description = models.TextField(null=True)
     nom_categorie = models.CharField(max_length=255)
 
+class BeerInfo(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    weez_id = models.IntegerField(null=False)
+    amertume = models.IntegerField()
+    fruite = models.IntegerField()
+    acidite = models.IntegerField()
+    sucre = models.IntegerField()
+    description = models.CharField(max_length=1000)
+    logo = models.FileField(upload_to="beerinfo", null=True, blank=True, default=None)
 
 class Evenements(models.Model):
     id = models.BigAutoField(primary_key=True)
