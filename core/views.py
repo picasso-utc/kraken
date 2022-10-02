@@ -71,7 +71,14 @@ class MemberViewSet(viewsets.ModelViewSet):
     Membre : combinaison d'un semestre, d'un utilisateur et d'un poste
     """
     serializer_class = core_serializers.MemberSerializer
-    permission_classes = (IsAdminUser,)
+
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            permissions = [IsMemberUser()]
+        else:
+            permissions = [IsAdminUser()]
+
+        return permissions
 
     def get_queryset(self):
         # Tri par semestre
