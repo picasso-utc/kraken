@@ -91,15 +91,14 @@ class RankedMatchesSerializer(serializers.ModelSerializer):
         validated_data['elo_looser'] = looser_elo
 
         if support == 'E':
-            validated_data.pop('winner_score', None)
-            validated_data.pop('looser_score', None)
+            validated_data.pop('score_looser', None)
 
-        looser_score = validated_data.get('looser_score', 5)
+        looser_score = validated_data.get('score_looser', 5)
 
         if winner.nb_game > 5 and looser.nb_game > 5:
             winner.elo, looser.elo = calculate_new_elo(
-                winner_elo=winner.elo,
-                looser_elo=looser.elo,
+                winner_elo=winner_elo,
+                looser_elo=looser_elo,
                 winner_nb_game=winner.nb_game,
                 looser_nb_game=looser.nb_game,
                 looser_score=looser_score
