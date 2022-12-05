@@ -22,6 +22,7 @@ urlpatterns = [
     path('api/core/team', core_views.get_team),
     path('api/core/badge_scan', core_views.badge_scan),
     path('api/core/covid_stat', core_views.covid_stat),
+    # path('api/core/export', core_views.get_export),
 
     # Inclusion URL application Perm
     path('api/perms/', include('perm.urls')),
@@ -49,6 +50,9 @@ urlpatterns = [
 
     # include elo system lib
     path('api/elo/', include('elo.urls')),
+
+    # include stock system lib
+    path('api/stock/', include('stock.urls')),
 
     # Inclusion fichier Router
     # Ce dernier contient les Viewset, 1 URL = 1 CRUD
