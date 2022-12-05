@@ -122,3 +122,6 @@ tv/migrations/*
 
 
 backup.sql
+
+# stock exports
+stock/export.csv

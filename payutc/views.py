@@ -14,18 +14,20 @@ from payutc import models as payutc_models
 from payutc import serializers as payutc_serializers
 
 
-class GoodiesWinnerViewSet(mixins.ListModelMixin,
-                           mixins.CreateModelMixin,
-                           mixins.DestroyModelMixin,
-                           mixins.UpdateModelMixin,
-                           viewsets.GenericViewSet):
+class GoodiesWinnerViewSet(
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    mixins.DestroyModelMixin,
+    mixins.UpdateModelMixin,
+    viewsets.GenericViewSet
+):
     """
-	ViewSet pour gérer les vainqueurs des goodies
-	Création aléatoire à partir d'une date de début et de fin
-	Récupération des vainqueurs
-	Mise à jour du statut (Récupérer ou pas)
-	Suppression
-	"""
+    ViewSet pour gérer les vainqueurs des goodies
+    Création aléatoire à partir d'une date de début et de fin
+    Récupération des vainqueurs
+    Mise à jour du statut (Récupérer ou pas)
+    Suppression
+    """
 
     permission_classes = (IsMemberUserOrReadOnly,)
 
@@ -67,7 +69,7 @@ class GoodiesWinnerViewSet(mixins.ListModelMixin,
             user = sales[int(random_value) - 1]['rows'][0]['payments'][0]['buyer']
             user_description = user["first_name"] + " " + user["last_name"]
             # Si l'utilisateur n'est pas un membre du Pic ou un login déjà dans la liste des vainqueurs, ajout
-            if (user["username"] not in pic_members and user_description not in goodies_winners):
+            if user["username"] not in pic_members and user_description not in goodies_winners:
                 goodies_winners.append(user_description)
                 payutc_models.GoodiesWinner.objects.create(winner=user_description, picked_up=False)
 
@@ -137,12 +139,13 @@ def get_sorted_articles(request, format=None):
 
     return JsonResponse(list(sorted_articles.values()), status=200, safe=False)
 
+
 @api_view(['POST'])
 def get_beers_sells(request):
     """
-	Obtention des ventes dans la journée courante des ids mis en paramètres
-	Méthode utilisée publique, utilisée pour le duel des brasseurs en A19 
-	"""
+    Obtention des ventes dans la journée courante des ids mis en paramètres
+    Méthode utilisée publique, utilisée pour le duel des brasseurs en A19
+    """
     beers = request.data['beers']
     response = dict()
 
