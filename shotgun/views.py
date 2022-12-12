@@ -5,7 +5,7 @@ from rest_framework import viewsets
 
 from core.models import UserRight
 from core.permissions import FULL_CONNEXION
-from core.services.payutc import PayutcClient
+from core.services.ginger import GingerClient
 from shotgun import models as shotgun_models
 from shotgun import serializers as shotgun_serializers
 
@@ -59,34 +59,43 @@ class UserInShotgunViewSet(viewsets.ModelViewSet):
             return Response(status=403)
 
     def make_shotgun(self, request, max):
-        p = PayutcClient()
-        p.login_admin()
-        data_temp = request.data.copy()
-        liste = p.auto_complete({'queryString': request.data['login']})
-        if len(liste) == 1:
-            data_temp['email'] = liste[0]['email']
-            nbListe = shotgun_models.Creneau.objects.select_related('user').filter(
-                userinshotgun__id_creneau=request.data['id_creneau']).count()
-            if nbListe < max:
-                serializer = self.get_serializer(data=data_temp)
+        try:
+            login = request.data['login']
+
+            g = GingerClient()
+            ginger_response = g.get_user_info(login)
+
+            request.data['email'] = ginger_response['data']['mail']
+
+            cur_nb = shotgun_models.Creneau.objects.select_related('user').filter(
+                userinshotgun__id_creneau=request.data['id_creneau']
+            ).count()
+
+            if cur_nb < max:
+                serializer = self.get_serializer(data=request.data)
                 serializer.is_valid(raise_exception=True)
                 self.perform_create(serializer)
                 headers = self.get_success_headers(serializer.data)
-                return Response({"Success": "shotgun réalisé"}, status=200, headers=headers)
+                return Response({"Success": "Shotgun réalisé"}, status=200, headers=headers)
             else:
-                return Response({"Fail": "maximim de personnes déjà atteint"}, status=429)
-        else:
-            return Response({"Fail": "votre login est invalide"}, status=422)
+                return Response({"Fail": "Maximum de personnes déjà atteint"}, status=429)
+        except Exception:
+            return Response({"Fail": "Votre login est invalide"}, status=422)
 
     def create(self, request, *args, **kwargs):
-        print('cc')
-        if hasRight(request):
-            creneau = shotgun_models.Creneau.objects.filter(id=request.data['id_creneau']).values('max_people')
-            return self.make_shotgun(request, creneau[0]['max_people'])
-        else:
-            creneau = shotgun_models.Creneau.objects.filter(id=request.data['id_creneau']).values('actif', 'max_people',
-                                                                                                  'shotgunDate')
-            if creneau[0]['actif'] and creneau[0]['shotgunDate'] < timezone.now():
-                return self.make_shotgun(request, creneau[0]['max_people'])
+        id_creneau = request.data['id_creneau']
+
+        try:
+            creneau = shotgun_models.Creneau.objects.get(id=id_creneau)
+
+            if hasRight(request):
+                return self.make_shotgun(request, creneau.max_people)
             else:
-                return Response({"Fail": "Le shotgun est terminé / n'a pas commencé"}, status=451)
+                if creneau.actif and creneau.shotgunDate < timezone.now():
+                    return self.make_shotgun(request, creneau.max_people)
+                elif not creneau.actif:
+                    return Response({"Fail": "Le shotgun est terminé"}, status=423)
+                elif creneau.shotgunDate > timezone.now():
+                    return Response({"Fail": "Le shotgun n'a pas commencé"}, status=425)
+        except Exception:
+            return Response({"Fail": "Ce shotgun n'existe pas"}, status=404)
