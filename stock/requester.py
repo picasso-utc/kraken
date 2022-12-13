@@ -13,20 +13,35 @@ def request_sales():
 
     try:
         last_sale = Sales.objects.latest('timestamp')
-    except:
+    except Exception:
         last_sale = None
 
     if last_sale is not None:
         current_timestamp = last_sale.timestamp + timedelta(seconds=1)
+
     else:
         start_date = current_semester.start_date
         current_timestamp = timezone.make_aware(datetime.combine(start_date, datetime.min.time()))
 
     while True:
-        current_timestamp_plus_t = datetime.combine(current_timestamp, datetime.max.time())
+        current_timestamp_plus_t = timezone.make_aware(datetime.combine(current_timestamp, datetime.max.time()))
+
+        if timezone.make_naive(current_timestamp) < datetime.now() < timezone.make_naive(current_timestamp_plus_t):
+            try:
+                update_export_csv()
+                update_sharepoint('stock/export.csv', 'export.csv')
+            except Exception as err:
+                print('Requester error : {}'.format(err))
+                pass
+            time_to_sleep = (current_timestamp_plus_t - timezone.make_aware(datetime.now())).seconds
+            print("Script will sleep during {} minutes".format(time_to_sleep // 60))
+            time.sleep(time_to_sleep)
+        else:
+            time.sleep(10)
 
         print(
-            "{} : Request sales between {} and {}".format(timezone.now(), current_timestamp, current_timestamp_plus_t))
+            "{} : Request sales between {} and {}".format(timezone.now(), current_timestamp, current_timestamp_plus_t)
+        )
 
         transactions = get_sales_from_payutc(current_timestamp, current_timestamp_plus_t)
 
@@ -41,18 +56,7 @@ def request_sales():
                 semester_id=current_semester
             )
 
-        current_timestamp = datetime.combine(current_timestamp_plus_t + timedelta(hours=1), datetime.min.time())
+        current_timestamp = timezone.make_aware(datetime.combine(current_timestamp_plus_t + timedelta(hours=1), datetime.min.time()))
 
-        if datetime.now() < current_timestamp:
-            try:
-                update_export_csv()
-                update_sharepoint('stock/export.csv', 'export.csv')
-            except Exception as err:
-                print('Requester error : {}'.format(err))
-                pass
-            time.sleep((current_timestamp - datetime.now()).seconds)
-        else:
-            time.sleep(10)
-
-        if current_timestamp > datetime.combine(current_semester.end_date, datetime.max.time()):
+        if current_timestamp > timezone.make_aware(datetime.combine(current_semester.end_date, datetime.max.time())):
             break
