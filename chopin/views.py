@@ -23,7 +23,7 @@ class NewsletterViewSet(viewsets.ModelViewSet):
         right = request.session.get('right')
         login = request.session.get('login')
         has_full_connexion = request.session.get('connexion') == FULL_CONNEXION
-        if right == 'A' and (UserRight.objects.filter(login=login, right=right).count()) and has_full_connexion:
+        if right == 'A' or right == 'M' and (UserRight.objects.filter(login=login, right=right).count()) and has_full_connexion:
             id = self.request.query_params.get('id')
             if id is None:
                 serializer = self.get_serializer(data=request.data)
@@ -113,9 +113,9 @@ class CalendarViewSet(viewsets.ModelViewSet):
         if self.request.method == "GET":
             return []
         elif self.request.method == "POST":
-            return [IsAdminUser()]
+            return [IsMemberUser()]
         elif self.request.method == "DELETE":
-            return [IsAdminUser()]
+            return [IsMemberUser()]
         else:
             return []
 
@@ -128,7 +128,7 @@ class TrendingProductViewSet(viewsets.ModelViewSet):
         right = request.session.get('right')
         login = request.session.get('login')
         has_full_connexion = request.session.get('connexion') == FULL_CONNEXION
-        if right == 'A' and (UserRight.objects.filter(login=login, right=right).count()) and has_full_connexion:
+        if right == 'A' or right == 'M' and (UserRight.objects.filter(login=login, right=right).count()) and has_full_connexion:
             if chopin_models.TrendingProduct.objects.count() > 0:
                 chopin_models.TrendingProduct.objects.all().delete()
             serializer = self.get_serializer(data=request.data)
@@ -148,9 +148,9 @@ class EvenementsViewSet(viewsets.ModelViewSet):
         if self.request.method == "GET":
             return []
         elif self.request.method == "POST":
-            return [IsAdminUser()]
+            return [IsMemberUser()]
         elif self.request.method == "DELETE":
-            return [IsAdminUser()]
+            return [IsMemberUser()]
         else:
             return []
 
@@ -162,9 +162,9 @@ class BeerInfoViewSet(viewsets.ModelViewSet):
         if self.request.method == "GET":
             return []
         elif self.request.method == "POST":
-            return [IsAdminUser()]
+            return [IsMemberUser()]
         elif self.request.method == "DELETE":
-            return [IsAdminUser()]
+            return [IsMemberUser()]
         else:
             return []
 
