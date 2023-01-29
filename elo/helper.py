@@ -7,20 +7,27 @@ from elo.models import RankedMatches, EloRanking, SoloRankedMatches, DuoRankedMa
 def get_newbie_coef(elo, nb_game):
     if nb_game < 20:
         return 40
-    if elo < 2400:
+    if elo < 2000:
         return 20
     return 10
 
 
-def get_new_elo(old_elo, score_coef, newbie_coef, proba_fide, win):
-    win_coef = 1 if win else 0
+def get_viscosity_coef(elo):
+    return max((1000 - elo) / 50, 1)
 
-    return old_elo + score_coef * newbie_coef * (win_coef - proba_fide)
+
+def get_new_elo(old_elo, score_coef, newbie_coef, viscosity_coef, proba_fide, win):
+    if win:
+        return old_elo + score_coef * newbie_coef * (1 - proba_fide)
+    return old_elo - score_coef * newbie_coef * proba_fide / viscosity_coef
 
 
 def calculate_new_elo(winner_elo, looser_elo, winner_nb_game, looser_nb_game, looser_score=5):
     winner_newbie_coef = get_newbie_coef(winner_elo, winner_nb_game)
     looser_newbie_coef = get_newbie_coef(looser_elo, looser_nb_game)
+
+    winner_viscosity_coef = get_viscosity_coef(winner_elo)
+    looser_viscosity_coef = get_viscosity_coef(looser_elo)
 
     elo_difference = looser_elo - winner_elo
 
@@ -33,6 +40,7 @@ def calculate_new_elo(winner_elo, looser_elo, winner_nb_game, looser_nb_game, lo
         old_elo=winner_elo,
         score_coef=score_coef,
         newbie_coef=winner_newbie_coef,
+        viscosity_coef=winner_viscosity_coef,
         proba_fide=winner_proba_fide,
         win=True,
     ))
@@ -40,6 +48,7 @@ def calculate_new_elo(winner_elo, looser_elo, winner_nb_game, looser_nb_game, lo
         old_elo=looser_elo,
         score_coef=score_coef,
         newbie_coef=looser_newbie_coef,
+        viscosity_coef=looser_viscosity_coef,
         proba_fide=looser_proba_fide,
         win=False,
     ))
@@ -115,4 +124,3 @@ def update_matches(player: EloRanking, game_list: List[Union[SoloRankedMatches, 
 
         if game != game_list[-1]:
             game.save()
-
