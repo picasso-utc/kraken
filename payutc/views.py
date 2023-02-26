@@ -1,5 +1,5 @@
 import random
-from datetime import datetime
+import datetime
 
 from django.db.models import Q
 from django.http import JsonResponse
@@ -168,3 +168,24 @@ def get_beers_sells(request):
             response[duel][beer]['quantity'] = nb_sells
 
     return JsonResponse({'beers': response}, status=200)
+
+# dictionnaire = {
+#   "id" : "quantité"
+# }
+
+@api_view(['POST'])
+def get_sells(request):
+    drink_ids = request.data["ids"]
+    response = dict()
+
+    current_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    later_date = (datetime.datetime.now() - datetime.timedelta(minutes=15)).strftime("%Y-%m-%d %H:%M:%S")
+
+    p = PayutcClient()
+    p.login_admin()
+
+    for drink_id in drink_ids:
+        nb_sells = p.get_nb_sell(obj_id=drink_id, start=later_date, end=current_date)
+        response[drink_id] = nb_sells
+
+    return JsonResponse(response, status=200)
