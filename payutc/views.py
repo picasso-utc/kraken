@@ -175,17 +175,21 @@ def get_beers_sells(request):
 
 @api_view(['POST'])
 def get_sells(request):
-    drink_ids = request.data["ids"]
-    response = dict()
+    drinks = request.data["drinks"]
 
-    current_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    later_date = (datetime.datetime.now() - datetime.timedelta(minutes=15)).strftime("%Y-%m-%d %H:%M:%S")
+    # current_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    # later_date = (datetime.datetime.now() - datetime.timedelta(minutes=15)).strftime("%Y-%m-%d %H:%M:%S")
+
+    current_date = (datetime.datetime.now()).strftime('%Y-%m-%d')
+    start_date = current_date + "T00:00:01.000Z"
+    end_date = current_date + "T23:59:59.000Z"
 
     p = PayutcClient()
     p.login_admin()
 
-    for drink_id in drink_ids:
-        nb_sells = p.get_nb_sell(obj_id=drink_id, start=later_date, end=current_date)
-        response[drink_id] = nb_sells
+    for drink in drinks:
+        # nb_sells = p.get_nb_sell(obj_id=drink["id"], start=start_date, end=end_date)
 
-    return JsonResponse(response, status=200)
+        drink["total"] = drink["total"] + random.randrange(10) # nb_sells
+
+    return JsonResponse({"drinks" : drinks}, status=200)
