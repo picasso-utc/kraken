@@ -188,8 +188,9 @@ def get_sells(request):
     p.login_admin()
 
     for drink in drinks:
-        # nb_sells = p.get_nb_sell(obj_id=drink["id"], start=start_date, end=end_date)
+        nb_sells = p.get_nb_sell(obj_id=drink["id"], start=start_date, end=end_date)
 
-        drink["total"] = drink["total"] + random.randrange(10) # nb_sells
+        drink["total"] = nb_sells
+        # drink["total"] + random.randrange(20) # 
 
     return JsonResponse({"drinks" : drinks}, status=200)
