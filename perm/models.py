@@ -261,8 +261,12 @@ class Astreinte(models.Model):
         ('M2', 'Matin 2'),
         ('D1', 'Déjeuner 1'),
         ('D2', 'Déjeuner 2'),
+        ('S1', 'Soir 1'),
+        ('S2', 'Soir 2'),
+        # Kept this just in case (should be deleted soon)
         ('S', 'Soir'),
     )
+
     member = models.ForeignKey(core_models.Member, on_delete=models.CASCADE)
     creneau = models.ForeignKey(Creneau, related_name="astreintes", on_delete=models.CASCADE)
     astreinte_type = models.CharField(choices=ASTREINTE_TYPE_CHOICES, max_length=2)
