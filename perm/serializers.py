@@ -50,10 +50,14 @@ class CreneauSerializer(serializers.ModelSerializer):
 class CreneauAstreinteSerializer(serializers.ModelSerializer):
     perm = PermPublicSerializer(read_only=True)
     astreintes = serializers.StringRelatedField(many=True, required=False, read_only=True)
+    size = serializers.SerializerMethodField()
 
+    def get_size(self, instance):
+        return instance.get_size()
+    
     class Meta:
         model = perm_models.Creneau
-        fields = ('id', 'perm', 'creneau', 'date', 'astreintes')
+        fields = ('id', 'perm', 'creneau', 'date', 'astreintes', 'size')
 
 
 class CreneauPublicSerializer(serializers.ModelSerializer):
@@ -95,6 +99,14 @@ class AstreinteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = perm_models.Astreinte
+        exclude = list()
+
+class ShotgunSerializer(serializers.ModelSerializer):
+    launched_by = core_serializers.ShortMemberSerializer(read_only=True)
+    launched_by_id = serializers.PrimaryKeyRelatedField(queryset=core_models.Member.objects.all(), source="launched_by")
+
+    class Meta:
+        model = perm_models.Shotgun
         exclude = list()
 
 
