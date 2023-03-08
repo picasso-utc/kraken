@@ -10,10 +10,9 @@ from django.template.loader import render_to_string
 from rest_framework import viewsets
 from rest_framework.decorators import api_view, permission_classes
 from xlwt import Workbook
-
 from core import models as core_models
 from core import viewsets as core_viewsets
-from core.permissions import IsAdminUser
+from core.permissions import CanAccessMenuFunctionnalities, IsAdminUser
 from core.services import excel_generation
 from core.services.current_semester import get_current_semester
 from core.services.current_semester import get_request_semester
@@ -72,6 +71,22 @@ class ReversementEffectueViewSet(viewsets.ModelViewSet):
     serializer_class = treso_serializers.ReversementEffectueSerializer
     queryset = treso_models.ReversementEffectue.objects.all()
     permission_classes = (IsAdminUser,)
+
+class ExonerationViewSet(viewsets.ModelViewSet):
+    """ViewSet des exoneration"""
+    serializer_class = treso_serializers.ExonerationSerializer
+    queryset = treso_models.Exoneration.objects.all()
+    permission_classes = (CanAccessMenuFunctionnalities,)
+
+    def create(self, request):
+        # Création utilisateur bloqué
+        exonerations = request.data['obj_ids']
+        for (id, qtty) in exonerations:
+            for _ in range(qtty):
+                treso_models.Exoneration.objects.create(
+                    article_id = id
+                )
+        return JsonResponse( {"msg" : "Exonerated successfuly"} )
 
 
 @api_view(['GET'])
