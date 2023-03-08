@@ -3,6 +3,7 @@ from core import models as core_models
 from core.settings import PAYUTC_ARTICLES_CATEGORY
 from django.utils import timezone
 from core.services.current_semester import get_current_semester
+from datetime import date, timedelta
 
 
 class Perm(models.Model):
@@ -62,6 +63,11 @@ class Creneau(models.Model):
 
     def __str__(self):
         return f"{self.date}:{self.creneau}:{self.id}"
+    
+    def get_size(self):
+        if(self.creneau == 'S'):
+            return [2, 3, 3, 4, 3, 0][self.date.weekday()]
+        return 1
 
     def get_montant_deco_max(self):
         if self.montantTTCMaxAutorise:
@@ -255,8 +261,12 @@ class Astreinte(models.Model):
         ('M2', 'Matin 2'),
         ('D1', 'Déjeuner 1'),
         ('D2', 'Déjeuner 2'),
+        ('S1', 'Soir 1'),
+        ('S2', 'Soir 2'),
+        # Kept this just in case (should be deleted soon)
         ('S', 'Soir'),
     )
+
     member = models.ForeignKey(core_models.Member, on_delete=models.CASCADE)
     creneau = models.ForeignKey(Creneau, related_name="astreintes", on_delete=models.CASCADE)
     astreinte_type = models.CharField(choices=ASTREINTE_TYPE_CHOICES, max_length=2)
@@ -266,8 +276,32 @@ class Astreinte(models.Model):
     note_menu = models.IntegerField(default=0)
     commentaire = models.CharField(null=True, default=None, blank=True, max_length=255)
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['member', 'astreinte_type', 'creneau'], name='unique_astreinteur'
+            )
+        ]
+    
+    def save(self, *args, **kwargs):
+        maxSize = self.creneau.get_size()
+
+        today = self.creneau.date
+        firstDayOfTheWeek = self.creneau.date - timedelta(days=today.weekday())
+
+        if len(Astreinte.objects.filter(creneau=self.creneau, astreinte_type=self.astreinte_type)) >= maxSize:
+            print("Already too much people for this astreinte...")
+        elif len(Shotgun.objects.filter(date = firstDayOfTheWeek)) <= 0:
+            print("No shotgun has started for this week :(")
+        else:
+            super(Astreinte, self).save(*args, **kwargs)
+
     def __str__(self):
         return f"{self.astreinte_type} - {self.member.userright.name} - {self.id}"
+    
+class Shotgun(models.Model):
+    date = models.DateField(primary_key=True)
+    launched_by = models.ForeignKey(core_models.Member, on_delete=models.CASCADE)
 
 
 class PermHalloween(models.Model):

@@ -63,6 +63,15 @@ class AstreinteViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         qs = perm_models.Astreinte.objects
         return get_request_semester(qs, self.request, "member__semestre__id")
+    
+class ShotgunViewSet(viewsets.ModelViewSet):
+    """ViewSet Astreinte"""
+    serializer_class = perm_serializers.ShotgunSerializer
+    permission_classes = (IsMemberUser,)
+
+    def get_queryset(self):
+        qs = perm_models.Shotgun.objects
+        return qs
 
 
 class MenuViewSet(viewsets.ModelViewSet):

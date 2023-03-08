@@ -204,6 +204,8 @@ class PayutcClient:
         if not sessionid:
             badge_id = self.get_config('badge_id')["badge_id"]
             pin = str(self.get_config('pin')["pin"])
+            print(badge_id)
+            print(pin)
             sessionid = self.login_badge(pin=pin, badge_id=badge_id)['sessionid']
             cache.set('sessionid', sessionid, 30 * 60)
         self.config['sessionid'] = sessionid
