@@ -85,6 +85,11 @@ class ReversementEffectueSerializer(serializers.ModelSerializer):
         model = treso_models.ReversementEffectue
         exclude = list()
 
+class ExonerationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = treso_models.Exoneration
+        exclude = list()
+
 
 class SimpleFactureRecueSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField()
