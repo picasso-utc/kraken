@@ -46,6 +46,7 @@ router.register('facture/cheque', treso_views.ChequeViewSet)
 router.register('facture/emise', treso_views.FactureEmiseViewSet, 'facture_emise')
 router.register('facture/emiserow', treso_views.FactureEmiseRowViewSet)
 router.register('facture/reversements', treso_views.ReversementEffectueViewSet, 'facture_reversement')
+router.register('exoneration', treso_views.ExonerationViewSet, 'exoneration')
 
 # Application WebTV
 router.register('tvs', tv_views.WebTVViewSet)

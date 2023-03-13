@@ -158,3 +158,7 @@ class ReversementEffectue(PricedModel):
     """
     semestre = models.ForeignKey(Semestre, on_delete=models.SET_NULL, null=True, default=get_current_semester)
     date_effectue = models.DateField(null=True)  # Date a laquelle il fut effectue
+
+class Exoneration(models.Model):
+    date_exoneration = models.DateTimeField(auto_now_add=True, blank=True)
+    article_id = models.IntegerField()
