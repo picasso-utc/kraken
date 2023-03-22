@@ -262,12 +262,14 @@ def send_mail(request):
         sorted_creneaux = sorted(creneaux, key=lambda x: x['creneau_index'])
 
         mail_content = render_to_string('perm_notification.html', {'creneaux': sorted_creneaux})
+
         email = EmailMessage(
             subject=f"Pic'Asso - Perm {perm['nom']}",
             body=mail_content,
             from_email=DEFAULT_FROM_EMAIL,
-            to=[perm['mail_resp']],
+            to=[perm['mail_resp'], perm['mail_resp_2']],
         )
+
         email.content_subtype = "html"  # this is the crucial part
         email.attach_file('core/templates/exemple_planning.xlsx')
         email.send()
