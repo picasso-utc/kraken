@@ -30,6 +30,9 @@ urlpatterns = [
                   # Inclusion URL application Treso
                   path( 'api/treso/', include( 'treso.urls' ) ),
 
+                  # Inclusion URL application Treso
+                  path( 'api/treso2/', include( 'treso2.urls' ) ),
+
                   # Inclusion URL application Payutc
                   path( 'api/payutc/', include( 'payutc.urls' ) ),
 

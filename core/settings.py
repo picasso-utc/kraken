@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'core',
     'perm',
     'treso',
+    'treso2',
     'payutc',
     'survey',
     'tv',

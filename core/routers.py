@@ -1,5 +1,6 @@
 from rest_framework import routers
 from treso import views as treso_views
+from treso2 import views as treso2_views
 from core import views as core_views
 from perm import views as perm_views
 from payutc import views as payutc_views
@@ -47,6 +48,12 @@ router.register('facture/emise', treso_views.FactureEmiseViewSet, 'facture_emise
 router.register('facture/emiserow', treso_views.FactureEmiseRowViewSet)
 router.register('facture/reversements', treso_views.ReversementEffectueViewSet, 'facture_reversement')
 router.register('exoneration', treso_views.ExonerationViewSet, 'exoneration')
+
+# Application Treso2
+router.register('facture2/categories', treso2_views.CategorieFactureRecueViewSet)
+router.register('facture2/recue', treso2_views.FactureRecueViewSet, 'facture_recue')
+router.register('facture2/emise', treso2_views.FactureEmiseViewSet, 'facture_emise')
+router.register('facture2/cheque', treso2_views.ChequeViewSet)
 
 # Application WebTV
 router.register('tvs', tv_views.WebTVViewSet)
