@@ -263,6 +263,7 @@ class Astreinte(models.Model):
         ('D2', 'Déjeuner 2'),
         ('S1', 'Soir 1'),
         ('S2', 'Soir 2'),
+        ('A', 'Divers'),
         # Kept this just in case (should be deleted soon)
         ('S', 'Soir'),
     )
@@ -284,15 +285,16 @@ class Astreinte(models.Model):
         ]
     
     def save(self, *args, **kwargs):
-        maxSize = self.creneau.get_size()
+        if(self._state.adding):
+            maxSize = self.creneau.get_size()
 
-        today = self.creneau.date
-        firstDayOfTheWeek = self.creneau.date - timedelta(days=today.weekday())
+            today = self.creneau.date
+            firstDayOfTheWeek = self.creneau.date - timedelta(days=today.weekday())
 
-        if len(Astreinte.objects.filter(creneau=self.creneau, astreinte_type=self.astreinte_type)) >= maxSize:
-            print("Already too much people for this astreinte...")
-        elif len(Shotgun.objects.filter(date = firstDayOfTheWeek)) <= 0:
-            print("No shotgun has started for this week :(")
+            if len(Astreinte.objects.filter(creneau=self.creneau, astreinte_type=self.astreinte_type)) >= maxSize:
+                print("Already too much people for this astreinte...")
+            else:
+                super(Astreinte, self).save(*args, **kwargs)
         else:
             super(Astreinte, self).save(*args, **kwargs)
 
