@@ -129,7 +129,7 @@ class BlockedUser(models.Model):
     """
     Classe qui regroupe tous les utilisateurs bloqués
     """
-    badge_uid = models.CharField(null=False, default=None, max_length=15, blank=False, unique=True)
+    cas = models.CharField(null=False, default=None, max_length=8, blank=False, unique=True)
     name = models.CharField(null=False, default=None, max_length=255, blank=False)
     justification = models.CharField(null=False, default=None, max_length=255, blank=False)
     date = models.DateField(auto_now_add=True, blank=True)
