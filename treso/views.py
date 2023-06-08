@@ -7,6 +7,7 @@ from django.db.models import Sum
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
 from django.template.loader import render_to_string
+from django.db.models import Count
 from rest_framework import viewsets
 from rest_framework.decorators import api_view, permission_classes
 from xlwt import Workbook
@@ -22,6 +23,7 @@ from perm import models as perm_models
 from perm import serializers as perm_serializers
 from treso import models as treso_models
 from treso import serializers as treso_serializers
+
 
 
 class CategorieFactureRecueViewSet(viewsets.ModelViewSet):
@@ -232,5 +234,53 @@ def get_categories_stats(request):
 
         return JsonResponse(list(queryset), safe=False)
 
+    except Exception as err:
+        return JsonResponse({"error": str(err)}, status=400)
+    
+@api_view(['POST'])
+@permission_classes((IsAdminUser,))
+def get_categories_exonerations(request):
+    start_date = request.data.get('start_date')
+    end_date = request.data.get('end_date')
+
+    try:
+        # Get exonerations
+        
+        queryset = treso_models.Exoneration.objects.filter(
+            date_exoneration__gte=start_date, date_exoneration__lte=end_date
+        ).values('article_id').annotate(dcount=Count('article_id')).order_by()
+
+        idQuerySet = list(map(lambda elem : elem['article_id'], queryset))
+
+        # Create Weez client
+        p = PayutcClient()
+        p.login_admin()
+
+        # Fetch Weez's articles (maybe the limit is way too high...)
+        articles = p.get_articles_resources(limit = 5000)
+        articles = list(filter(lambda elem : elem['id'] in idQuerySet ,articles))
+
+        for article in articles:
+            exoneredArticle = next(elem for elem in queryset if elem['article_id'] == article['id'])
+            article['qtty'] = exoneredArticle['dcount']
+
+        # Fetch Weez's categories
+        categories = p.get_categories()
+
+        # Map id => Category name
+        categoriesDict = {}
+        for categorie in categories:
+            key = categorie['id']
+            value = {'name': categorie['name'], 'qtty' : 0}
+            categoriesDict[key] = value
+
+        for article in articles:
+            category_id = int(article['category'])
+            categoriesDict[category_id]['qtty'] += article['qtty']
+
+        categoriesDict = {k: v for k, v in categoriesDict.items() if v['qtty'] > 0}
+
+        return JsonResponse(list(categoriesDict.values()), safe=False)
+    
     except Exception as err:
         return JsonResponse({"error": str(err)}, status=400)
