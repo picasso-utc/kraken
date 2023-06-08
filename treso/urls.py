@@ -8,5 +8,6 @@ urlpatterns = [
     path('conventions', treso_views.get_all_conventions),
     path('excel/factures', treso_views.excel_facture_generation),
     path('excel/cheques', treso_views.excel_cheque_generation),
-    path('stats', treso_views.get_categories_stats)
+    path('stats', treso_views.get_categories_stats),
+    path('exonerations', treso_views.get_categories_exonerations)
 ]

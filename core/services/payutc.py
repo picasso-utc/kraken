@@ -272,6 +272,17 @@ class PayutcClient:
         """Récupère tous les articles sur Weez"""
         fun_id = self.get_config('fun_id')
         return self.request('post', 'SELFPOS/getArticles', fun_id, api='services')
+    
+    def get_articles_resources(self, offset=0, limit=100):
+        """Récupère tous les articles sur Weez via resources"""
+        data = {'fun_id' : BASE_CONFIG['fun_id'], 'offset' : offset, 'limit' : limit}
+
+        return self.request('get', 'products', data, api='resources')
+    
+    def get_categories(self):
+        """Récupère toutes les catégories sur Weez"""
+        fun_id = self.get_config('fun_id')
+        return self.request('post', 'SELFPOS/getCategories', fun_id, api='services')
 
     def set_product(self, data=None):
         """Crée un nouvel article sur Weez"""
