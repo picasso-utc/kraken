@@ -169,28 +169,36 @@ def get_beers_sells(request):
 
     return JsonResponse({'beers': response}, status=200)
 
-# dictionnaire = {
-#   "id" : "quantité"
-# }
-
 @api_view(['POST'])
 def get_sells(request):
-    drinks = request.data["drinks"]
+    """
+    Obtention des ventes dans la journée courante des articles en fonction de leurs ids.
 
-    # current_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    # later_date = (datetime.datetime.now() - datetime.timedelta(minutes=15)).strftime("%Y-%m-%d %H:%M:%S")
+    La requete post reçoit comme data un dictionnaire nommé 'drinks' contenant une liste de sous-dictionnaires. Chaque sous dictionnaire represente un article et doit posseder un champ 'id' pour l'id de l'article et un champ 'total' initialement vide.
+    La requete retourne ce meme dictionnaire apres avoir mis à jours les totaux de chaque article.
 
+    La fonction fonctionne pour tout type d'articles, pas seulement des boissons.
+    """
+    # Recuperation de la liste drinks possedant les ids des articles
+    articles = request.data["drinks"]
+
+    # Recuperation de la date du jour
     current_date = (datetime.datetime.now()).strftime('%Y-%m-%d')
+    # Creation des dates de departs et de fin respectivement a 00h00:01 et a 23h59:59
     start_date = current_date + "T00:00:01.000Z"
     end_date = current_date + "T23:59:59.000Z"
 
+    # Creation d'une instance du client payutc
     p = PayutcClient()
     p.login_admin()
 
-    for drink in drinks:
-        nb_sells = p.get_nb_sell(obj_id=drink["id"], start=start_date, end=end_date)
+    # On itere parmis tous les articles
+    for article in articles:
+        # Recuperation du nombre de vente d'un article en utilisant la fonction get_nb_sell du client payutc
+        nb_sells = p.get_nb_sell(obj_id=article["id"], start=start_date, end=end_date)
 
-        drink["total"] = nb_sells
-        # drink["total"] + random.randrange(20) # 
+        # On remplace la valeur du champ 'total' par le nombre de ventes
+        article["total"] = nb_sells
 
-    return JsonResponse({"drinks" : drinks}, status=200)
+    # On retourne le dictionnaire drinks mis à jour
+    return JsonResponse({"drinks" : articles}, status=200)
