@@ -116,7 +116,7 @@ CSRF_COOKIE_HTTPONLY = False  # False to enable the use of cookies in ajax reque
 CSRF_USE_SESSIONS = False  # Useful ??
 CORS_ALLOW_HEADERS = ('content-disposition', 'accept-encoding', 'cookie', 'credentials',
                       'content-type', 'accept', 'origin', 'withcredentials', 'x-xsrf-token')
-SESSION_COOKIE_SAMESITE = None
+SESSION_COOKIE_SAMESITE = 'Lax'
 # X_FRAME_OPTIONS = 'ALLOW-FROM kraken.picasso-utc.fr'
 
 SECRET_KEY = confidentials.SECRET_KEY
