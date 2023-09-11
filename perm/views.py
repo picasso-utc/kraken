@@ -272,6 +272,7 @@ def send_mail(request):
 
         email.content_subtype = "html"  # this is the crucial part
         email.attach_file('core/templates/exemple_planning.xlsx')
+        email.attach_file('core/templates/livre_de_recette_de_teddy.pdf')
         email.send()
         print(f"Envoi du mail {perm['nom']}")
 
